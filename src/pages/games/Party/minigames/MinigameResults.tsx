@@ -1,3 +1,5 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
+import GameXpReward from "@/components/games/GameXpReward";
 import { useEffect, useState } from "react";
 import { COLORS } from "../../../../games/party/config.ts";
 import type { MinigameDefinition } from "../../../../games/party/minigames/types.ts";
@@ -11,6 +13,7 @@ const ORDINAL = ["1st", "2nd", "3rd", "4th"];
 
 // Counts from the pre-reward total up to the authoritative total. Display only.
 function CoinCount({ to, gained }: { to: number; gained: number }) {
+  useGameLanguage();
   const [shown, setShown] = useState(to - gained);
   useEffect(() => {
     if (gained <= 0) return;
@@ -24,7 +27,7 @@ function CoinCount({ to, gained }: { to: number; gained: number }) {
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
   }, [to, gained]);
-  return <>{shown}</>;
+  return <>{gameUi(shown)}</>;
 }
 
 export default function MinigameResults({
@@ -38,14 +41,16 @@ export default function MinigameResults({
   minigame: MinigameRuntime;
   playerId: string;
 }) {
+  useGameLanguage();
   const results = minigame.results ?? [];
   const leader = match.players.find((p) => p.id === results[0]?.playerId);
   const champion = match.players.find((p) => p.id === match.winner);
   const festival = match.mode === "festival";
   return (
     <div className="mg-results">
-      <span className="pp-eyebrow">RESULTS</span>
-      <h2>{definition.name}</h2>
+      <span className="pp-eyebrow">{gameUi("RESULTS")}</span>
+      <h2>{gameUi(definition.name)}</h2>
+      <GameXpReward />
       <ol className="mg-podium">
         {results.map((r, i) => {
           const p = match.players.find((player) => player.id === r.playerId)!;
@@ -61,17 +66,17 @@ export default function MinigameResults({
                 } as React.CSSProperties
               }
             >
-              <b className="mg-place">{definition.teamOf ? `Team ${definition.teamOf(minigame.state, p.id)}` : ORDINAL[r.position - 1]}</b>
+              <b className="mg-place">{gameUi(definition.teamOf ? `Team ${definition.teamOf(minigame.state, p.id)}` : ORDINAL[r.position - 1])}</b>
               <Portrait player={p} />
               <span className="mg-name">
                 {p.name}
-                <small>{r.score ?? 0} pts</small>
+                <small>{gameUi(r.score ?? 0)}{gameUi(" pts")}</small>
               </span>
               <span className={`mg-reward ${gained ? "" : "none"}`}>
-                +{gained}
+                +{gameUi(gained)}
               </span>
               <span className="mg-total" aria-label={festival ? `${match.festivalScores?.[p.id] ?? 0} festival points` : `${p.coins} coins`}>
-                {festival ? <>★ {match.festivalScores?.[p.id] ?? 0}</> : <>🪙 <CoinCount to={p.coins} gained={gained} /></>}
+                {festival ? <>★ {match.festivalScores?.[p.id] ?? 0}</> : <>🪙 <CoinCount to={p.coins} gained={gameUi(gained)} /></>}
               </span>
             </li>
           );

@@ -10,7 +10,7 @@ import { getRankFromRating } from '../src/games/atlas/ranked.ts';
 const require=createRequire(import.meta.url);
 function component(path, modules={}) {
   const compiled=ts.transpileModule(readFileSync(new URL(path,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2023,esModuleInterop:true}}).outputText;
-  const exports={};new Function('require','exports',compiled)(name=>modules[name]??require(name),exports);return exports;
+  const exports={};new Function('require','exports',compiled)(name=>name.endsWith('/i18n/gameUi.ts')?{gameUi:value=>value,useGameLanguage:()=>({language:'en'})}:modules[name]??require(name),exports);return exports;
 }
 const routes=component('../src/components/social/inviteRoute.ts',{'@/data/chessVariants':{variants:[]}});
 test('invite destinations autojoin the correct game and Watten seat count',()=>{

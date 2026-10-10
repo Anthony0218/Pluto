@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -200,7 +201,7 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
                 onClick={() => void createRoom()}
                 className={`mt-6 w-full rounded-xl px-5 py-3 font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${info.accentButton}`}
               >
-                {loading === "create" ? ui("Creating...") : ui("Create Multiplayer Room")}
+                {gameUi(loading === "create" ? ui("Creating...") : ui("Create Multiplayer Room"))}
               </button>
             </section>
 
@@ -230,17 +231,17 @@ export default function SeededVariantMultiplayerLobby({ variant }: Props) {
                 onClick={() => void joinRoom()}
                 className="mt-3 w-full rounded-xl border border-white/10 bg-white/5 px-5 py-3 font-black text-zinc-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {loading === "join" ? ui("Joining...") : ui("Join Room")}
+                {gameUi(loading === "join" ? ui("Joining...") : ui("Join Room"))}
               </button>
             </section>
           </div>
         )}
 
-        {error && (
+        {gameUi(error && (
           <div className="mt-5 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
             {ui(error)}
           </div>
-        )}
+        ))}
       </div>
     </main>
   );

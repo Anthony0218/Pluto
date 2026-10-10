@@ -1,8 +1,10 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { memo } from "react";
 import type { District } from "../../../games/MedievalKingdoms/edravane/types.ts";
 
 /** All scenery stays inside the playable hex: geography and hit targets share a footprint. */
 export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
+  useGameLanguage();
   const forest = d.biome === "forest",
     rock = ["mountains", "glacier", "volcanic", "hills"].includes(d.biome),
     snow = ["glacier", "tundra"].includes(d.biome);
@@ -124,7 +126,7 @@ export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
           {d.city && (
             <g
               transform={`translate(${d.castle ? -9 : 0},5)`}
-              aria-label={d.city === "major" ? "Major city" : "City"}
+              aria-label={gameUi(d.city === "major" ? "Major city" : "City")}
             >
               <path
                 d="M-6 5V-2h4V-7h4v3h4V5Z"
@@ -151,7 +153,7 @@ export const TerrainTile = memo(function TerrainTile({ d }: { d: District }) {
           {d.castle && (
             <g
               transform={`translate(${d.city ? 9 : 0},4)`}
-              aria-label={`Castle level ${d.castle.level}`}
+              aria-label={gameUi(`Castle level ${d.castle.level}`)}
             >
               <path
                 d="M-6 6V-5h2v2h2v-2h4v2h2v-2h2V6Z"

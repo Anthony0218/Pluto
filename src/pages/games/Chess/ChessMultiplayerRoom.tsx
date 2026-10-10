@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -64,7 +65,7 @@ function ChessPageShell({ children }: { children: React.ReactNode }) {
           </Link>
         </ChessPageHeader>
 
-        {children}
+        {gameUi(children)}
       </div>
     </main>
   );
@@ -357,7 +358,7 @@ export default function ChessMultiplayerRoom() {
             </span>
 
             <span className="text-sm font-black text-amber-300">
-              {copied ? ui("Copied ✓") : ui("Copy")}
+              {gameUi(copied ? ui("Copied ✓") : ui("Copy"))}
             </span>
           </button>
 
@@ -425,23 +426,23 @@ export default function ChessMultiplayerRoom() {
               <p className="text-[9px] font-black uppercase tracking-[0.28em] text-amber-300/65">{ui("Room status")}</p>
 
               <h2 className="mt-2 font-serif text-[27px] leading-tight text-white sm:text-[31px]">
-                {room.status === "playing"
+                {gameUi(room.status === "playing"
                   ? ui("Game is starting")
                   : players.length < 2
                     ? ui("Waiting for another player")
                     : !isCasual || bothReady
                       ? ui("Both players are ready")
-                      : ui("Waiting for both players to be ready")}
+                      : ui("Waiting for both players to be ready"))}
               </h2>
 
               <p className="mt-2 text-sm leading-6 text-zinc-500">
-                {room.status === "playing"
+                {gameUi(room.status === "playing"
                   ? ui("Opening the synchronized board...")
                   : players.length < 2
                     ? ui("The second player card will fill automatically when your opponent joins.")
                     : !isCasual || bothReady
                       ? isHost ? ui("Your opponent is here. Start whenever you are ready.") : ui("Both seats are occupied. Waiting for the host to start.")
-                      : ui("Each player picks a different color and presses Ready. Then the host can start.")}
+                      : ui("Each player picks a different color and presses Ready. Then the host can start."))}
               </p>
 
               {isCasual && inSetup && myPlayer && (
@@ -461,13 +462,13 @@ export default function ChessMultiplayerRoom() {
                     onClick={startGame}
                     className="group mt-3 flex w-full items-center justify-between rounded-xl border border-amber-300/45 bg-amber-300/[0.06] px-4 py-3.5 text-sm font-black text-amber-200 transition hover:bg-amber-300/[0.10] disabled:cursor-not-allowed disabled:border-white/[0.08] disabled:bg-white/[0.02] disabled:text-zinc-600"
                   >
-                    <span>{starting ? ui("Starting...") : ui("Start Game")}</span>
+                    <span>{gameUi(starting ? ui("Starting...") : ui("Start Game"))}</span>
                     <span className="text-xl transition group-enabled:group-hover:translate-x-1">→</span>
                   </button>
                 ) : (
                   players.length === 2 && (
                     <div className="mt-3 rounded-xl border border-white/[0.08] bg-white/[0.025] px-4 py-3 text-sm text-zinc-500">
-                      {!isCasual || bothReady ? ui("Waiting for host...") : ui("The host can start once both players are ready.")}
+                      {gameUi(!isCasual || bothReady ? ui("Waiting for host...") : ui("The host can start once both players are ready."))}
                     </div>
                   )
                 ))}
@@ -533,7 +534,7 @@ function PlayerCard({
               className="block h-full w-full"
             />
           ) : (
-            <span>{symbol}</span>
+            <span>{gameUi(symbol)}</span>
           )}
         </div>
 
@@ -547,7 +548,7 @@ function PlayerCard({
           </p>
 
           <h2 className="mt-1.5 truncate font-serif text-[25px] leading-tight text-white sm:text-[29px]">
-            {player?.display_name ?? ui("Waiting...")}
+            {gameUi(player?.display_name ?? ui("Waiting..."))}
           </h2>
 
           {player && color !== undefined && (
@@ -561,8 +562,8 @@ function PlayerCard({
                       : "border-dashed border-white/15 text-zinc-500"
                 }`}
               >
-                {color && <span aria-hidden="true">{symbol}</span>}
-                {color === "white" ? ui("White") : color === "black" ? ui("Black") : ui("No color")}
+                {color && <span aria-hidden="true">{gameUi(symbol)}</span>}
+                {gameUi(color === "white" ? ui("White") : color === "black" ? ui("Black") : ui("No color"))}
               </span>
               <span
                 className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-bold ${
@@ -572,7 +573,7 @@ function PlayerCard({
                 }`}
               >
                 <span className={`h-1.5 w-1.5 rounded-full ${ready ? "bg-emerald-400" : "bg-zinc-600"}`} />
-                {ready ? ui("Ready") : ui("Not ready")}
+                {gameUi(ready ? ui("Ready") : ui("Not ready"))}
               </span>
             </div>
           )}
@@ -586,7 +587,7 @@ function PlayerCard({
                     : "bg-zinc-700"
                 }`}
               />
-              <span>{player ? ui("Player joined") : ui("Waiting for player")}</span>
+              <span>{gameUi(player ? ui("Player joined") : ui("Waiting for player"))}</span>
             </div>
           )}
           {canInvite && <InviteFriendButton className="mt-3" />}

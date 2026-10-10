@@ -1,0 +1,66 @@
+/* Shared menu styles also apply to dialogs portalled outside the scene. */
+.sk-page:not(:fullscreen) > .sk-game-menu.sk-header {
+  position: sticky; top: 0; inset-inline: auto; z-index: 55; transform: none;
+  flex: none; overflow: visible; background: #211b16f5;
+}
+.sk-menu-icon { position: relative; }
+.sk-header-actions .sk-menu-icon > .sk-menu-tooltip {
+  display: none; position: absolute; top: calc(100% + 9px); left: 50%; transform: translateX(-50%);
+  z-index: 60; padding: 7px 11px; border: 1px solid #e4cb8d; border-radius: 7px;
+  color: #fff4d2; background: #211b16; white-space: nowrap; font-size: 13px;
+  pointer-events: none; box-shadow: 0 4px 15px #0009;
+}
+.sk-header-actions .sk-menu-icon:is(:hover, :focus-visible) > .sk-menu-tooltip { display: block; }
+.sk-card-tabs { display: flex; align-items: flex-end; gap: 12px; overflow-x: auto; padding: 8px 4px 12px; margin: 8px 0 16px; border-bottom: 1px solid #c9b58166; }
+.sk-card-tab { position: relative; flex: 0 0 128px; height: auto; aspect-ratio: calc(var(--sk-tab-ratio, .64) * 2); overflow: hidden; padding: 0; border: 2px solid #e5d9b8; border-radius: 10px 10px 0 0; background: #eee4cf; color: #fff4d7; cursor: pointer; box-shadow: 0 5px 9px #0004; transition: transform .15s; }
+.sk-card-tab:hover { transform: translateY(-3px); }
+.sk-card-tab.is-selected { border-color: #f2ce70; box-shadow: 0 0 0 2px #f2ce7044; }
+.sk-card-tab:focus-visible { outline: 3px solid #65dfb4; outline-offset: 2px; }
+.sk-card-tab-art { position: absolute; inset: 0; display: block; }
+.sk-card-tab-art > img { display: block; width: 100%; height: auto; }
+.sk-card-tab-back { display: grid; place-items: center; width: 100%; height: 200%; box-sizing: border-box; border: 6px solid #f6e8c7; background: var(--back-pattern, repeating-linear-gradient(45deg,var(--back-dark,#17482f) 0 5px,var(--back-light,#e5d19f) 5px 10px)); color: var(--back-accent,#b38042); font-size: 48px; }
+.sk-card-tab-label { position: absolute; inset-inline: 0; bottom: 0; padding: 9px 4px; background: #17231af2; color: #fff7dc; font-size: 13px; font-weight: 750; line-height: 1.2; text-align: center; }
+.sk-card-tab.is-selected .sk-card-tab-label { background: #f2ce70f2; color: #302718; }
+.sk-menu-panel-title { color: #f3d686; margin: 0 0 14px; }
+.sk-popup-menu-navigation { display: flex; align-items: center; gap: 4px; overflow-x: auto; margin: 2px 0 10px; padding: 0; }
+.sk-popup-menu-navigation button { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 6px; min-height: 32px; padding: 6px 8px; border: 0; border-radius: 6px; background: transparent; color: #dfd5bd; font: inherit; font-size: 13px; cursor: pointer; }
+.sk-popup-menu-navigation button:hover, .sk-popup-menu-navigation button:focus-visible { background: #ffffff12; color: #fff5dc; outline: none; }
+.sk-popup-menu-navigation button:focus-visible { box-shadow: inset 0 0 0 2px #65dfb4; }
+.sk-popup-menu-navigation button.is-active { background: #f2ce7022; color: #f2d37b; font-weight: 750; }
+.sk-settings-lock { border: 0; margin: 0; padding: 0; min-width: 0; }
+.sk-settings-lock:disabled { opacity: .65; }
+.sk-rulebook .sk-player-settings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sk-avatar-option:disabled { cursor: default; }
+.sk-glossary-cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.sk-glossary-cards article { display: flex; align-items: center; gap: 14px; padding: 12px; border: 1px solid #c9b58144; border-radius: 12px; background: #ffffff08; }
+.sk-glossary-cards img { width: 62px; height: auto; border-radius: 5px; }
+.sk-glossary-cards h4 { margin: 0 0 6px; color: #f3d686; }
+.sk-glossary-cards p { font-size: 13px; margin-bottom: 0; }
+.sk-glossary-terms > div { padding: 10px 0; border-bottom: 1px solid #ffffff1c; }
+.sk-glossary-terms dt { color: #f3d686; font-weight: 700; }
+.sk-glossary-terms dd { margin: 5px 0 0; line-height: 1.5; }
+.sk-lesson-example { margin: 14px 0; padding: 14px; background: #ffffff0a; border-radius: 10px; }
+.sk-lesson-example figcaption { line-height: 1.6; font-size: 14px; margin-top: 10px; }
+.sk-review-counters { display: flex; flex-wrap: wrap; gap: 14px; margin-block: 16px; }
+.sk-review-counters .sk-team-scores { flex: 1 1 400px; margin: 0; }
+.sk-review-counters meter { display: block; width: 100%; margin-top: 6px; accent-color: #f3d686; }
+.sk-trump-counter { display: flex; flex-direction: column; gap: 8px; padding: 14px; border: 1px solid #f3d68655; border-radius: 10px; }
+.sk-trump-counter strong { font-size: 26px; color: #f3d686; }
+.sk-hide-players .sk-avatar-image, .sk-hide-players .sk-avatar::before, .sk-hide-players .sk-avatar::after { visibility: hidden; }
+.sk-announcements-dialog .sk-log { max-height: 55dvh; overflow: auto; font-size: 13px; line-height: 1.6; }
+@media (max-width: 700px) {
+  .sk-card-tabs { gap: 8px; }
+  .sk-card-tab { flex-basis: 108px; }
+  .sk-card-tab-label { font-size: 12px; }
+  .sk-popup-menu-navigation button { padding-inline: 7px; }
+  .sk-popup-menu-navigation button span { font-size: 12px; }
+  .sk-glossary-cards, .sk-rulebook .sk-player-settings { grid-template-columns: 1fr; }
+  .sk-page:not(:fullscreen) > .sk-game-menu.sk-header { padding: 8px; border-radius: 0 0 12px 12px; }
+  .sk-page .sk-header-actions { width: 100%; justify-content: center; flex-wrap: wrap; gap: 6px; }
+  .sk-page .sk-header-actions .sk-menu-icon { min-width: 40px; min-height: 40px; }
+}
+.sk-difficulty-offer { z-index: 300; }
+.sk-sound-selection { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin: 16px 0; }
+.sk-rule-panel label { color: #f5e9ce; }
+
+.sk-compact-announcements { font-size: 13px; line-height: 1.6; max-height: 55dvh; overflow: auto; }

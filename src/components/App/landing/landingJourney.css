@@ -141,3 +141,7 @@
 .journey-layer[data-gl] .journey-art :is(.solar-atmosphere, .solar-ring) { display: none; }
 .journey-layer[data-gl] .journey-art .solar-sphere { background: none; box-shadow: none; }
 .journey-layer[data-gl] .journey-art .solar-sphere::after { display: none; }
+
+/* A game's picture on the CSS planet (the fallback look); the WebGL planet paints its own. */
+.journey-surface { position: absolute; inset: 0; }
+.journey-layer[data-gl] .journey-surface { display: none; }

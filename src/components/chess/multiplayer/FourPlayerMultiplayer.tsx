@@ -1,3 +1,5 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
+import useChessBoardFit from "@/components/chess/useChessBoardFit";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -262,7 +264,7 @@ export function FourPlayerMultiplayerLobby() {
                 onClick={() => void createRoom()}
                 className="mt-5 w-full rounded-xl bg-cyan-300 px-5 py-3 font-black text-zinc-950 hover:bg-cyan-200 disabled:opacity-40"
               >
-                {loading === "create" ? ui("Creating...") : ui("Create 4-Player Room")}
+                {gameUi(loading === "create" ? ui("Creating...") : ui("Create 4-Player Room"))}
               </button>
             </Panel>
 
@@ -284,7 +286,7 @@ export function FourPlayerMultiplayerLobby() {
                 onClick={() => void joinRoom()}
                 className="mt-4 w-full rounded-xl border border-cyan-400/20 bg-cyan-400/[0.07] px-5 py-3 font-black text-cyan-200 hover:bg-cyan-400/10 disabled:opacity-40"
               >
-                {loading === "join" ? ui("Joining...") : ui("Join Room")}
+                {gameUi(loading === "join" ? ui("Joining...") : ui("Join Room"))}
               </button>
             </Panel>
           </div>
@@ -783,27 +785,27 @@ export function FourPlayerMultiplayerGame() {
           <section className="rounded-3xl border border-amber-300/25 bg-zinc-900/80 p-5 text-center shadow-2xl shadow-black/25 sm:p-8">
             <div className="text-4xl">🌐</div>
             <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
-            <h2 className="mt-2 text-3xl font-black text-white">{filledSeats}{ui("/4 players connected")}</h2>
+            <h2 className="mt-2 text-3xl font-black text-white">{gameUi(filledSeats)}{ui("/4 players connected")}</h2>
             <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-zinc-400">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
             <button type="button" onClick={() => void copyCode()} className="mx-auto mt-6 block w-full max-w-xl rounded-2xl border border-amber-300/25 bg-amber-300/[0.07] px-5 py-5 transition hover:border-amber-200/50 hover:bg-amber-300/[0.1]" title={ui("Copy room code")}>
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
               <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">{room.code}</p>
-              <p className="mt-4 text-xs font-bold text-zinc-400">{copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}</p>
+              <p className="mt-4 text-xs font-bold text-zinc-400">{gameUi(copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code"))}</p>
             </button>
           </section>
 
           <section className="mt-5 rounded-3xl border border-white/10 bg-zinc-900/75 p-5 shadow-xl shadow-black/15 sm:p-6">
-            <div className="mb-4 flex items-center justify-between gap-3"><div><h2 className="text-sm font-black text-white">{ui("Players")}</h2><p className="mt-1 text-xs text-zinc-500">{ui("Red → Blue → Yellow → Green")}</p></div><span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-black text-cyan-100">{filledSeats}/4</span></div>
+            <div className="mb-4 flex items-center justify-between gap-3"><div><h2 className="text-sm font-black text-white">{ui("Players")}</h2><p className="mt-1 text-xs text-zinc-500">{ui("Red → Blue → Yellow → Green")}</p></div><span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-black text-cyan-100">{gameUi(filledSeats)}/4</span></div>
             <div className="grid gap-3 sm:grid-cols-2">
               {orderedPlayers.map(({ color, player }) => {
                 const isBot = plannedBotColors.includes(color);
                 const isHost = room.host_id === user?.id;
-                return <div key={color} className={`rounded-xl border ${playerStyles[color].border} ${playerStyles[color].soft} px-4 py-3`}><div className="flex items-center justify-between gap-3"><div><p className={`text-xs font-black ${playerStyles[color].text}`}>{fourPlayerLabel(color)}</p><p className="mt-1 text-xs text-zinc-400">{player?.display_name ?? (isBot ? ui("AI bot") : ui("Waiting for player"))}</p></div>{myColor === color && <span className="rounded-full bg-white/10 px-2 py-1 text-[9px] font-black text-white">{ui("YOU")}</span>}</div>{isHost && !player && <div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={() => setBotSlot(color, false)} aria-pressed={!isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${!isBot ? "bg-cyan-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("Player")}</button><button type="button" onClick={() => setBotSlot(color, true)} aria-pressed={isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${isBot ? "bg-amber-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("AI bot")}</button></div>}{!player && !isBot && <InviteFriendButton />}</div>;
+                return <div key={color} className={`rounded-xl border ${playerStyles[color].border} ${playerStyles[color].soft} px-4 py-3`}><div className="flex items-center justify-between gap-3"><div><p className={`text-xs font-black ${playerStyles[color].text}`}>{gameUi(fourPlayerLabel(color))}</p><p className="mt-1 text-xs text-zinc-400">{gameUi(player?.display_name ?? (isBot ? ui("AI bot") : ui("Waiting for player")))}</p></div>{myColor === color && <span className="rounded-full bg-white/10 px-2 py-1 text-[9px] font-black text-white">{ui("YOU")}</span>}</div>{isHost && !player && <div className="mt-3 grid grid-cols-2 gap-2"><button type="button" onClick={() => setBotSlot(color, false)} aria-pressed={!isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${!isBot ? "bg-cyan-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("Player")}</button><button type="button" onClick={() => setBotSlot(color, true)} aria-pressed={isBot} className={`rounded-lg px-2 py-2 text-[10px] font-black ${isBot ? "bg-amber-300 text-zinc-950" : "bg-white/5 text-zinc-400"}`}>{ui("AI bot")}</button></div>}{!player && !isBot && <InviteFriendButton />}</div>;
               })}
             </div>
           </section>
 
-          {room.host_id === user?.id && <section className="mt-5 rounded-3xl border border-amber-300/20 bg-amber-400/5 p-5 text-center"><p className="text-sm text-zinc-300">{unassignedHumanSlots.length ? ui("Choose AI for each open slot you do not want a person to fill.") : ui("Every slot is assigned. Start when you are ready.")}</p><button type="button" disabled={actionLoading !== null || unassignedHumanSlots.length > 0} onClick={() => void startWithBots()} className="mt-4 rounded-xl bg-amber-300 px-5 py-3 font-bold text-zinc-950 disabled:opacity-50">{actionLoading ? ui("Starting...") : ui("Start assigned game")}</button></section>}
+          {room.host_id === user?.id && <section className="mt-5 rounded-3xl border border-amber-300/20 bg-amber-400/5 p-5 text-center"><p className="text-sm text-zinc-300">{gameUi(unassignedHumanSlots.length ? ui("Choose AI for each open slot you do not want a person to fill.") : ui("Every slot is assigned. Start when you are ready."))}</p><button type="button" disabled={actionLoading !== null || unassignedHumanSlots.length > 0} onClick={() => void startWithBots()} className="mt-4 rounded-xl bg-amber-300 px-5 py-3 font-bold text-zinc-950 disabled:opacity-50">{gameUi(actionLoading ? ui("Starting...") : ui("Start assigned game"))}</button></section>}
         </div>
       </main>
     );
@@ -812,7 +814,7 @@ export function FourPlayerMultiplayerGame() {
   return (
     <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1780px]">
-        <ChessPageHeader className="mb-6 flex flex-col gap-4 rounded-3xl border border-cyan-400/15 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between" description={<> {fourPlayerLabel(liveState.turn)}{ui("to move")} </>}>
+        <ChessPageHeader className="mb-6 flex flex-col gap-4 rounded-3xl border border-cyan-400/15 bg-zinc-900/70 px-5 py-4 shadow-xl shadow-black/20 sm:flex-row sm:items-center sm:justify-between" description={<> {gameUi(fourPlayerLabel(liveState.turn))}{ui("to move")} </>}>
 
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -820,7 +822,7 @@ export function FourPlayerMultiplayerGame() {
               onClick={() => void copyCode()}
               className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 font-mono text-xs font-black text-zinc-300"
             >
-              {copied ? ui("Copied") : `Room ${room.code}`}
+              {gameUi(copied ? ui("Copied") : `Room ${room.code}`)}
             </button>
             <Link
               to="/games/chess/variants/4-players/multiplayer"
@@ -831,9 +833,9 @@ export function FourPlayerMultiplayerGame() {
 
         {error && <ErrorBox>{ui(error)}</ErrorBox>}
 
-        {mixedGame && <p className="mb-3 text-sm text-amber-200">{ui("Bots: ")}{botColors.map(fourPlayerLabel).join(", ")}{ui(" · The host keeps this room open to run bot turns.")}</p>}
+        {mixedGame && <p className="mb-3 text-sm text-amber-200">{ui("Bots: ")}{gameUi(botColors.map(fourPlayerLabel).join(", "))}{ui(" · The host keeps this room open to run bot turns.")}</p>}
         {filledSeats < 4 && (
-          <div className="mb-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.06] px-4 py-3 text-sm text-cyan-100">{ui("Waiting for players:")}<b>{filledSeats}/4</b>{ui(". Share room code")}{" "}
+          <div className="mb-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.06] px-4 py-3 text-sm text-cyan-100">{ui("Waiting for players:")}<b>{gameUi(filledSeats)}/4</b>{ui(". Share room code")}{gameUi(" ")}
             <b>{room.code}</b>.
           </div>
         )}
@@ -841,7 +843,7 @@ export function FourPlayerMultiplayerGame() {
         <main className="grid gap-5 chess-game-grid four-player-game-grid xl:grid-cols-[260px_minmax(0,1fr)]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title={ui("Game Controls")} subtitle={ui("Online actions")}>
+              <Panel gameControls title={ui("Game Controls")} subtitle={ui("Online actions")}>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -859,7 +861,7 @@ export function FourPlayerMultiplayerGame() {
                   >{ui("Resign")}</button>
                 </div>
                 {myUndoRequest && (
-                  <p className="mt-3 text-xs text-amber-200">{ui("Undo vote:")}{undoVotes.length}/{requiredUndoApprovals}{" "}{ui("approvals.")}</p>
+                  <p className="mt-3 text-xs text-amber-200">{ui("Undo vote:")}{gameUi(undoVotes.length)}/{gameUi(requiredUndoApprovals)}{gameUi(" ")}{ui("approvals.")}</p>
                 )}
                 {opponentUndoRequest && (
                   <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[0.06] p-3">
@@ -879,7 +881,7 @@ export function FourPlayerMultiplayerGame() {
                       </div>
                     )}
                     <p className="mt-2 text-[10px] text-zinc-500">
-                      {undoVotes.length}/{requiredUndoApprovals}{ui("approvals · all other players must agree")}</p>
+                      {gameUi(undoVotes.length)}/{gameUi(requiredUndoApprovals)}{ui("approvals · all other players must agree")}</p>
                   </div>
                 )}
               </Panel>
@@ -904,8 +906,8 @@ export function FourPlayerMultiplayerGame() {
                 <div>
                   <p className="text-[9px] font-black uppercase tracking-widest text-blue-300">{ui("History Preview")}</p>
                   <p className="mt-1 text-sm font-bold text-white">
-                    {historyPreviewIndex === 0 ? ui("Initial position") : (gameState.moves[historyPreviewIndex - 1] ??
-                        `Action ${historyPreviewIndex}`)}
+                    {gameUi(historyPreviewIndex === 0 ? ui("Initial position") : (gameState.moves[historyPreviewIndex - 1] ??
+                        `Action ${historyPreviewIndex}`))}
                   </p>
                 </div>
                 <button
@@ -918,7 +920,7 @@ export function FourPlayerMultiplayerGame() {
 
             {displayedState.event && (
               <div className="mb-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-center text-xs font-bold text-zinc-400">
-                {displayedState.event}
+                {gameUi(displayedState.event)}
               </div>
             )}
 
@@ -934,7 +936,7 @@ export function FourPlayerMultiplayerGame() {
                     onClick={() => void rematch()}
                     className="mt-5 rounded-xl bg-white px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40"
                   >
-                    {myRematchReady ? ui("Rematch requested") : ui("Request rematch")}
+                    {gameUi(myRematchReady ? ui("Rematch requested") : ui("Request rematch"))}
                   </button>
                 }
               />
@@ -969,7 +971,7 @@ export function FourPlayerMultiplayerGame() {
                     <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                     <h2 className="mt-2 text-2xl font-black text-white">
-                      {filledSeats}{ui("/4 players connected")}</h2>
+                      {gameUi(filledSeats)}{ui("/4 players connected")}</h2>
 
                     <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
@@ -982,7 +984,7 @@ export function FourPlayerMultiplayerGame() {
                     </div>
 
                     <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
+                      {gameUi(copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code"))}
                     </p>
                   </button>
                     <RoomSlots total={4} names={orderedPlayers.map(({ player }) => player?.display_name)} labels={orderedPlayers.map(({ color }) => fourPlayerLabel(color))} overlay />
@@ -1016,7 +1018,7 @@ function ColorPicker({
           onClick={() => onChange(color)}
           className={`rounded-xl border px-3 py-3 text-sm font-black transition ${value === color ? playerStyles[color].button : "border-white/10 bg-black/20 text-zinc-500 hover:bg-white/5"}`}
         >
-          {fourPlayerLabel(color)}
+          {gameUi(fourPlayerLabel(color))}
         </button>
       ))}
     </div>
@@ -1126,8 +1128,9 @@ function FourPlayerBoard({
     return { ...slot, color };
   });
 
+  const frameRef = useChessBoardFit();
   return (
-    <div className="w-full rounded-[28px] border p-2 shadow-[0_30px_80px_rgba(0,0,0,0.55)] sm:p-3" style={{ borderColor: colors.frame, backgroundColor: colors.frame }}>
+    <div ref={frameRef} className="chess-board-frame w-full rounded-[28px] border p-2 shadow-[0_30px_80px_rgba(0,0,0,0.55)] sm:p-3" style={{ borderColor: colors.frame, backgroundColor: colors.frame }}>
       <div className="rounded-[18px] border border-black/40 p-1 shadow-inner sm:p-1.5" style={{ backgroundColor: colors.frame }}>
         <div
           className="grid aspect-square w-full overflow-hidden rounded-xl bg-zinc-950 shadow-[0_12px_30px_rgba(0,0,0,0.45)]"
@@ -1149,12 +1152,12 @@ function FourPlayerBoard({
               >
                 <div className="flex items-start justify-between gap-1">
                   <span className={`text-[8px] font-black uppercase tracking-[0.14em] sm:text-[10px] ${playerStyles[slot.color].text}`}>
-                    {fourPlayerLabel(slot.color)}
+                    {gameUi(fourPlayerLabel(slot.color))}
                   </span>
                   {!state.winner && state.turn === slot.color && <span className="rounded bg-white/20 px-1 text-[7px] font-black text-white sm:text-[9px]">{ui("Turn")}</span>}
                 </div>
                 <span className="truncate text-[9px] font-bold text-zinc-100 sm:text-xs">
-                  {!state.activePlayers.includes(slot.color) ? ui("OUT") : (player?.display_name ?? ui("Waiting..."))}
+                  {gameUi(!state.activePlayers.includes(slot.color) ? ui("OUT") : (player?.display_name ?? ui("Waiting...")))}
                 </span>
                 {myColor === slot.color && (
                   <span className="absolute bottom-1 right-1 rounded bg-white/15 px-1 py-0.5 text-[7px] font-black text-white sm:bottom-2 sm:right-2 sm:text-[8px]">
@@ -1190,7 +1193,7 @@ function FourPlayerBoard({
                 <button
                   key={`${row}-${column}`}
                   type="button"
-                  aria-label={fourPlayerSquareName(square)}
+                  aria-label={gameUi(fourPlayerSquareName(square))}
                   onClick={() => onSquareClick(square.row, square.column)}
                   className={`group relative flex aspect-square items-center justify-center overflow-hidden border-0 p-0 transition ${selected ? "z-10 ring-4 ring-inset ring-fuchsia-300" : ""}`}
                   style={{ backgroundColor: light ? colors.light : colors.dark }}
@@ -1219,22 +1222,24 @@ function FourPlayerBoard({
 }
 
 function Panel({
+  gameControls = false,
   title,
   subtitle,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   subtitle?: string;
   children: ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/15 backdrop-blur-md">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/15 backdrop-blur-md">
       <div className="mb-4">
         <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
         {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}
       </div>
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -1243,7 +1248,7 @@ function ErrorBox({ children }: { children: ReactNode }) {
   useUiLanguage();
   return (
     <div className="mb-5 mt-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
-      {children}
+      {gameUi(children)}
     </div>
   );
 }

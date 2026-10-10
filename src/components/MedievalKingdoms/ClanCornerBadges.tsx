@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { CLANS } from "../../games/MedievalKingdoms/clanData";
 
 const positionClass = {
@@ -21,6 +22,7 @@ const clanStyle = {
 } as const;
 
 export default function ClanCornerBadges() {
+  useGameLanguage();
   return (
     <>
       {CLANS.map((clan) => (
@@ -41,10 +43,10 @@ export default function ClanCornerBadges() {
             `}
         >
           <div className="text-[9px] font-black uppercase tracking-[0.18em]">
-            {clan.name}
+            {gameUi(clan.name)}
           </div>
 
-          <div className="mt-0.5 text-[8px] opacity-70">{clan.motto}</div>
+          <div className="mt-0.5 text-[8px] opacity-70">{gameUi(clan.motto)}</div>
         </div>
       ))}
     </>

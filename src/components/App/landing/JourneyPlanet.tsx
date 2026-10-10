@@ -2,6 +2,8 @@ import type { CSSProperties } from "react";
 import { useTransform, type MotionStyle } from "motion/react";
 import * as m from "motion/react-m";
 import type { PlanetPose } from "./planetPose";
+import { SurfaceArt } from "../planetary/PlanetScene";
+import { planetSurfaces } from "../planetary/planetSurfaces";
 
 const books = [
   { color: "#e79924", period: 9, delay: 0 },
@@ -15,6 +17,12 @@ const moons = [
   { color: "#60a5fa", period: 14, delay: -10.5 },
 ];
 
+/** One game's picture on the planet, faded in while the journey is at that game's sections. */
+function SurfaceLayer({ pose, tone }: { pose: PlanetPose; tone: string }) {
+  const opacity = useTransform(pose.surface, value => value.tone === tone ? value.weight : 0);
+  return <m.span className="journey-surface" style={{ opacity }}><SurfaceArt markup={planetSurfaces[tone]} /></m.span>;
+}
+
 /** The CSS planet: the fallback look, and always the home of the orbiting books, friends and the scanner sweep. */
 export default function JourneyPlanet({ pose }: { pose: PlanetPose }) {
   const tilt = useTransform(pose.tilt, value => `${value}deg`);
@@ -24,7 +32,7 @@ export default function JourneyPlanet({ pose }: { pose: PlanetPose }) {
       <span className="solar-art journey-art">
         <span className="solar-atmosphere" />
         <span className="solar-ring" />
-        <span className="solar-sphere"><m.span className="journey-scan" style={{ opacity: pose.scan }} /></span>
+        <span className="solar-sphere">{Object.keys(planetSurfaces).map(tone => <SurfaceLayer key={tone} pose={pose} tone={tone} />)}<m.span className="journey-scan" style={{ opacity: pose.scan }} /></span>
       </span>
       <m.span className="journey-orbiters" style={{ opacity: pose.books }}>
         {books.map(book => <span key={book.color} className="journey-orbiter" style={{ "--t": `${book.period}s`, "--d": `${book.delay}s` } as CSSProperties}><i className="journey-book" style={{ background: book.color }} /></span>)}

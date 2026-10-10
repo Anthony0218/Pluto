@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useState, type ComponentType, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -34,6 +35,7 @@ export default function VariantAiLauncher({
   Board,
   sideLabels,
 }: Props) {
+  useGameLanguage();
   const navigate = useNavigate();
 
   const [settings, setSettings] = useState<VariantAiStartSettings | null>(null);
@@ -41,7 +43,7 @@ export default function VariantAiLauncher({
   if (!settings) {
     return (
       <VariantAiSettingsScreen
-        title={title}
+        title={gameUi(title)}
         icon={icon}
         sideLabels={sideLabels}
         onBack={() => navigate(-1)}

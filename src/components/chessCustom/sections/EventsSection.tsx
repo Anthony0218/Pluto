@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { Plus, Zap } from "lucide-react";
 import { useState } from "react";
 import { createId } from "@/games/chess/custom/engine/presets";
@@ -8,6 +9,7 @@ import { EventCard } from "../EventBuilder";
 import { Button, EmptyState, SectionHeading } from "../ui";
 
 export default function EventsSection() {
+  useGameLanguage();
   const { variant, dispatch, focusTarget } = useEditor();
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(focusTarget ? [focusTarget] : variant.events.slice(0, 1).map((event) => event.id)));
   const toggle = (id: string) =>
@@ -29,7 +31,7 @@ export default function EventsSection() {
       <SectionHeading
         step="events"
         eyebrow="Events"
-        title="When this happens…"
+        title={gameUi("When this happens…")}
         description={ui("Events react to the game: WHEN something happens, optionally wait, check IF conditions hold, THEN run actions — or ELSE run others. King-capture consequences live here too.")}
         actions={
           <Button tone="primary" onClick={add}>
@@ -38,7 +40,7 @@ export default function EventsSection() {
           </Button>
         }
       />
-      {variant.events.length === 0 ? (
+      {gameUi(variant.events.length === 0 ? (
         <EmptyState icon={<Zap size={20} />} title={ui("No events yet")} action={<Button tone="primary" onClick={add}>{ui("Create the first event")}</Button>}>
           {ui("Events can spawn reinforcements, transform pieces, change tiles, grant extra turns or decide the game.")}
         </EmptyState>
@@ -62,7 +64,7 @@ export default function EventsSection() {
             />
           ))}
         </div>
-      )}
+      ))}
       <p className="mt-6 text-xs leading-5 text-zinc-500">
         {ui("Safety: event chains are capped at 6 nested triggers and 200 actions per move, so a loop can never freeze a game. Advanced scripting is reserved for a future version — the variant format keeps an extensions slot for it.")}
       </p>

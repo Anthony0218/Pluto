@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { BookOpen } from "lucide-react";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -102,7 +103,7 @@ export default function ChessMenu() {
                             : "border-white/10 bg-white/[0.035] text-zinc-400 group-hover:border-amber-300/25 group-hover:text-zinc-100"
                       }`}
                     >
-                      {mode.icon}
+                      {gameUi(mode.icon)}
                     </div>
 
                     <div className="min-w-0 flex-1">
@@ -131,8 +132,8 @@ export default function ChessMenu() {
                   </div>
                 </>;
                 return mode.disabled
-                  ? <div key={mode.path} aria-disabled="true" className={cardClassName}>{content}</div>
-                  : <Link key={mode.path} to={mode.path} className={cardClassName}>{content}</Link>;
+                  ? <div key={mode.path} aria-disabled="true" className={cardClassName}>{gameUi(content)}</div>
+                  : <Link key={mode.path} to={mode.path} className={cardClassName}>{gameUi(content)}</Link>;
               })}
 
 

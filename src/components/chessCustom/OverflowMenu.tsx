@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { ui } from "@/i18n/ui";
 import { MoreIcon } from "./icons/ChessCustomIcons";
@@ -14,6 +15,7 @@ export interface MenuItem {
 
 /** A small keyboard-friendly actions menu (Escape closes, arrows move). */
 export default function OverflowMenu({ items, label, guide, className = "" }: { items: MenuItem[]; label: string; guide?: string; className?: string }) {
+  useGameLanguage();
   const [open, setOpen] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLUListElement>(null);
@@ -54,8 +56,8 @@ export default function OverflowMenu({ items, label, guide, className = "" }: { 
       <button
         ref={button}
         type="button"
-        aria-label={label}
-        title={label}
+        aria-label={gameUi(label)}
+        title={gameUi(label)}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={open ? id : undefined}
@@ -65,8 +67,8 @@ export default function OverflowMenu({ items, label, guide, className = "" }: { 
       >
         <MoreIcon size={18} />
       </button>
-      {open && (
-        <ul ref={menu} id={id} role="menu" aria-label={label} className="absolute bottom-full right-0 z-50 mb-2 min-w-[180px] rounded-2xl border border-amber-300/20 bg-[#101318] p-1.5 shadow-2xl">
+      {gameUi(open && (
+        <ul ref={menu} id={id} role="menu" aria-label={gameUi(label)} className="absolute bottom-full right-0 z-50 mb-2 min-w-[180px] rounded-2xl border border-amber-300/20 bg-[#101318] p-1.5 shadow-2xl">
           {items.map((item) => (
             <li key={item.id} role="none" className={item.mobileOnly ? "sm:hidden" : ""}>
               <button
@@ -80,13 +82,13 @@ export default function OverflowMenu({ items, label, guide, className = "" }: { 
                   item.tone === "danger" ? "text-red-200 hover:bg-red-500/15 focus:bg-red-500/15" : "text-zinc-200 hover:bg-white/[0.07] focus:bg-white/[0.07]"
                 }`}
               >
-                {item.icon}
+                {gameUi(item.icon)}
                 {ui(item.label)}
               </button>
             </li>
           ))}
         </ul>
-      )}
+      ))}
     </div>
   );
 }

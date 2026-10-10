@@ -1,12 +1,14 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useId } from "react";
 
 /** Yannick's authored variant: a low viewpoint on the volume behind the board. */
 export default function JanmannGambitArtwork({ compact = false }: { compact?: boolean }) {
+  useGameLanguage();
   const id = useId().replace(/:/g, "");
   const gold = "#e9b878";
   return (
     <div className={`relative h-full overflow-hidden bg-[#10141e] ${compact ? "min-h-[180px]" : "min-h-[300px]"}`}>
-      <svg viewBox="0 0 240 280" role="img" aria-label="Janmann’s Gambit by Yannick: a thoughtful man with wavy hair rests his hand on his chin, studying a faceted chess sphere above a table of geometric notes." className="absolute inset-0 h-full w-full transition duration-500 group-hover:scale-105">
+      <svg viewBox="0 0 240 280" role="img" aria-label={gameUi("Janmann’s Gambit by Yannick: a thoughtful man with wavy hair rests his hand on his chin, studying a faceted chess sphere above a table of geometric notes.")} className="absolute inset-0 h-full w-full transition duration-500 group-hover:scale-105">
         <defs>
           <radialGradient id={`${id}-light`} cx="70%" cy="62%" r="65%">
             <stop stopColor="#c88b43" stopOpacity=".3" />
@@ -39,8 +41,8 @@ export default function JanmannGambitArtwork({ compact = false }: { compact?: bo
           <path d="M0-34-29 17H29ZM0 34-29-17H29ZM-34 0H34M0-34V34" />
         </g>
         <g fill={gold} fontFamily="Georgia, serif" fontStyle="italic" fontSize="6.5" opacity=".7">
-          <text x="145" y="111">8 sectors · 80 Dividends</text>
-          <text x="154" y="122">V = Vouter − Vinner</text>
+          <text x="145" y="111">{gameUi("8 sectors · 80 Dividends")}</text>
+          <text x="154" y="122">{gameUi("V = Vouter − Vinner")}</text>
         </g>
 
         {/* Seated figure, looking diagonally across the board. */}
@@ -89,7 +91,7 @@ export default function JanmannGambitArtwork({ compact = false }: { compact?: bo
           </g>
         </g>
         <text x="211" y="237" fill={gold} fontSize="10" fontFamily="Georgia, serif" fontStyle="italic">m³</text>
-        <text x="120" y="257" textAnchor="middle" fill="#eed7b4" fontSize="8" fontFamily="sans-serif" letterSpacing="2">THINK DIFFERENTLY</text>
+        <text x="120" y="257" textAnchor="middle" fill="#eed7b4" fontSize="8" fontFamily="sans-serif" letterSpacing="2">{gameUi("THINK DIFFERENTLY")}</text>
       </svg>
     </div>
   );

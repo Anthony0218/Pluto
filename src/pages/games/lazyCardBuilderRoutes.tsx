@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { lazy, Suspense, type ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -10,7 +11,8 @@ const Simulation = lazy(() => import("./CardBuilder/SimulationPage.tsx"));
 const Room = lazy(() => import("./CardBuilder/RoomPage.tsx"));
 
 function Lazy({ children }: { children: ReactNode }) {
-  return <Suspense fallback={<main className="min-h-[var(--app-height)] px-6 py-10 text-sm text-zinc-500">Loading the card builder…</main>}>{children}</Suspense>;
+  useGameLanguage();
+  return <Suspense fallback={<main className="min-h-[var(--app-height)] px-6 py-10 text-sm text-zinc-500">Loading the card builder…</main>}>{gameUi(children)}</Suspense>;
 }
 
 export function CardBuilderHomeRoute() {

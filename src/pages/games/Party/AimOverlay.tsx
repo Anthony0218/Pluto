@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useRef, useState } from "react";
 import { COLORS } from "../../../games/party/config.ts";
 import { aimTargetPosition } from "../../../games/party/items/aim.ts";
@@ -23,6 +24,7 @@ export default function AimOverlay({
   onFire: (aimX: number, aimY: number, elapsedMs: number) => void;
   onCancel: () => void;
 }) {
+  useGameLanguage();
   const definition = itemRegistry.get(aim.itemId),
     geometry = definition.aim!.geometry(aim.band);
   const target = match.players.find((p) => p.id === aim.targetPlayerId)!;
@@ -82,13 +84,13 @@ export default function AimOverlay({
       ? "ANY RANGE"
       : `${aim.band.toUpperCase()} · ${aim.distance} SPACE${aim.distance === 1 ? "" : "S"}`;
   return (
-    <div className="pp-aim" role="dialog" aria-label={`Aim ${definition.name} at ${target.name}`}>
+    <div className="pp-aim" role="dialog" aria-label={gameUi(`Aim ${definition.name} at ${target.name}`)}>
       <div className="pp-aim-card">
         <header>
           <span className="pp-eyebrow">
-            {definition.icon} {definition.name.toUpperCase()} → {target.name.toUpperCase()}
+            {gameUi(definition.icon)} {gameUi(definition.name.toUpperCase())} → {target.name.toUpperCase()}
           </span>
-          <b className="pp-aim-band">{bandLabel}</b>
+          <b className="pp-aim-band">{gameUi(bandLabel)}</b>
           <span className="pp-aim-timer" aria-hidden="true">
             <span ref={timer} />
           </span>
@@ -127,12 +129,12 @@ export default function AimOverlay({
             <Portrait player={target} />
           </div>
           {/* Rings are sized in % of the square field: radius r (normalized) spans r × 50% of it. */}
-          {geometry.hitRadius > geometry.centerRadius && (
+          {gameUi(geometry.hitRadius > geometry.centerRadius && (
             <i
               className="pp-aim-ring spread"
               style={{ left: pct(reticle.x), top: pct(reticle.y), width: scale(geometry.hitRadius * 2) }}
             />
-          )}
+          ))}
           <i
             className={`pp-aim-ring core ${aim.itemId === "lucky-six" ? "precise" : ""}`}
             style={{ left: pct(reticle.x), top: pct(reticle.y), width: scale(geometry.centerRadius * 2) }}
@@ -140,19 +142,15 @@ export default function AimOverlay({
           <i className="pp-aim-cross" style={{ left: pct(reticle.x), top: pct(reticle.y) }} />
         </div>
         <p className="pp-aim-help">
-          {fired
+          {gameUi(fired
             ? "Shot fired…"
             : aim.itemId === "lucky-six"
               ? "Drag the crosshair onto the moving target and release to fire. Hit = 20, miss = 0."
-              : "Drag to aim, release to fire. Target inside the inner ring = centered; inside the outer spread = partial."}
+              : "Drag to aim, release to fire. Target inside the inner ring = centered; inside the outer spread = partial.")}
         </p>
         <div className="pp-sheet-actions">
-          <button onClick={onCancel} disabled={fired}>
-            Lower weapon
-          </button>
-          <button className="pp-primary" disabled={fired} onClick={() => fire(reticle.x, reticle.y)}>
-            Fire here
-          </button>
+          <button onClick={onCancel} disabled={fired}>{gameUi(" Lower weapon ")}</button>
+          <button className="pp-primary" disabled={fired} onClick={() => fire(reticle.x, reticle.y)}>{gameUi(" Fire here ")}</button>
         </div>
       </div>
     </div>

@@ -1,3 +1,5 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
+import GameXpReward from "@/components/games/GameXpReward";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -24,6 +26,7 @@ export default function GoRankedGamePage() {
 }
 
 function RankedGoGame({ code }: { code?: string }) {
+  useGameLanguage();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [params] = useSearchParams();
@@ -76,8 +79,8 @@ function RankedGoGame({ code }: { code?: string }) {
     catch (cause) { setError(cause instanceof Error ? cause.message : "Move failed. Refreshing the board."); try { await request("snapshot"); } catch { /* Keep last verified position; polling retries. */ } }
     finally { inFlight.current = false; setBusy(false); }
   }
-  if (!user) return <main className="go-page"><Link to="/login">Sign in to play ranked Go</Link></main>;
-  if (!g || !sample) return <main className="go-page"><Link to="/games/go/ranked">← Go Ranked</Link><p role={error ? "alert" : "status"}>{error ?? "Loading ranked game…"}</p></main>;
+  if (!user) return <main className="go-page"><Link to="/login">{gameUi("Sign in to play ranked Go")}</Link></main>;
+  if (!g || !sample) return <main className="go-page"><Link to="/games/go/ranked">{gameUi("← Go Ranked")}</Link><p role={error ? "alert" : "status"}>{gameUi(error ?? "Loading ranked game…")}</p></main>;
   const userId = user.id;
   const state = g.state, color = user.id === g.black_id ? "black" : "white";
   const disabled = busy || g.status !== "playing" || state.currentPlayer !== color;
@@ -96,26 +99,27 @@ function RankedGoGame({ code }: { code?: string }) {
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not save this game."); }
   }
   return <main className="go-page">
-    <header className="go-page-header"><Link to="/games/go/ranked">← Go Ranked</Link><h1>Go · Ranked {goTimeControlLabel(g.time_control)}</h1><span className="text-xs text-amber-200">9 × 9 · Komi {state.komi}</span></header>
-    {error && <p role="alert" className="my-3 rounded-xl border border-red-400/25 bg-red-400/10 p-4 text-red-200">{error}</p>}
-    <div className="go-game-toolbar"><div className="go-tabs" role="tablist" aria-label="Go game views"><button onClick={() => setReview(false)} aria-selected={!review} role="tab">Play</button>{reviewAvailable && <button onClick={() => setReview(true)} aria-selected={review} role="tab">Game Review</button>}</div>{g.status === "finished" || g.status === "abandoned" ? <Link className="go-action" to="/games/go/ranked">Find next match</Link> : <span className="go-muted">Reconnecting preserves your clock. Clocks continue while disconnected.</span>}</div>
+    <header className="go-page-header"><Link to="/games/go/ranked">{gameUi("← Go Ranked")}</Link><h1>{gameUi("Go · Ranked ")}{gameUi(goTimeControlLabel(g.time_control))}</h1><span className="text-xs text-amber-200">{gameUi("9 × 9 · Komi ")}{gameUi(state.komi)}</span></header>
+    {error && <p role="alert" className="my-3 rounded-xl border border-red-400/25 bg-red-400/10 p-4 text-red-200">{gameUi(error)}</p>}
+    <div className="go-game-toolbar"><div className="go-tabs" role="tablist" aria-label={gameUi("Go game views")}><button onClick={() => setReview(false)} aria-selected={!review} role="tab">{gameUi("Play")}</button>{reviewAvailable && <button onClick={() => setReview(true)} aria-selected={review} role="tab">{gameUi("Game Review")}</button>}</div>{g.status === "finished" || g.status === "abandoned" ? <Link className="go-action" to="/games/go/ranked">{gameUi("Find next match")}</Link> : <span className="go-muted">{gameUi("Reconnecting preserves your clock. Clocks continue while disconnected.")}</span>}</div>
     {review && reviewAvailable ? <GoGameReview game={state} /> : <div className="go-play-layout"><section><GoBoard state={state} disabled={disabled} onMove={move => void action(move.type === "resign" ? "resign" : "move", move)} /></section><aside>
-      <h2 role="status">{g.status === "ready" ? "Waiting for both players · starts when both connect" : g.status === "abandoned" ? "Abandoned before start · No Elo change" : state.result ?? `${state.currentPlayer} to move`}</h2>
-      {score && <p className="go-muted">Final area score: Black {score.black} · White {score.white}</p>}
-      {g.status === "ready" && <><p className="go-muted">{Math.max(0, Math.ceil((Date.parse(g.created_at) + 30_000 - Date.parse(sample.snapshot.serverNow) - (now - sample.receivedAt)) / 1000))} seconds to connect</p><button className="go-action" disabled={busy} onClick={() => void action("abandon")}>Cancel before start</button></>}
+      <h2 role="status">{gameUi(g.status === "ready" ? "Waiting for both players · starts when both connect" : g.status === "abandoned" ? "Abandoned before start · No Elo change" : state.result ?? `${state.currentPlayer} to move`)}</h2>
+      {score && <p className="go-muted">{gameUi("Final area score: Black ")}{gameUi(score.black)}{gameUi(" · White ")}{gameUi(score.white)}</p>}
+      {g.status === "ready" && <><p className="go-muted">{gameUi(Math.max(0, Math.ceil((Date.parse(g.created_at) + 30_000 - Date.parse(sample.snapshot.serverNow) - (now - sample.receivedAt)) / 1000)))}{gameUi(" seconds to connect")}</p><button className="go-action" disabled={busy} onClick={() => void action("abandon")}>{gameUi("Cancel before start")}</button></>}
       <div className="space-y-3">{sample.snapshot.players.map(player => {
         const profile = (player.color === "black" ? black : white).rows?.find(row => row.time_control === g.time_control);
         const position = profile?.leaderboard_rank, r = sample.snapshot.result;
         const change = r ? { before: player.color === "black" ? r.black_before : r.white_before, after: player.color === "black" ? r.black_after : r.white_after } : undefined;
         const clock = goClock(sample.snapshot, player.color, sample.receivedAt, now);
         const ms = clock.inByoYomi ? clock.periodMs : clock.mainMs;
-        return <div key={player.user_id}><RankedPlayerBar name={player.username} avatarId={player.avatar_id} color={player.color} active={g.status === "playing" && state.currentPlayer === player.color} me={player.user_id === user.id} rating={change?.after ?? profile?.rating ?? player.rating} ratingChange={change} leaderboardRank={position} topRank={isTop10(position) ? position! : undefined} showTier t={ui} /><div role="timer" aria-label={`${player.color} clock`} className={`mt-2 rounded-xl border px-4 py-2 text-right font-mono text-3xl font-bold tabular-nums ${ms < 10000 ? "border-red-400 bg-red-950 text-red-200" : "border-white/10 text-zinc-300"}`}>{formatClock(ms)}<span className="mt-1 block font-sans text-xs font-medium">{clock.inByoYomi ? "Byo-yomi" : "Main time"} · {clock.periodsRemaining} × {g.byo_yomi_ms / 1000}s{clock.inByoYomi ? " remaining" : " byo-yomi"}</span></div></div>;
+        return <div key={player.user_id}><RankedPlayerBar name={player.username} avatarId={player.avatar_id} color={player.color} active={g.status === "playing" && state.currentPlayer === player.color} me={player.user_id === user.id} rating={change?.after ?? profile?.rating ?? player.rating} ratingChange={change} leaderboardRank={position} topRank={isTop10(position) ? position! : undefined} showTier t={ui} /><div role="timer" aria-label={gameUi(`${player.color} clock`)} className={`mt-2 rounded-xl border px-4 py-2 text-right font-mono text-3xl font-bold tabular-nums ${ms < 10000 ? "border-red-400 bg-red-950 text-red-200" : "border-white/10 text-zinc-300"}`}>{gameUi(formatClock(ms))}<span className="mt-1 block font-sans text-xs font-medium">{gameUi(clock.inByoYomi ? "Byo-yomi" : "Main time")} · {gameUi(clock.periodsRemaining)} × {gameUi(g.byo_yomi_ms / 1000)}s{gameUi(clock.inByoYomi ? " remaining" : " byo-yomi")}</span></div></div>;
       })}</div>
-      <div className="go-controls"><button disabled={disabled} onClick={() => void action("move", { type: "pass" })}>Pass</button><button disabled={busy || g.status !== "playing"} onClick={() => setConfirmResign(true)}>Resign</button></div>
-      {confirmResign && <div className="mt-3 rounded-xl border border-red-400/25 bg-red-400/10 p-4"><p>Resigning counts as a ranked loss.</p><div className="go-controls"><button disabled={busy} onClick={() => void action("resign")}>Confirm resignation</button><button onClick={() => setConfirmResign(false)}>Keep playing</button></div></div>}
-      {state.moveHistory.length > 0 && <div className="go-result-actions"><button className="go-action" onClick={() => saveResult(false)}>Save Game</button>{reviewAvailable && <button className="go-action" onClick={() => saveResult(true)}>Analyze Game</button>}</div>}
-      {saveNotice && <p role="status" className="go-muted">{saveNotice}</p>}
-      <h3>Moves</h3><ol className="go-game-history">{state.moveHistory.map((move, i) => <li key={i}>{i + 1}. {move.player === "black" ? "B" : "W"} {goCoordinate(move, state.boardSize)}</li>)}</ol>
+      {g.status === "finished" && <GameXpReward amount={100} />}
+      <div className="go-controls"><button disabled={disabled} onClick={() => void action("move", { type: "pass" })}>{gameUi("Pass")}</button><button disabled={busy || g.status !== "playing"} onClick={() => setConfirmResign(true)}>{gameUi("Resign")}</button></div>
+      {confirmResign && <div className="mt-3 rounded-xl border border-red-400/25 bg-red-400/10 p-4"><p>{gameUi("Resigning counts as a ranked loss.")}</p><div className="go-controls"><button disabled={busy} onClick={() => void action("resign")}>{gameUi("Confirm resignation")}</button><button onClick={() => setConfirmResign(false)}>{gameUi("Keep playing")}</button></div></div>}
+      {state.moveHistory.length > 0 && <div className="go-result-actions"><button className="go-action" onClick={() => saveResult(false)}>{gameUi("Save Game")}</button>{reviewAvailable && <button className="go-action" onClick={() => saveResult(true)}>{gameUi("Analyze Game")}</button>}</div>}
+      {saveNotice && <p role="status" className="go-muted">{gameUi(saveNotice)}</p>}
+      <h3>{gameUi("Moves")}</h3><ol className="go-game-history">{state.moveHistory.map((move, i) => <li key={i}>{gameUi(i + 1)}. {gameUi(move.player === "black" ? "B" : "W")} {gameUi(goCoordinate(move, state.boardSize))}</li>)}</ol>
     </aside></div>}
   </main>;
 }

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { validateVariant } from "@/games/chess/custom/engine/validation";
@@ -21,6 +22,7 @@ export default function ShareDialog({ entry, onClose }: { entry: LibraryEntry | 
 }
 
 function ShareForm({ entry, onClose }: { entry: LibraryEntry; onClose: () => void }) {
+  useGameLanguage();
   const { userId, share, unshare, loadSaved, editVariant } = useEditor();
   const current = entry.meta.visibility;
   const [visibility, setVisibility] = useState<VariantVisibility>(userId ? "public" : "private");
@@ -88,31 +90,31 @@ function ShareForm({ entry, onClose }: { entry: LibraryEntry; onClose: () => voi
           </Button>
           <Button tone={publishing ? "primary" : current === "public" ? "danger" : "ghost"} disabled={busy || blocked} onClick={() => void submit()}>
             {publishing ? <ShareIcon size={15} /> : <PrivateIcon size={15} />}
-            {primaryLabel}
+            {gameUi(primaryLabel)}
           </Button>
         </>
       }
     >
       <div className="grid gap-4 sm:grid-cols-[150px_minmax(0,1fr)]">
         <div className="hidden rounded-2xl border border-white/[0.06] bg-black/30 p-3 sm:block">
-          <BoardThumbnail preview={entry.preview} label={`${entry.name} ${ui("preview")}`} className="aspect-square w-full" />
+          <BoardThumbnail preview={entry.preview} label={gameUi(`${entry.name} ${ui("preview")}`)} className="aspect-square w-full" />
           <p className="mt-2 text-center text-[11px] text-zinc-500">{ui("Preview image is generated from the board.")}</p>
         </div>
         <div className="space-y-3">
           <fieldset className="grid gap-2">
             <legend className={`${labelClass} mb-1.5`}>{ui("Visibility")}</legend>
-            {option("private", "Private", "Only you can see and play it.", PrivateIcon)}
-            {option("public", "Public", "Listed in Community for everyone.", PublicIcon, !signedIn)}
+            {gameUi(option("private", "Private", "Only you can see and play it.", PrivateIcon))}
+            {gameUi(option("public", "Public", "Listed in Community for everyone.", PublicIcon, !signedIn))}
           </fieldset>
-          {!signedIn && (
+          {gameUi(!signedIn && (
             <p className="rounded-xl border border-sky-400/25 bg-sky-400/[0.07] px-3 py-2 text-xs text-sky-100">
-              {ui("Sign in to publish variants to Community.")}{" "}
+              {ui("Sign in to publish variants to Community.")}{gameUi(" ")}
               <Link to="/login" className="font-semibold underline underline-offset-2">
                 {ui("Sign in")}
               </Link>
             </p>
-          )}
-          {publishing && signedIn && (
+          ))}
+          {gameUi(publishing && signedIn && (
             <>
               <label className="block">
                 <span className={labelClass}>{ui("Title")}</span>
@@ -128,11 +130,11 @@ function ShareForm({ entry, onClose }: { entry: LibraryEntry; onClose: () => voi
                 <input value={tags} onChange={(event) => setTags(event.target.value)} placeholder={ui("e.g. portals, 3 layers, fast")} className={`${inputClass} mt-1.5`} />
                 <span className="mt-1 block text-[11px] text-zinc-500">{ui("Comma separated, up to 6.")}</span>
               </label>
-              {(errors ?? 0) > 0 && (
+              {gameUi((errors ?? 0) > 0 && (
                 <p className="flex items-start gap-2 rounded-xl border border-red-400/25 bg-red-500/10 px-3 py-2 text-xs text-red-100">
                   <WarningIcon size={15} className="mt-0.5 shrink-0" />
                   <span>
-                    {ui("Fix the validation errors before publishing:")} {errors}.{" "}
+                    {ui("Fix the validation errors before publishing:")} {gameUi(errors)}.{gameUi(" ")}
                     <button
                       type="button"
                       className="font-semibold underline underline-offset-2"
@@ -145,10 +147,10 @@ function ShareForm({ entry, onClose }: { entry: LibraryEntry; onClose: () => voi
                     </button>
                   </span>
                 </p>
-              )}
+              ))}
               {current === "public" && entry.meta.publishedOutdated && <p className="text-xs text-amber-200/80">{ui("You have edited this variant since publishing. Update the public version to share your changes.")}</p>}
             </>
-          )}
+          ))}
           {!publishing && current === "public" && <p className="text-xs leading-5 text-zinc-400">{ui("Making it private removes it from Community. Your copy in My Games is kept.")}</p>}
         </div>
       </div>

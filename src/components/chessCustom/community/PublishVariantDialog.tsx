@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { validateVariant } from "@/games/chess/custom/engine/validation";
@@ -19,6 +20,7 @@ export default function PublishVariantDialog({ open, onClose, onPublished }: { o
 }
 
 function PublishForm({ onClose, onPublished }: { onClose: () => void; onPublished: () => void }) {
+  useGameLanguage();
   const { userId, library, libraryStatus, share, loadSaved, editVariant, go } = useEditor();
   const entries = sortLibrary(library, "updated");
   const [selectedId, setSelectedId] = useState<string | null>(entries[0]?.id ?? null);
@@ -82,21 +84,21 @@ function PublishForm({ onClose, onPublished }: { onClose: () => void; onPublishe
           </Button>
           <Button tone="primary" disabled={busy || blocked} onClick={() => void submit()}>
             <ShareIcon size={15} />
-            {isPublic ? ui("Update Public Version") : ui("Publish to Community")}
+            {gameUi(isPublic ? ui("Update Public Version") : ui("Publish to Community"))}
           </Button>
         </>
       }
     >
-      {!signedIn ? (
+      {gameUi(!signedIn ? (
         <p className="rounded-xl border border-sky-400/25 bg-sky-400/[0.07] px-3 py-2 text-sm text-sky-100">
-          {ui("Sign in to publish variants to Community.")}{" "}
+          {ui("Sign in to publish variants to Community.")}{gameUi(" ")}
           <Link to="/login" className="font-semibold underline underline-offset-2">
             {ui("Sign in")}
           </Link>
         </p>
       ) : entries.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-white/10 p-6 text-center text-sm text-zinc-400">
-          {libraryStatus === "loading" ? (
+          {gameUi(libraryStatus === "loading" ? (
             <span role="status">{ui("Loading your games…")}</span>
           ) : (
             <>
@@ -111,7 +113,7 @@ function PublishForm({ onClose, onPublished }: { onClose: () => void; onPublishe
                 {ui("Create a variant")}
               </Button>
             </>
-          )}
+          ))}
         </div>
       ) : (
         <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
@@ -128,17 +130,17 @@ function PublishForm({ onClose, onPublished }: { onClose: () => void; onPublishe
                     }`}
                   >
                     <input type="radio" name="publish-variant" value={entry.id} checked={active} onChange={() => choose(entry)} className="sr-only" />
-                    <BoardThumbnail preview={entry.preview} label={`${entry.name} ${ui("preview")}`} className="aspect-square w-12 shrink-0" />
+                    <BoardThumbnail preview={entry.preview} label={gameUi(`${entry.name} ${ui("preview")}`)} className="aspect-square w-12 shrink-0" />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold text-zinc-100">{entry.name}</span>
-                      <span className="block truncate text-xs text-zinc-500">{entry.description || ui("No description.")}</span>
+                      <span className="block truncate text-sm font-semibold text-zinc-100">{gameUi(entry.name)}</span>
+                      <span className="block truncate text-xs text-zinc-500">{gameUi(entry.description || ui("No description."))}</span>
                     </span>
-                    {entry.meta.visibility === "public" && (
+                    {gameUi(entry.meta.visibility === "public" && (
                       <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-400/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-200">
                         <PublicIcon size={12} />
                         {ui("Public")}
                       </span>
-                    )}
+                    ))}
                   </label>
                 );
               })}
@@ -155,11 +157,11 @@ function PublishForm({ onClose, onPublished }: { onClose: () => void; onPublishe
               {!description.trim() && <span className="mt-1 block text-[11px] text-amber-200/80">{ui("A short description is required to publish.")}</span>}
             </label>
             {isPublic && <p className="text-xs leading-5 text-zinc-400">{ui("This variant is already public. Publishing again updates the public version.")}</p>}
-            {(errors ?? 0) > 0 && selected && (
+            {gameUi((errors ?? 0) > 0 && selected && (
               <p className="flex items-start gap-2 rounded-xl border border-red-400/25 bg-red-500/10 px-3 py-2 text-xs text-red-100">
                 <WarningIcon size={15} className="mt-0.5 shrink-0" />
                 <span>
-                  {ui("Fix the validation errors before publishing:")} {errors}.{" "}
+                  {ui("Fix the validation errors before publishing:")} {gameUi(errors)}.{gameUi(" ")}
                   <button
                     type="button"
                     className="font-semibold underline underline-offset-2"
@@ -172,10 +174,10 @@ function PublishForm({ onClose, onPublished }: { onClose: () => void; onPublishe
                   </button>
                 </span>
               </p>
-            )}
+            ))}
           </div>
         </div>
-      )}
+      ))}
     </Dialog>
   );
 }

@@ -1,6 +1,7 @@
 import { useTransform, type MotionValue } from "motion/react";
 import { useLanding } from "./landingContext";
-import { buildPoseTable, featureWeight, sample, sampleColor, smoothstep, type PoseTable, type StopMeta } from "./landingMath";
+import { buildPoseTable, featureWeight, sample, sampleColor, smoothstep, stopWeight, type PoseTable, type StopMeta } from "./landingMath";
+import { surfaceKey } from "../planetary/planetSurfaces";
 import { toneOf, type Tone } from "./tones";
 
 export const PLANET_ART_MAX = 480;
@@ -31,6 +32,8 @@ export type PlanetPose = {
   ring: MotionValue<string>;
   /** Ring angle in degrees. */
   tilt: MotionValue<number>;
+  /** The game whose picture covers the planet (a `planetSurfaces` key) and how strongly; weight 0 means the plain planet. */
+  surface: MotionValue<{ tone: string; weight: number }>;
   books: MotionValue<number>;
   scan: MotionValue<number>;
   moons: MotionValue<number>;
@@ -81,9 +84,21 @@ export function usePlanetPose(): PlanetPose {
     return base * intro * hero;
   });
   const tilt = useTransform(() => { const { pose } = table(); return sample(index.get(), pose.keys, pose.tilt); });
+  const surface = useTransform(() => {
+    layout.get();
+    const at = index.get();
+    let best = { tone: "", weight: 0 };
+    stage.current.stops.forEach((stop, position) => {
+      const tone = surfaceKey(stop.tone);
+      // The first section's game is already on the planet when the flyby delivers it.
+      const weight = tone ? (position === 0 && at < 1 ? 1 : stopWeight(at, position + 1)) : 0;
+      if (tone && weight > best.weight) best = { tone, weight };
+    });
+    return best;
+  });
   const read = { index, layout, stage, table };
   return {
-    x, y, scale, opacity, tilt,
+    x, y, scale, opacity, tilt, surface,
     light: useToneColor("light", read), base: useToneColor("base", read), dark: useToneColor("dark", read), glow: useToneColor("glow", read), ring: useToneColor("ring", read),
     books: useFeatureWeight("books", read), scan: useFeatureWeight("scan", read), moons: useFeatureWeight("moons", read),
   };

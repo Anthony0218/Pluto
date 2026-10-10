@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useCardTheme } from "@/context/CardThemeContext";
 import {
   WATTEN_CARD_CLIP,
@@ -33,6 +34,7 @@ export default function WattenCard({
   helpStatus,
   onClick,
 }: WattenCardProps) {
+  useGameLanguage();
   const { cardTheme } = useCardTheme();
 
   const imageSrc = getWattenCardImage(card, cardTheme);
@@ -106,7 +108,7 @@ export default function WattenCard({
       <div className="relative h-full w-full">
         <img
           src={imageSrc}
-          alt={`${card.suit} ${card.rank}`}
+          alt={gameUi(`${card.suit} ${card.rank}`)}
           draggable={false}
           style={{
             clipPath: WATTEN_CARD_CLIP,
@@ -154,7 +156,7 @@ export default function WattenCard({
             group-hover:block
           "
         >
-          {hint}
+          {gameUi(hint)}
 
           {/* Tooltip arrow */}
           <div

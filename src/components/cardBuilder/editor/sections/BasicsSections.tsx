@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { useState } from "react";
 import { GripVertical, Plus, Trash2 } from "lucide-react";
 import { RANKS, RANK_NAMES, SUITS, SUIT_NAMES, SUIT_SYMBOLS, deckSize, withRank, type Rank } from "@/games/cards/cards/card";
@@ -10,18 +11,19 @@ import { CombinationsPanel, VariablesPanel } from "./ExtraPanels";
 
 /* 1. Basic information */
 export function BasicsSection() {
+  useGameLanguage();
   const { def, edit } = useCardEditor();
   return (
-    <SectionShell section="basics" eyebrow="1 · Basics" title="Basic information" description="Name your game and describe it in a sentence. Players see this on the game card.">
+    <SectionShell section="basics" eyebrow="1 · Basics" title={gameUi("Basic information")} description={gameUi("Name your game and describe it in a sentence. Players see this on the game card.")}>
       <Panel>
         <div className="grid gap-4">
-          <Field label="Name">
+          <Field label={gameUi("Name")}>
             <input className={inputClass} value={def.name} maxLength={80} onChange={(event) => edit((draft) => void (draft.name = event.target.value))} />
           </Field>
-          <Field label="Short description">
+          <Field label={gameUi("Short description")}>
             <textarea className={`${inputClass} min-h-20`} value={def.description} maxLength={600} onChange={(event) => edit((draft) => void (draft.description = event.target.value))} />
           </Field>
-          {def.templateId && <p className="text-xs text-zinc-500">Started from the template “{def.templateId}”.</p>}
+          {def.templateId && <p className="text-xs text-zinc-500">{gameUi("Started from the template “")}{gameUi(def.templateId)}”.</p>}
         </div>
       </Panel>
     </SectionShell>
@@ -30,6 +32,7 @@ export function BasicsSection() {
 
 /* 2. Deck */
 export function DeckSection() {
+  useGameLanguage();
   const { def, edit, mode } = useCardEditor();
   const [dragging, setDragging] = useState<number | null>(null);
   const order = def.deck.rankOrder;
@@ -47,9 +50,9 @@ export function DeckSection() {
       draft.deck.rankOrder = withRank(draft.deck.rankOrder, rank);
     });
   return (
-    <SectionShell section="deck" eyebrow="2 · Deck" title="Deck" description="The standard 32-card deck is 7 to Ace in four suits; add the 6s for a 36-card deck. Drag the ranks to set which beats which in your game.">
-      <Panel title="Rank order" eyebrow="Weakest → strongest">
-        <ol aria-label="Rank order, weakest first" className="flex flex-wrap items-center gap-2">
+    <SectionShell section="deck" eyebrow="2 · Deck" title={gameUi("Deck")} description={gameUi("The standard 32-card deck is 7 to Ace in four suits; add the 6s for a 36-card deck. Drag the ranks to set which beats which in your game.")}>
+      <Panel title={gameUi("Rank order")} eyebrow="Weakest → strongest">
+        <ol aria-label={gameUi("Rank order, weakest first")} className="flex flex-wrap items-center gap-2">
           {order.map((rank, index) => (
             <li
               key={rank}
@@ -63,47 +66,47 @@ export function DeckSection() {
               className={`flex items-center gap-1 rounded-xl border px-2 py-2 ${def.deck.ranks.includes(rank) ? "border-white/15 bg-[#fbf8f1] text-zinc-900" : "border-white/10 bg-white/5 text-zinc-500 line-through"} ${dragging === index ? "opacity-50" : ""}`}
             >
               <GripVertical size={14} className="cursor-grab text-zinc-400" aria-hidden />
-              <span className="w-8 text-center text-lg font-black">{rank}</span>
+              <span className="w-8 text-center text-lg font-black">{gameUi(rank)}</span>
               <span className="flex flex-col">
-                <button type="button" aria-label={`Move ${RANK_NAMES[rank]} weaker`} disabled={index === 0} onClick={() => moveRank(index, index - 1)} className="text-[10px] leading-none text-zinc-500 disabled:opacity-20">
+                <button type="button" aria-label={gameUi(`Move ${RANK_NAMES[rank]} weaker`)} disabled={index === 0} onClick={() => moveRank(index, index - 1)} className="text-[10px] leading-none text-zinc-500 disabled:opacity-20">
                   ◀
                 </button>
-                <button type="button" aria-label={`Move ${RANK_NAMES[rank]} stronger`} disabled={index === order.length - 1} onClick={() => moveRank(index, index + 1)} className="text-[10px] leading-none text-zinc-500 disabled:opacity-20">
+                <button type="button" aria-label={gameUi(`Move ${RANK_NAMES[rank]} stronger`)} disabled={index === order.length - 1} onClick={() => moveRank(index, index + 1)} className="text-[10px] leading-none text-zinc-500 disabled:opacity-20">
                   ▶
                 </button>
               </span>
-              {index < order.length - 1 && <span className="ml-1 text-zinc-500">&lt;</span>}
+              {index < order.length - 1 && <span className="ml-1 text-zinc-500">{gameUi("<")}</span>}
             </li>
           ))}
         </ol>
-        <p className="mt-3 text-sm text-zinc-400">{order.filter((rank) => def.deck.ranks.includes(rank)).join(" < ")}</p>
+        <p className="mt-3 text-sm text-zinc-400">{gameUi(order.filter((rank) => def.deck.ranks.includes(rank)).join(" < "))}</p>
       </Panel>
       <div className="grid gap-4 md:grid-cols-2">
-        <Panel title="Ranks in the deck">
+        <Panel title={gameUi("Ranks in the deck")}>
           <div className="flex flex-wrap gap-2">
             {RANKS.map((rank) => (
               <button key={rank} type="button" aria-pressed={def.deck.ranks.includes(rank)} onClick={() => toggleRank(rank)} className={`rounded-lg border px-3 py-1.5 text-sm font-bold ${def.deck.ranks.includes(rank) ? "border-amber-300/50 bg-amber-300/15 text-amber-100" : "border-white/10 text-zinc-500"}`}>
-                {rank}
+                {gameUi(rank)}
               </button>
             ))}
           </div>
         </Panel>
-        <Panel title="Suits and copies">
+        <Panel title={gameUi("Suits and copies")}>
           <div className="flex flex-wrap gap-2">
             {SUITS.map((suit) => {
               const on = def.deck.suits.includes(suit);
               return (
                 <button key={suit} type="button" aria-pressed={on} onClick={() => edit((draft) => void (draft.deck.suits = on ? draft.deck.suits.filter((entry) => entry !== suit) : SUITS.filter((entry) => entry === suit || draft.deck.suits.includes(entry))))} className={`rounded-lg border px-3 py-1.5 text-sm font-bold ${on ? "border-amber-300/50 bg-amber-300/15 text-amber-100" : "border-white/10 text-zinc-500"}`}>
-                  {SUIT_SYMBOLS[suit]} {SUIT_NAMES[suit]}
+                  {gameUi(SUIT_SYMBOLS[suit])} {gameUi(SUIT_NAMES[suit])}
                 </button>
               );
             })}
           </div>
           <div className="mt-4 flex items-center gap-3">
-            <span className="text-sm text-zinc-300">Copies of each card</span>
-            <NumberField value={def.deck.copies} min={1} max={4} label="Copies" onChange={(copies) => edit((draft) => void (draft.deck.copies = copies))} />
+            <span className="text-sm text-zinc-300">{gameUi("Copies of each card")}</span>
+            <NumberField value={def.deck.copies} min={1} max={4} label={gameUi("Copies")} onChange={(copies) => edit((draft) => void (draft.deck.copies = copies))} />
           </div>
-          <p className="mt-3 text-sm font-semibold text-zinc-200">{deckSize(def.deck)} cards in total</p>
+          <p className="mt-3 text-sm font-semibold text-zinc-200">{gameUi(deckSize(def.deck))}{gameUi(" cards in total")}</p>
         </Panel>
       </div>
       {(mode === "advanced" || Boolean(def.combinations?.length)) && <CombinationsPanel />}
@@ -113,44 +116,45 @@ export function DeckSection() {
 
 /* 3. Players */
 export function PlayersSection() {
+  useGameLanguage();
   const { def, edit, mode } = useCardEditor();
   const [role, setRole] = useState("");
   return (
-    <SectionShell section="players" eyebrow="3 · Players" title="Players" description="How many people can sit at the table. Roles (like attacker and defender) are labels that rules and actions can refer to.">
+    <SectionShell section="players" eyebrow="3 · Players" title={gameUi("Players")} description={gameUi("How many people can sit at the table. Roles (like attacker and defender) are labels that rules and actions can refer to.")}>
       <Panel>
         <div className="flex flex-wrap gap-6">
-          <Field label="Minimum">
-            <NumberField value={def.players.min} min={1} max={def.players.max} label="Minimum players" onChange={(min) => edit((draft) => void (draft.players.min = min))} />
+          <Field label={gameUi("Minimum")}>
+            <NumberField value={def.players.min} min={1} max={def.players.max} label={gameUi("Minimum players")} onChange={(min) => edit((draft) => void (draft.players.min = min))} />
           </Field>
-          <Field label="Maximum">
-            <NumberField value={def.players.max} min={def.players.min} max={10} label="Maximum players" onChange={(max) => edit((draft) => void (draft.players.max = max))} />
+          <Field label={gameUi("Maximum")}>
+            <NumberField value={def.players.max} min={def.players.min} max={10} label={gameUi("Maximum players")} onChange={(max) => edit((draft) => void (draft.players.max = max))} />
           </Field>
         </div>
       </Panel>
-      {mode === "advanced" && (
-        <Panel title="Roles">
+      {gameUi(mode === "advanced" && (
+        <Panel title={gameUi("Roles")}>
           <div className="flex flex-wrap items-center gap-2">
             {(def.roles ?? []).map((entry) => (
               <span key={entry} className="inline-flex items-center gap-1 rounded-full border border-sky-400/30 bg-sky-400/10 px-2.5 py-1 text-xs text-sky-100">
-                {entry}
-                <button type="button" aria-label={`Remove role ${entry}`} onClick={() => edit((draft) => void (draft.roles = (draft.roles ?? []).filter((item) => item !== entry)))}>
+                {gameUi(entry)}
+                <button type="button" aria-label={gameUi(`Remove role ${entry}`)} onClick={() => edit((draft) => void (draft.roles = (draft.roles ?? []).filter((item) => item !== entry)))}>
                   ✕
                 </button>
               </span>
             ))}
-            <input aria-label="New role" className={`${inputClass} !w-40 py-1`} placeholder="new role" value={role} onChange={(event) => setRole(event.target.value.replace(/[^A-Za-z0-9_-]/g, ""))} />
+            <input aria-label={gameUi("New role")} className={`${inputClass} !w-40 py-1`} placeholder={gameUi("new role")} value={role} onChange={(event) => setRole(event.target.value.replace(/[^A-Za-z0-9_-]/g, ""))} />
             <Button size="sm" disabled={!role} onClick={() => (edit((draft) => void (draft.roles = [...new Set([...(draft.roles ?? []), role])])), setRole(""))}>
-              <Plus size={14} /> Add role
-            </Button>
+              <Plus size={14} />{gameUi(" Add role ")}</Button>
           </div>
         </Panel>
-      )}
+      ))}
     </SectionShell>
   );
 }
 
 /* 10. Rulebook */
 export function RulebookSection() {
+  useGameLanguage();
   const { def, edit } = useCardEditor();
   const facts = generateRulebookFacts(def);
   const fields: { key: keyof Rulebook; label: string; hint: string }[] = [
@@ -161,23 +165,23 @@ export function RulebookSection() {
     { key: "notes", label: "Extra notes", hint: "Variants, tips, edge cases (optional)." },
   ];
   return (
-    <SectionShell section="rulebook" eyebrow="10 · Rulebook" title="Rulebook" description="Explain your game in your own words. The facts on the right are generated from your configuration and always stay accurate — they are shown separately.">
+    <SectionShell section="rulebook" eyebrow="10 · Rulebook" title={gameUi("Rulebook")} description={gameUi("Explain your game in your own words. The facts on the right are generated from your configuration and always stay accurate — they are shown separately.")}>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
         <Panel>
           <div className="space-y-4">
             {fields.map((field) => (
-              <Field key={field.key} label={field.label} hint={field.hint}>
+              <Field key={field.key} label={gameUi(field.label)} hint={field.hint}>
                 <textarea className={`${inputClass} min-h-24`} maxLength={8000} value={def.rulebook[field.key] ?? ""} onChange={(event) => edit((draft) => void (draft.rulebook[field.key] = event.target.value))} />
               </Field>
             ))}
           </div>
         </Panel>
-        <Panel title="Generated from your settings" eyebrow="Facts">
+        <Panel title={gameUi("Generated from your settings")} eyebrow="Facts">
           <ul className="space-y-2 text-sm text-zinc-300">
             {facts.map((fact, index) => (
               <li key={index} className="rounded-lg border border-white/[0.06] bg-black/20 px-3 py-2">
-                <span className="mr-2 text-[10px] font-black uppercase tracking-wide text-zinc-500">{fact.topic}</span>
-                {fact.text}
+                <span className="mr-2 text-[10px] font-black uppercase tracking-wide text-zinc-500">{gameUi(fact.topic)}</span>
+                {gameUi(fact.text)}
               </li>
             ))}
           </ul>
@@ -202,6 +206,7 @@ const newSetting = (type: GameSettingDefinition["type"], key: string): GameSetti
 };
 
 export function SettingsSection() {
+  useGameLanguage();
   const { def, edit, mode } = useCardEditor();
   const settings = def.settings ?? [];
   const update = (index: number, next: GameSettingDefinition) => edit((draft) => void (draft.settings = (draft.settings ?? []).map((entry, i) => (i === index ? next : entry))));
@@ -209,8 +214,8 @@ export function SettingsSection() {
     <SectionShell
       section="settings"
       eyebrow="11 · Settings"
-      title="Game settings"
-      description="Options players choose in the lobby. Rules and effects can read them (value type “lobby setting”), so one game can cover many variants."
+      title={gameUi("Game settings")}
+      description={gameUi("Options players choose in the lobby. Rules and effects can read them (value type “lobby setting”), so one game can cover many variants.")}
       actions={
         <select aria-label="Add setting" className={`${inputClass} !w-auto py-1.5`} value="" onChange={(event) => event.target.value && edit((draft) => void (draft.settings = [...(draft.settings ?? []), newSetting(event.target.value as GameSettingDefinition["type"], `setting${(draft.settings?.length ?? 0) + 1}`)]))}>
           <option value="">+ Add setting…</option>
@@ -221,12 +226,12 @@ export function SettingsSection() {
         </select>
       }
     >
-      {!settings.length && <p className="text-sm text-zinc-500">No settings yet.</p>}
+      {!settings.length && <p className="text-sm text-zinc-500">{gameUi("No settings yet.")}</p>}
       <div className="grid gap-3 lg:grid-cols-2">
         {settings.map((setting, index) => (
           <Panel
             key={index}
-            title={setting.label}
+            title={gameUi(setting.label)}
             eyebrow={`${setting.type} · ${setting.key}`}
             actions={
               <button type="button" aria-label={`Delete setting ${setting.label}`} className="text-zinc-500 hover:text-red-300" onClick={() => edit((draft) => void (draft.settings = (draft.settings ?? []).filter((_, i) => i !== index)))}>
@@ -235,52 +240,51 @@ export function SettingsSection() {
             }
           >
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Label">
+              <Field label={gameUi("Label")}>
                 <input className={inputClass} value={setting.label} onChange={(event) => update(index, { ...setting, label: event.target.value })} />
               </Field>
-              <Field label="Key (used by rules)">
+              <Field label={gameUi("Key (used by rules)")}>
                 <input className={`${inputClass} font-mono`} value={setting.key} onChange={(event) => update(index, { ...setting, key: event.target.value.replace(/[^A-Za-z0-9_-]/g, "") })} />
               </Field>
-              {setting.type === "integer" && (
+              {gameUi(setting.type === "integer" && (
                 <>
-                  <Field label="Default">
-                    <NumberField value={setting.default} min={setting.min} max={setting.max} label="Default" onChange={(value) => update(index, { ...setting, default: value })} />
+                  <Field label={gameUi("Default")}>
+                    <NumberField value={setting.default} min={setting.min} max={setting.max} label={gameUi("Default")} onChange={(value) => update(index, { ...setting, default: value })} />
                   </Field>
-                  <Field label="Range">
+                  <Field label={gameUi("Range")}>
                     <span className="flex items-center gap-2">
-                      <NumberField value={setting.min} min={-100} max={setting.max} label="Minimum" onChange={(value) => update(index, { ...setting, min: value, default: Math.max(value, setting.default) })} />
+                      <NumberField value={setting.min} min={-100} max={setting.max} label={gameUi("Minimum")} onChange={(value) => update(index, { ...setting, min: value, default: Math.max(value, setting.default) })} />
                       –
-                      <NumberField value={setting.max} min={setting.min} max={1000} label="Maximum" onChange={(value) => update(index, { ...setting, max: value, default: Math.min(value, setting.default) })} />
+                      <NumberField value={setting.max} min={setting.min} max={1000} label={gameUi("Maximum")} onChange={(value) => update(index, { ...setting, max: value, default: Math.min(value, setting.default) })} />
                     </span>
                   </Field>
                 </>
-              )}
-              {setting.type === "boolean" && <Toggle checked={setting.default} onChange={(value) => update(index, { ...setting, default: value })} label="On by default" />}
-              {setting.type === "string" && (
-                <Field label="Default">
+              ))}
+              {setting.type === "boolean" && <Toggle checked={setting.default} onChange={(value) => update(index, { ...setting, default: value })} label={gameUi("On by default")} />}
+              {gameUi(setting.type === "string" && (
+                <Field label={gameUi("Default")}>
                   <input className={inputClass} value={setting.default} onChange={(event) => update(index, { ...setting, default: event.target.value })} />
                 </Field>
-              )}
-              {setting.type === "select" && (
+              ))}
+              {gameUi(setting.type === "select" && (
                 <div className="sm:col-span-2">
-                  <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Choices (● = default)</p>
+                  <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{gameUi("Choices (● = default)")}</p>
                   <ul className="space-y-1.5">
                     {setting.options.map((option, optionIndex) => (
                       <li key={optionIndex} className="flex items-center gap-2">
-                        <input type="radio" aria-label="Default choice" checked={setting.default === option.value} onChange={() => update(index, { ...setting, default: option.value })} />
-                        <input aria-label="Choice value" className={`${inputClass} !w-28 font-mono`} value={option.value} onChange={(event) => update(index, { ...setting, options: setting.options.map((entry, i) => (i === optionIndex ? { ...entry, value: event.target.value } : entry)) })} />
-                        <input aria-label="Choice label" className={inputClass} value={option.label} onChange={(event) => update(index, { ...setting, options: setting.options.map((entry, i) => (i === optionIndex ? { ...entry, label: event.target.value } : entry)) })} />
-                        <button type="button" aria-label="Remove choice" className="text-zinc-500 hover:text-red-300" onClick={() => update(index, { ...setting, options: setting.options.filter((_, i) => i !== optionIndex) })}>
+                        <input type="radio" aria-label={gameUi("Default choice")} checked={setting.default === option.value} onChange={() => update(index, { ...setting, default: option.value })} />
+                        <input aria-label={gameUi("Choice value")} className={`${inputClass} !w-28 font-mono`} value={option.value} onChange={(event) => update(index, { ...setting, options: setting.options.map((entry, i) => (i === optionIndex ? { ...entry, value: event.target.value } : entry)) })} />
+                        <input aria-label={gameUi("Choice label")} className={inputClass} value={option.label} onChange={(event) => update(index, { ...setting, options: setting.options.map((entry, i) => (i === optionIndex ? { ...entry, label: event.target.value } : entry)) })} />
+                        <button type="button" aria-label={gameUi("Remove choice")} className="text-zinc-500 hover:text-red-300" onClick={() => update(index, { ...setting, options: setting.options.filter((_, i) => i !== optionIndex) })}>
                           ✕
                         </button>
                       </li>
                     ))}
                   </ul>
                   <Button size="sm" className="mt-2" onClick={() => update(index, { ...setting, options: [...setting.options, { value: `option${setting.options.length + 1}`, label: "New choice" }] })}>
-                    <Plus size={14} /> Choice
-                  </Button>
+                    <Plus size={14} />{gameUi(" Choice ")}</Button>
                 </div>
-              )}
+              ))}
             </div>
           </Panel>
         ))}

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { Crown, Gem, Medal, Shield, Sparkles, Star, Trophy } from "lucide-react";
 import type { RankFamily } from "@/games/chess/ranked/tiers";
 
@@ -12,6 +13,7 @@ const styles = {
 } satisfies Record<RankFamily, { Icon: typeof Shield; className: string }>;
 
 export default function RankEmblem({ family, size = "md" }: { family: RankFamily; size?: "sm" | "md" | "lg" }) {
+  useGameLanguage();
   const { Icon, className } = styles[family];
-  return <span role="img" aria-label={`${family} rank emblem`} className={`inline-grid shrink-0 place-items-center rounded-2xl border bg-gradient-to-br shadow-[inset_0_1px_rgba(255,255,255,.35),0_10px_24px_rgba(0,0,0,.35)] ${className} ${size === "lg" ? "h-20 w-20" : size === "sm" ? "h-9 w-9 rounded-xl" : "h-14 w-14"}`}><Icon size={size === "lg" ? 42 : size === "sm" ? 18 : 28} strokeWidth={1.7} aria-hidden="true" /></span>;
+  return <span role="img" aria-label={gameUi(`${family} rank emblem`)} className={`inline-grid shrink-0 place-items-center rounded-2xl border bg-gradient-to-br shadow-[inset_0_1px_rgba(255,255,255,.35),0_10px_24px_rgba(0,0,0,.35)] ${className} ${size === "lg" ? "h-20 w-20" : size === "sm" ? "h-9 w-9 rounded-xl" : "h-14 w-14"}`}><Icon size={size === "lg" ? 42 : size === "sm" ? 18 : 28} strokeWidth={1.7} aria-hidden="true" /></span>;
 }

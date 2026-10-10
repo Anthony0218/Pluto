@@ -1,3 +1,5 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
+import GameXpReward from "@/components/games/GameXpReward";
 import PlayerBar from "@/components/ranked/RankedPlayerBar";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -2383,7 +2385,7 @@ export default function ChessMultiplayerGame() {
           HEADER
          ========================================================= */}
 
-        <ChessPageHeader title={room.match_kind === "ranked" ? "Ranked Chess" : undefined} className="
+        <ChessPageHeader title={gameUi(room.match_kind === "ranked" ? "Ranked Chess" : undefined)} className="
           mb-2
           flex
           shrink-0
@@ -2503,11 +2505,11 @@ export default function ChessMultiplayerGame() {
                           : "bg-white/5 text-zinc-500"
                     }`}
                   >
-                    {materialState.materialDifference > 0 &&
-                      `${t("White")} +${materialState.materialDifference}`}
-                    {materialState.materialDifference < 0 &&
-                      `${t("Black")} +${Math.abs(materialState.materialDifference)}`}
-                    {materialState.materialDifference === 0 && t("Equal")}
+                    {gameUi(materialState.materialDifference > 0 &&
+                      `${t("White")} +${materialState.materialDifference}`)}
+                    {gameUi(materialState.materialDifference < 0 &&
+                      `${t("Black")} +${Math.abs(materialState.materialDifference)}`)}
+                    {gameUi(materialState.materialDifference === 0 && t("Equal"))}
                   </span>
                 </div>
 
@@ -2533,7 +2535,7 @@ export default function ChessMultiplayerGame() {
                       {t("White in check")}
                     </p>
                     <p className="mt-1 font-bold text-zinc-300">
-                      {materialState.whiteChecks}
+                      {gameUi(materialState.whiteChecks)}
                     </p>
                   </div>
 
@@ -2542,7 +2544,7 @@ export default function ChessMultiplayerGame() {
                       {t("Black in check")}
                     </p>
                     <p className="mt-1 font-bold text-zinc-300">
-                      {materialState.blackChecks}
+                      {gameUi(materialState.blackChecks)}
                     </p>
                   </div>
                 </div>
@@ -2560,7 +2562,7 @@ export default function ChessMultiplayerGame() {
                     </p>
                   </div>
                   <span className="rounded-lg border border-white/5 bg-white/5 px-2.5 py-1 text-xs font-bold text-zinc-400">
-                    {gameState.moves.length}
+                    {gameUi(gameState.moves.length)}
                   </span>
                 </div>
                 <ChessMoveHistoryList
@@ -2575,9 +2577,9 @@ export default function ChessMultiplayerGame() {
                     content: (
                       <>
                         <span className="text-base leading-none">
-                          {getMultiplayerHistoryPieceSymbol(move.color, move.piece)}
+                          {gameUi(getMultiplayerHistoryPieceSymbol(move.color, move.piece))}
                         </span>
-                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{move.san}</span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(move.san)}</span>
                       </>
                     ),
                   }))}
@@ -2608,10 +2610,10 @@ export default function ChessMultiplayerGame() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="rounded-lg border border-amber-300/10 bg-amber-300/[0.06] px-2 py-1 text-xs font-bold text-amber-200">
-                      {savedGames.length}
+                      {gameUi(savedGames.length)}
                     </span>
                     <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
-                      {savedGamesOpen ? ui("Hide") : ui("Show")}
+                      {gameUi(savedGamesOpen ? ui("Hide") : ui("Show"))}
                     </span>
                   </div>
                 </button>
@@ -2631,7 +2633,7 @@ export default function ChessMultiplayerGame() {
                         onClick={() => void saveCurrentGame()}
                         className="rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2.5 text-xs font-black text-amber-200 transition hover:bg-amber-400/20 disabled:cursor-not-allowed disabled:opacity-35"
                       >
-                        {savingGame ? "…" : t("Save")}
+                        {gameUi(savingGame ? "…" : t("Save"))}
                       </button>
                     </div>
                     <div className="max-h-80 space-y-1 overflow-y-auto p-2 pt-0 [scrollbar-width:thin]">
@@ -2647,12 +2649,12 @@ export default function ChessMultiplayerGame() {
                           >
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-xs font-bold text-zinc-200">
-                                {savedGame.name || t("Unnamed Game")}
+                                {gameUi(savedGame.name || t("Unnamed Game"))}
                               </p>
                               <p className="mt-1 truncate text-[10px] text-zinc-600">
-                                {savedGame.white_player || t("White")}{" "}
-                                <span className="px-1 text-zinc-700">{ui("vs")}</span>{" "}
-                                {savedGame.black_player || t("Black")}
+                                {gameUi(savedGame.white_player || t("White"))}{gameUi(" ")}
+                                <span className="px-1 text-zinc-700">{ui("vs")}</span>{gameUi(" ")}
+                                {gameUi(savedGame.black_player || t("Black"))}
                               </p>
                             </div>
                             <button
@@ -2728,7 +2730,7 @@ export default function ChessMultiplayerGame() {
                     <span className="text-xs text-zinc-500">{t("Status")}</span>
 
                     <span className="text-xs font-bold capitalize text-zinc-300">
-                      {gameState.status}
+                      {gameUi(gameState.status)}
                     </span>
                   </div>
 
@@ -2750,7 +2752,7 @@ export default function ChessMultiplayerGame() {
                     </span>
 
                     <span className="text-sm font-bold text-zinc-200">
-                      {myColor === "w" ? t("White") : t("Black")}
+                      {gameUi(myColor === "w" ? t("White") : t("Black"))}
                     </span>
                   </div>
                 </div>
@@ -2819,9 +2821,9 @@ export default function ChessMultiplayerGame() {
                     </p>
 
                     <p className="mt-1 text-sm font-bold text-white">
-                      {t("Move")} {historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
+                      {t("Move")} {gameUi(historyPreview.moveNumber)}
+                      {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                      {gameUi(historyPreview.san)}
                     </p>
                   </div>
 
@@ -2853,71 +2855,74 @@ export default function ChessMultiplayerGame() {
                 </div>
               )}
 
-              <ChessMatchStatus
-                event={multiplayerMatchStatus.event}
-                message={multiplayerMatchStatus.message}
-                detail={multiplayerMatchStatus.detail}
-                label={ui("Match status")}
-                className="mb-2"
-                effects={[
-                  {
-                    id: "room",
-                    label: t("Room"),
-                    value: room.code,
-                    tone: "blue",
-                  },
-                  ...(room.match_kind !== "ranked" && myRematchReady && !opponentRematchReady
-                    ? [
-                        {
-                          id: "rematch-waiting",
-                          label: t("Waiting for opponent..."),
-                          tone: "amber" as const,
-                        },
-                      ]
-                    : room.match_kind !== "ranked" && opponentRematchReady && !myRematchReady
+              <div className={gameState.status === "finished" ? "chess-status-row" : undefined}>
+                <ChessMatchStatus
+                  event={multiplayerMatchStatus.event}
+                  message={multiplayerMatchStatus.message}
+                  detail={multiplayerMatchStatus.detail}
+                  label={ui(gameState.status === "finished" ? "Game over" : "Match status")}
+                  className="mb-2"
+                  effects={[
+                    {
+                      id: "room",
+                      label: t("Room"),
+                      value: room.code,
+                      tone: "blue",
+                    },
+                    ...(room.match_kind !== "ranked" && myRematchReady && !opponentRematchReady
                       ? [
                           {
-                            id: "rematch-offer",
-                            label: t("Opponent wants a rematch."),
-                            tone: "emerald" as const,
+                            id: "rematch-waiting",
+                            label: t("Waiting for opponent..."),
+                            tone: "amber" as const,
                           },
                         ]
-                      : []),
-                ]}
-                actions={
-                  gameReviewAvailable && !historyPreview ? (
-                    <>
-                      <button
-                        type="button"
-                        disabled={reviewMoves.length === 0}
-                        onClick={() => {
-                          setHistoryPreviewPly(null);
-                          setReviewOpen(true);
-                        }}
-                        className="rounded-lg border border-amber-300/25 bg-amber-300/[0.10] px-3 py-2 text-[10px] font-black text-amber-100 transition hover:bg-amber-300/[0.16] disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        {t("Open Game Review")}
-                      </button>
+                      : room.match_kind !== "ranked" && opponentRematchReady && !myRematchReady
+                        ? [
+                            {
+                              id: "rematch-offer",
+                              label: t("Opponent wants a rematch."),
+                              tone: "emerald" as const,
+                            },
+                          ]
+                        : []),
+                  ]}
+                  actions={
+                    gameReviewAvailable && !historyPreview ? (
+                      <>
+                        <button
+                          type="button"
+                          disabled={reviewMoves.length === 0}
+                          onClick={() => {
+                            setHistoryPreviewPly(null);
+                            setReviewOpen(true);
+                          }}
+                          className="rounded-lg border border-amber-300/25 bg-amber-300/[0.10] px-3 py-2 text-[10px] font-black text-amber-100 transition hover:bg-amber-300/[0.16] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {t("Open Game Review")}
+                        </button>
 
-                      {room.match_kind !== "ranked" && <button
-                        type="button"
-                        disabled={myRematchReady || actionLoading === "rematch"}
-                        onClick={requestRematch}
-                        className="rounded-lg border border-emerald-300/20 bg-emerald-300/[0.08] px-3 py-2 text-[10px] font-black text-emerald-100 transition hover:bg-emerald-300/[0.14] disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        {myRematchReady ? t("Rematch requested") : t("Rematch")}
-                      </button>}
+                        {room.match_kind !== "ranked" && <button
+                          type="button"
+                          disabled={myRematchReady || actionLoading === "rematch"}
+                          onClick={requestRematch}
+                          className="rounded-lg border border-emerald-300/20 bg-emerald-300/[0.08] px-3 py-2 text-[10px] font-black text-emerald-100 transition hover:bg-emerald-300/[0.14] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {gameUi(myRematchReady ? t("Rematch requested") : t("Rematch"))}
+                        </button>}
 
-                      <Link
-                        to={lobbyPath}
-                        className="rounded-lg border border-white/10 bg-white/[0.045] px-3 py-2 text-[10px] font-black text-zinc-300 transition hover:bg-white/[0.08] hover:text-white"
-                      >
-                        {t("Back to lobby")}
-                      </Link>
-                    </>
-                  ) : undefined
-                }
-              />
+                        <Link
+                          to={lobbyPath}
+                          className="rounded-lg border border-white/10 bg-white/[0.045] px-3 py-2 text-[10px] font-black text-zinc-300 transition hover:bg-white/[0.08] hover:text-white"
+                        >
+                          {t("Back to lobby")}
+                        </Link>
+                      </>
+                    ) : undefined
+                  }
+                />
+              {gameState.status === "finished" && <GameXpReward amount={100} />}
+            </div>
 
               {/* =====================================================
                 BOARD
@@ -2946,7 +2951,7 @@ export default function ChessMultiplayerGame() {
                         <>
                           <span aria-hidden="true">⚡</span>
                           <span>{ui("Premove")}</span>
-                          <span className="font-mono text-rose-50">{premove.from}→{premove.to}</span>
+                          <span className="font-mono text-rose-50">{gameUi(premove.from)}→{gameUi(premove.to)}</span>
                           <button
                             type="button"
                             onClick={() => setPremove(null)}
@@ -2983,7 +2988,7 @@ export default function ChessMultiplayerGame() {
                 <span className="text-sm text-zinc-500">{t("Moves")}</span>
 
                 <span className="text-sm font-bold text-zinc-200">
-                  {gameState.moves.length}
+                  {gameUi(gameState.moves.length)}
                 </span>
               </div>
             </div>
@@ -2999,7 +3004,7 @@ export default function ChessMultiplayerGame() {
               <div className={`shrink-0 space-y-2 ${room.match_kind === "ranked" ? "pt-3" : ""}`}>
                 {room.match_kind === "ranked" && (
                   <p className="flex items-center justify-between gap-2 px-1 text-[10px] font-black uppercase tracking-[0.2em] text-amber-200/70">
-                    <span>{ui("Ranked")} · {timeControlLabel(room.time_control, ui)}</span>
+                    <span>{ui("Ranked")} · {gameUi(timeControlLabel(room.time_control, ui))}</span>
                     <span className="font-semibold normal-case tracking-normal text-rose-200/60">{ui("Premoves on")}</span>
                   </p>
                 )}
@@ -3054,7 +3059,7 @@ export default function ChessMultiplayerGame() {
 
               {/* GAME CONTROLS */}
 
-              <section className="rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] p-4 shadow-2xl shadow-black/35 backdrop-blur-xl">
+              <section data-chess-controls className="rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] p-4 shadow-2xl shadow-black/35 backdrop-blur-xl">
                 <div className="mb-5">
                   <div className="flex items-center gap-2">
                     <div
@@ -3086,7 +3091,7 @@ export default function ChessMultiplayerGame() {
                   >
                     <span aria-hidden="true">▣</span>
                     <span>
-                      {savingGame ? "…" : `${t("Save")} ${t("Game")}`}
+                      {gameUi(savingGame ? "…" : `${t("Save")} ${t("Game")}`)}
                     </span>
                   </button>
 
@@ -3114,14 +3119,14 @@ export default function ChessMultiplayerGame() {
                           disabled:opacity-40
                         "
                         >
-                          {actionLoading === "undo-request" ? t("Undo request sent") : t("Undo Move")}
+                          {gameUi(actionLoading === "undo-request" ? t("Undo request sent") : t("Undo Move"))}
                         </button>
 
                         {!canRequestUndo && gameState.moves.length > 0 && (
                           <p className="px-1 text-center text-[10px] leading-4 text-zinc-600">
-                            {alreadyRequestedUndoForCurrentMove ? t("You already requested undo for this move.") : t(
+                            {gameUi(alreadyRequestedUndoForCurrentMove ? t("You already requested undo for this move.") : t(
                                   "Only the player who made the last move can request undo.",
-                                )}
+                                ))}
                           </p>
                         )}
                       </>
@@ -3320,7 +3325,7 @@ export default function ChessMultiplayerGame() {
                   </div>
 
                   <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
-                    {gameState.moves.length}
+                    {gameUi(gameState.moves.length)}
                   </span>
                 </div>
 
@@ -3335,9 +3340,9 @@ export default function ChessMultiplayerGame() {
                     content: (
                       <>
                         <span className="text-base leading-none">
-                          {getMultiplayerHistoryPieceSymbol(move.color, move.piece)}
+                          {gameUi(getMultiplayerHistoryPieceSymbol(move.color, move.piece))}
                         </span>
-                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{move.san}</span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(move.san)}</span>
                       </>
                     ),
                   }))}
@@ -3390,7 +3395,7 @@ export default function ChessMultiplayerGame() {
                     <span className="text-xs text-zinc-500">{t("Turn")}</span>
 
                     <span className="text-xs font-bold text-zinc-300">
-                      {chess.turn() === "w" ? t("White") : t("Black")}
+                      {gameUi(chess.turn() === "w" ? t("White") : t("Black"))}
                     </span>
                   </div>
 
@@ -3410,7 +3415,7 @@ export default function ChessMultiplayerGame() {
                     </span>
 
                     <span className="text-xs font-bold text-amber-200">
-                      {gameState.moves.length}
+                      {gameUi(gameState.moves.length)}
                     </span>
                   </div>
 
@@ -3430,7 +3435,7 @@ export default function ChessMultiplayerGame() {
                     </span>
 
                     <span className="text-xs font-bold text-zinc-400">
-                      {gameState.version}
+                      {gameUi(gameState.version)}
                     </span>
                   </div>
                 </div>
@@ -3454,10 +3459,10 @@ export default function ChessMultiplayerGame() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="rounded-lg border border-amber-300/10 bg-amber-300/[0.06] px-2 py-1 text-xs font-bold text-amber-200">
-                      {savedGames.length}
+                      {gameUi(savedGames.length)}
                     </span>
                     <span className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black text-amber-300">
-                      {savedGamesOpen ? ui("Hide") : ui("Show")}
+                      {gameUi(savedGamesOpen ? ui("Hide") : ui("Show"))}
                     </span>
                   </div>
                 </button>
@@ -3477,7 +3482,7 @@ export default function ChessMultiplayerGame() {
                         onClick={() => void saveCurrentGame()}
                         className="rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2.5 text-xs font-black text-amber-200 transition hover:bg-amber-400/20 disabled:cursor-not-allowed disabled:opacity-35"
                       >
-                        {savingGame ? "…" : t("Save")}
+                        {gameUi(savingGame ? "…" : t("Save"))}
                       </button>
                     </div>
                     <div className="max-h-80 space-y-1 overflow-y-auto p-2 pt-0 [scrollbar-width:thin]">
@@ -3493,12 +3498,12 @@ export default function ChessMultiplayerGame() {
                           >
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-xs font-bold text-zinc-200">
-                                {savedGame.name || t("Unnamed Game")}
+                                {gameUi(savedGame.name || t("Unnamed Game"))}
                               </p>
                               <p className="mt-1 truncate text-[10px] text-zinc-600">
-                                {savedGame.white_player || t("White")}{" "}
-                                <span className="px-1 text-zinc-700">{ui("vs")}</span>{" "}
-                                {savedGame.black_player || t("Black")}
+                                {gameUi(savedGame.white_player || t("White"))}{gameUi(" ")}
+                                <span className="px-1 text-zinc-700">{ui("vs")}</span>{gameUi(" ")}
+                                {gameUi(savedGame.black_player || t("Black"))}
                               </p>
                             </div>
                             <button
@@ -3528,7 +3533,7 @@ export default function ChessMultiplayerGame() {
           <div
             role="dialog"
             aria-modal="true"
-            aria-label={showLeaveConfirm ? ui("Leave ranked game?") : t("Resign game?")}
+            aria-label={gameUi(showLeaveConfirm ? ui("Leave ranked game?") : t("Resign game?"))}
             className="
               fixed
               inset-0
@@ -3561,16 +3566,16 @@ export default function ChessMultiplayerGame() {
               </div>
 
               <h2 className={`${showLeaveConfirm ? "mt-7 text-3xl sm:text-4xl" : "mt-5 text-2xl"} font-black text-white`}>
-                {showLeaveConfirm ? ui("Leave ranked game?") : t("Resign game?")}
+                {gameUi(showLeaveConfirm ? ui("Leave ranked game?") : t("Resign game?"))}
               </h2>
 
               <p className={`${showLeaveConfirm ? "mt-4 text-base leading-7" : "mt-2 text-sm leading-6"} text-zinc-400`}>
-                {showLeaveConfirm
+                {gameUi(showLeaveConfirm
                   ? ui("If you leave now, you lose the game. Are you sure?")
-                  : t("Your opponent wins the game.")}
+                  : t("Your opponent wins the game."))}
               </p>
               {room.match_kind === "ranked" && <p className="mt-4 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-lg font-black text-red-200" aria-live="polite">
-                {forfeitEloLoss === null ? forfeitQuoteFailed ? ui("Elo loss is unavailable right now. Leaving still counts as a loss.") : ui("Calculating Elo loss…") : `${ui("You will lose")} ${forfeitEloLoss} ${ui("Elo")}`}
+                {gameUi(forfeitEloLoss === null ? forfeitQuoteFailed ? ui("Elo loss is unavailable right now. Leaving still counts as a loss.") : ui("Calculating Elo loss…") : `${ui("You will lose")} ${forfeitEloLoss} ${ui("Elo")}`)}
               </p>}
 
               <div className="mt-7 grid grid-cols-2 gap-3">
@@ -3609,7 +3614,7 @@ export default function ChessMultiplayerGame() {
                     disabled:opacity-40
                   "
                 >
-                  {showLeaveConfirm ? ui("Leave and lose") : t("Resign now")}
+                  {gameUi(showLeaveConfirm ? ui("Leave and lose") : t("Resign now"))}
                 </button>
               </div>
             </div>
@@ -3620,18 +3625,18 @@ export default function ChessMultiplayerGame() {
           <div role="dialog" aria-modal="true" aria-label={ui("Draw your color card")} className="fixed inset-0 z-[60] flex items-center justify-center bg-[#05070b]/95 px-5 py-10 backdrop-blur-xl">
             <section className="w-full max-w-2xl rounded-[30px] border border-amber-300/25 bg-[radial-gradient(circle_at_50%_0%,rgba(245,158,11,.16),transparent_55%),#0d111a] p-7 text-center shadow-2xl shadow-black sm:p-11" aria-label={ui("Draw your color card")}>
               <p className="text-xs font-black uppercase tracking-[.3em] text-amber-300">{ui("Ranked Chess")}</p>
-              <h2 className="mt-4 font-serif text-4xl text-white sm:text-5xl">{selectedRankedCard === null ? ui("Draw your color") : ui("Your color is revealed")}</h2>
+              <h2 className="mt-4 font-serif text-4xl text-white sm:text-5xl">{gameUi(selectedRankedCard === null ? ui("Draw your color") : ui("Your color is revealed"))}</h2>
               <p className="mx-auto mt-4 max-w-lg text-sm leading-6 text-zinc-400">{ui("Pick one of the two cards. White and black were assigned at random when the match began.")}</p>
               <div className="mt-9 grid grid-cols-2 gap-4 sm:gap-7">
                 {[0, 1].map(index => {
                   const revealedColor = selectedRankedCard === index ? myColor : myColor === "w" ? "b" : "w";
                   return <button key={index} type="button" disabled={selectedRankedCard !== null} onClick={() => drawRankedCard(index)} className={`flex aspect-[.72] flex-col items-center justify-center rounded-[24px] border p-5 shadow-xl transition duration-300 ${selectedRankedCard === null ? "border-amber-300/35 bg-gradient-to-br from-[#38312a] to-[#11131a] hover:-translate-y-2 hover:border-amber-200 hover:shadow-amber-300/10" : revealedColor === "w" ? "border-amber-200 bg-gradient-to-br from-[#fff9e8] to-[#c9ae80] text-[#211a11]" : "border-zinc-500 bg-gradient-to-br from-[#4d4d52] to-[#111114] text-white"}`}>
-                    <span className="text-[clamp(4rem,13vw,8rem)] leading-none">{selectedRankedCard === null ? "?" : revealedColor === "w" ? "♔" : "♚"}</span>
-                    <span className="mt-5 text-sm font-black uppercase tracking-[.23em]">{selectedRankedCard === null ? ui("Draw card") : revealedColor === "w" ? ui("White") : ui("Black")}</span>
+                    <span className="text-[clamp(4rem,13vw,8rem)] leading-none">{gameUi(selectedRankedCard === null ? "?" : revealedColor === "w" ? "♔" : "♚")}</span>
+                    <span className="mt-5 text-sm font-black uppercase tracking-[.23em]">{gameUi(selectedRankedCard === null ? ui("Draw card") : revealedColor === "w" ? ui("White") : ui("Black"))}</span>
                   </button>;
                 })}
               </div>
-              <p className="mt-7 text-xs text-zinc-500">{selectedRankedCard === null ? ui("Both players draw a card before playing.") : ui("Opening the board…")}</p>
+              <p className="mt-7 text-xs text-zinc-500">{gameUi(selectedRankedCard === null ? ui("Both players draw a card before playing.") : ui("Opening the board…"))}</p>
             </section>
           </div>
         )}
@@ -3691,10 +3696,11 @@ function CapturedPiecesGrid({
     color: "white" | "black";
     pieces: PieceType[];
   }) {
+  useGameLanguage();
     return (
       <div className="grid grid-cols-[52px_minmax(0,1fr)] items-start gap-2">
         <div className="pt-2 text-[10px] font-black uppercase tracking-wider text-zinc-600">
-          {color === "white" ? t("White") : t("Black")}
+          {gameUi(color === "white" ? t("White") : t("Black"))}
         </div>
 
         <div
@@ -3732,7 +3738,7 @@ function CapturedPiecesGrid({
                   leading-none
                 "
               >
-                {symbols[color][piece]}
+                {gameUi(symbols[color][piece])}
               </span>
             ))
           )}

@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -154,22 +155,24 @@ function chessColor(color: TwoPlayerColor): FogSide {
 }
 
 function Panel({
+  gameControls = false,
   title,
   subtitle,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   subtitle?: string;
   children: ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       <div className="mb-4">
         <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
         {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}
       </div>
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -178,7 +181,7 @@ function ErrorBox({ children }: { children: ReactNode }) {
   useUiLanguage();
   return (
     <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
-      {children}
+      {gameUi(children)}
     </div>
   );
 }
@@ -329,7 +332,7 @@ export function FogOfWarMultiplayerLobby() {
                 onClick={() => void createRoom()}
                 className="mt-5 w-full rounded-xl bg-sky-300 px-5 py-3 font-black text-zinc-950 transition hover:bg-sky-200 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "create" ? ui("Creating...") : ui("Create Fog Room")}
+                {gameUi(loading === "create" ? ui("Creating...") : ui("Create Fog Room"))}
               </button>
             </Panel>
 
@@ -350,7 +353,7 @@ export function FogOfWarMultiplayerLobby() {
                 onClick={() => void joinRoom()}
                 className="mt-3 w-full rounded-xl border border-sky-400/20 bg-sky-400/[0.07] px-5 py-3 font-black text-sky-200 transition hover:bg-sky-400/10 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "join" ? ui("Joining...") : ui("Join Fog Room")}
+                {gameUi(loading === "join" ? ui("Joining...") : ui("Join Fog Room"))}
               </button>
             </Panel>
           </div>
@@ -688,8 +691,8 @@ export function FogOfWarMultiplayerGame() {
   return (
     <main className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
-        <ChessPageHeader className="mb-7 flex flex-col gap-4 rounded-3xl border border-sky-400/10 bg-zinc-900/55 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between" description={<> {ui("Private server-side fog ·")}{" "}
-                {snapshot.myColor === "white" ? ui("White") : ui("Black")}{ui("view")} </>}>
+        <ChessPageHeader className="mb-7 flex flex-col gap-4 rounded-3xl border border-sky-400/10 bg-zinc-900/55 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between" description={<> {ui("Private server-side fog ·")}{gameUi(" ")}
+                {gameUi(snapshot.myColor === "white" ? ui("White") : ui("Black"))}{ui("view")} </>}>
 
 
           <div className="flex flex-wrap items-center gap-2">
@@ -698,10 +701,10 @@ export function FogOfWarMultiplayerGame() {
               onClick={() => void copyRoomCode()}
               className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs font-black tracking-widest text-zinc-300"
             >
-              {copied ? ui("COPIED") : snapshot.room.code}
+              {gameUi(copied ? ui("COPIED") : snapshot.room.code)}
             </button>
             <span className="rounded-full border border-sky-400/15 bg-sky-400/[0.06] px-3 py-1.5 text-xs font-bold text-sky-200">
-              {snapshot.status === "waiting" ? ui("Waiting for opponent") : snapshot.status === "finished" ? ui("Game over") : snapshot.turn === "w" ? ui("White to move") : ui("Black to move")}
+              {gameUi(snapshot.status === "waiting" ? ui("Waiting for opponent") : snapshot.status === "finished" ? ui("Game over") : snapshot.turn === "w" ? ui("White to move") : ui("Black to move"))}
             </span>
           </div>
         </ChessPageHeader>
@@ -724,15 +727,15 @@ export function FogOfWarMultiplayerGame() {
           />
         </section>
 
-        {snapshot.status === "finished" && (
+        {gameUi(snapshot.status === "finished" && (
           <VisibleGameResult
             winner={snapshot.winner}
             playerColor={snapshot.myColor}
             reason={snapshot.endReason}
           />
-        )}
+        ))}
 
-        {snapshot.undo.opponent && (
+        {gameUi(snapshot.undo.opponent && (
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3">
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-amber-300">{ui("Undo request")}</p>
@@ -763,7 +766,7 @@ export function FogOfWarMultiplayerGame() {
               >{ui("Decline")}</button>
             </div>
           </div>
-        )}
+        ))}
 
         <div className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
@@ -776,23 +779,23 @@ export function FogOfWarMultiplayerGame() {
                       className="flex items-center justify-between rounded-xl border border-white/5 bg-black/20 px-3 py-2.5"
                     >
                       <span className="truncate text-sm font-bold text-zinc-200">
-                        {player.user_id === user.id ? `${player.display_name} · You` : player.display_name}
+                        {gameUi(player.user_id === user.id ? `${player.display_name} · You` : player.display_name)}
                       </span>
                       <span className="text-xl">
-                        {player.chosen_color === "white" ? "♔" : "♚"}
+                        {gameUi(player.chosen_color === "white" ? "♔" : "♚")}
                       </span>
                     </div>
                   ))}
                 </div>
                 {snapshot.status === "waiting" && (
-                  <p className="mt-3 rounded-xl border border-sky-400/10 bg-sky-400/[0.04] px-3 py-3 text-xs text-zinc-500">{ui("Share room code")}{" "}
+                  <p className="mt-3 rounded-xl border border-sky-400/10 bg-sky-400/[0.04] px-3 py-3 text-xs text-zinc-500">{ui("Share room code")}{gameUi(" ")}
                     <span className="font-mono font-black text-sky-200">
-                      {snapshot.room.code}
-                    </span>{" "}{ui("with your opponent.")}</p>
+                      {gameUi(snapshot.room.code)}
+                    </span>{gameUi(" ")}{ui("with your opponent.")}</p>
                 )}
               </Panel>
 
-              <Panel
+              <Panel gameControls
                 title={ui("Game Controls")}
                 subtitle={ui("Negotiated multiplayer actions")}
               >
@@ -824,11 +827,11 @@ export function FogOfWarMultiplayerGame() {
                   >{ui("Flag Resign")}</button>
                 </div>
 
-                {snapshot.undo.mine && (
+                {gameUi(snapshot.undo.mine && (
                   <p className="mt-3 rounded-xl border border-amber-300/10 bg-amber-300/[0.04] px-3 py-2 text-xs text-amber-200">{ui("Waiting for your opponent to answer the undo request…")}</p>
-                )}
+                ))}
 
-                {snapshot.status === "finished" && (
+                {gameUi(snapshot.status === "finished" && (
                   <div className="mt-3">
                     <button
                       type="button"
@@ -838,22 +841,22 @@ export function FogOfWarMultiplayerGame() {
                       }
                       className="w-full rounded-xl bg-sky-300 px-4 py-3 text-sm font-black text-zinc-950 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      {myReady ? ui("Rematch requested") : ui("Play Again")}
+                      {gameUi(myReady ? ui("Rematch requested") : ui("Play Again"))}
                     </button>
-                    {opponentReady && !myReady && (
+                    {gameUi(opponentReady && !myReady && (
                       <p className="mt-2 text-center text-xs font-bold text-emerald-300">{ui("Opponent is ready for a rematch.")}</p>
-                    )}
+                    ))}
                   </div>
-                )}
+                ))}
               </Panel>
 
               <Panel title={ui("Captured Pieces")} subtitle={ui("Material overview")}>
                 <div className="mb-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2 text-xs font-bold text-zinc-400">
-                  {materialDiff > 0
+                  {gameUi(materialDiff > 0
                     ? `White +${materialDiff}`
                     : materialDiff < 0
                       ? `Black +${Math.abs(materialDiff)}`
-                      : "Material equal"}
+                      : "Material equal")}
                 </div>
                 <CapturedPieces
                   capturedBlack={capturedBlack}
@@ -902,14 +905,14 @@ export function FogOfWarMultiplayerGame() {
 
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
-              {historyPreviewPly !== null && (
+              {gameUi(historyPreviewPly !== null && (
                 <div className="mb-3 flex items-center justify-between rounded-xl border border-sky-400/20 bg-sky-400/[0.07] px-4 py-3">
                   <div>
                     <p className="text-[9px] font-black uppercase tracking-widest text-sky-300">{ui("History Preview")}</p>
                     <p className="mt-1 text-sm font-bold text-white">
-                      {historyPreviewPly === 0 ? ui("Initial position") : (snapshot.history.find(
+                      {gameUi(historyPreviewPly === 0 ? ui("Initial position") : (snapshot.history.find(
                             (entry) => entry.ply === historyPreviewPly,
-                          )?.label ?? "Historical position")}
+                          )?.label ?? "Historical position"))}
                     </p>
                   </div>
                   <button
@@ -918,7 +921,7 @@ export function FogOfWarMultiplayerGame() {
                     className="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold"
                   >{ui("Back to Live Board")}</button>
                 </div>
-              )}
+              ))}
 
               <div className="relative">
                 <Board
@@ -950,7 +953,7 @@ export function FogOfWarMultiplayerGame() {
                       <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                       <h2 className="mt-2 text-2xl font-black text-white">
-                        {snapshot.players.length}{ui("/2 players connected")}</h2>
+                        {gameUi(snapshot.players.length)}{ui("/2 players connected")}</h2>
 
                       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
@@ -958,26 +961,26 @@ export function FogOfWarMultiplayerGame() {
                         <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
 
                         <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
-                          {snapshot.room.code}
+                          {gameUi(snapshot.room.code)}
                         </p>
                       </div>
 
                       <p className="mt-4 text-xs font-bold text-zinc-400">
-                        {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
+                        {gameUi(copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code"))}
                       </p>
                     </button>
                     <RoomSlots total={2} names={snapshot.players.map((player) => player.display_name)} overlay />
                   </div>
                 )}
 
-                {pendingPromotion && historyPreviewPly === null && (
+                {gameUi(pendingPromotion && historyPreviewPly === null && (
                   <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/45 p-4 backdrop-blur-[4px]">
                     <div className="w-full max-w-md rounded-3xl border border-sky-400/20 bg-zinc-900/95 p-5 shadow-2xl shadow-black/60">
                       <p className="mb-4 text-center text-xs font-black uppercase tracking-[0.24em] text-sky-300">{ui("Choose promotion")}</p>
                       <PromotionBar onPromote={promotePawn} />
                     </div>
                   </div>
-                )}
+                ))}
               </div>
             </div>
           </section>
@@ -986,7 +989,7 @@ export function FogOfWarMultiplayerGame() {
             <div className="space-y-4 xl:sticky xl:top-6">
               <Panel
                 title={ui("Fog Status")}
-                subtitle={`${snapshot.myColor === "white" ? "White" : "Black"}'s private vision`}
+                subtitle={gameUi(`${snapshot.myColor === "white" ? "White" : "Black"}'s private vision`)}
               >
                 <div className="grid grid-cols-2 gap-2">
                   <StatCard
@@ -1008,7 +1011,7 @@ export function FogOfWarMultiplayerGame() {
                 <div className="mt-3 rounded-xl border border-violet-400/10 bg-violet-400/[0.04] px-3 py-3">
                   <p className="text-[10px] font-black uppercase tracking-wider text-violet-300">{ui("Random Start")}</p>
                   <p className="mt-1 text-xs text-zinc-500">{ui("Same formation for both sides")}</p>
-                  <p className="mt-2 font-mono text-[10px] text-zinc-700">{ui("Seed")}{snapshot.seed}
+                  <p className="mt-2 font-mono text-[10px] text-zinc-700">{ui("Seed")}{gameUi(snapshot.seed)}
                   </p>
                 </div>
               </Panel>
@@ -1067,25 +1070,25 @@ function CapturedPieces({
   useUiLanguage();
   const render = (pieces: PieceType[], color: "w" | "b") => (
     <div className="mt-2 flex min-h-8 flex-wrap gap-1">
-      {pieces.length === 0 ? (
+      {gameUi(pieces.length === 0 ? (
         <span className="text-xs text-zinc-700">—</span>
       ) : (
         pieces.map((piece, index) => (
           <span key={`${color}-${piece}-${index}`} className="text-2xl">
-            {color === "w" ? whiteSymbols[piece] : blackSymbols[piece]}
+            {gameUi(color === "w" ? whiteSymbols[piece] : blackSymbols[piece])}
           </span>
         ))
-      )}
+      ))}
     </div>
   );
 
   return (
     <div className="rounded-2xl border border-white/5 bg-black/20 p-3">
       <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">{ui("Black")}</p>
-      {render(capturedBlack, "b")}
+      {gameUi(render(capturedBlack, "b"))}
       <div className="mt-3 border-t border-white/5 pt-3">
         <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">{ui("White")}</p>
-        {render(capturedWhite, "w")}
+        {gameUi(render(capturedWhite, "w"))}
       </div>
     </div>
   );
@@ -1104,11 +1107,11 @@ function RuleStrip({
   return (
     <div className="flex items-center gap-3">
       <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-400/10 text-lg font-black text-sky-200">
-        {icon}
+        {gameUi(icon)}
       </span>
       <div>
         <p className="text-xs font-black text-zinc-200">{ui(title)}</p>
-        <p className="mt-1 text-[10px] leading-4 text-zinc-600">{detail}</p>
+        <p className="mt-1 text-[10px] leading-4 text-zinc-600">{gameUi(detail)}</p>
       </div>
     </div>
   );
@@ -1118,7 +1121,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
   useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
-      <p className="text-xl font-black text-zinc-100">{value}</p>
+      <p className="text-xl font-black text-zinc-100">{gameUi(value)}</p>
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
       </p>

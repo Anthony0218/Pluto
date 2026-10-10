@@ -1,3 +1,4 @@
+import { baseGameValue } from './tariffs.ts';
 import { POINTS, SUITS, applyAction, cardStrength, contractLevel, createDeck, gameDefinition, isTrump, shouldAiKnock, trickWinner, viewFor, type Action, type AiDifficulty, type Card, type Contract, type GameState, type GameView, type GameRules } from './schafkopf.ts';
 import { botConfig, botLevel, type BotConfig, type BotLevel, type TipCode } from './botConfig.ts';
 import { category, gameKnowledge, knowledgeForLevel, publicPoints, sameParty, type GameKnowledge } from './knowledge.ts';
@@ -438,7 +439,7 @@ export function evaluateHand(hand: Card[], contract: Contract, position = 1, con
   const probability = Math.max(.05,Math.min(.99,1/(1+Math.exp(-(power-(contract.kind === 'rufspiel' ? 8 : 12))/2))));
   const minimum = contract.kind === 'wenz' || contract.kind === 'geier' ? tariffs?.laufendeAbWenzGeier ?? definition.laufendeMin : tariffs?.laufendeAbFarbspiel ?? definition.laufendeMin;
   const countedRun = tariffs?.laufendeAktiv === false ? 0 : Math.abs(topTrumpRun);
-  const value = ((contract.kind === 'rufspiel' ? tariffs?.rufspielValue ?? 10 : contract.kind === 'wenz' ? tariffs?.wenzValue ?? 30 : tariffs?.soloValue ?? 30) + (countedRun >= minimum ? countedRun*(tariffs?.laufendeValue ?? 10) : 0))*(contract.kind === 'sie' ? 4 : contract.tout ? 2 : 1);
+  const value = (baseGameValue(contract, tariffs) + (countedRun >= minimum ? countedRun*(tariffs?.laufendeValue ?? 10) : 0))*(contract.kind === 'sie' ? 4 : contract.tout ? 2 : 1);
   return {trumpCount,highTrumps,bremser,trumpSchmier,suitsWithoutAce,topTrumpRun,aces,voids,lonelyTens,exclusions,eligible,expectedGain:probability*value};
 }
 function contractChoices(view: GameView, level: BotLevel, config: BotConfig): Contract[] {

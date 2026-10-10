@@ -1,9 +1,11 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { useRef, type RefObject } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Group, MeshStandardMaterial } from "three";
 import { CHARACTER_VARIANTS } from "./characterRoster.ts";
 
 function Eyes({ ghost = false }: { ghost?: boolean }) {
+  useGameLanguage();
   return <group>
     {[-1, 1].map((side) => <group key={side} position={[side * 0.145, ghost ? 0.04 : 0.055, -0.345]}>
       <mesh scale={[0.075, ghost ? 0.12 : 0.09, 0.035]}><sphereGeometry args={[1, 12, 8]}/><meshStandardMaterial color="#152638" roughness={0.25}/></mesh>
@@ -19,6 +21,7 @@ export function PartyCharacter({ avatarId, color, motion, hitAt, offset, idle = 
   avatarId: number; color: string; motion?: RefObject<number>; hitAt?: number;
   offset?: RefObject<number | null>; idle?: boolean;
 }) {
+  useGameLanguage();
   const variant = CHARACTER_VARIANTS[avatarId % CHARACTER_VARIANTS.length] ?? "human";
   const root = useRef<Group>(null), head = useRef<Group>(null), eyes = useRef<Group>(null);
   const leftArm = useRef<Group>(null), rightArm = useRef<Group>(null);
@@ -84,10 +87,10 @@ export function PartyCharacter({ avatarId, color, motion, hitAt, offset, idle = 
       <mesh position={[0, -0.19, 0]} castShadow><capsuleGeometry args={[0.105, 0.26, 4, 10]}/><meshStandardMaterial color={ghost ? skin : animal ? skin : color}/></mesh>
       {!ghost && <mesh position={[0, -0.39, -0.015]}><sphereGeometry args={[0.11, 12, 8]}/><meshStandardMaterial color={skin}/></mesh>}
     </group>)}
-    {!ghost && [-1, 1].map((side) => <group key={side} ref={side < 0 ? leftFoot : rightFoot} position={[side * 0.16, 0.44, 0]}>
+    {gameUi(!ghost && [-1, 1].map((side) => <group key={side} ref={side < 0 ? leftFoot : rightFoot} position={[side * 0.16, 0.44, 0]}>
       <mesh position={[0, -0.16, 0]} castShadow><capsuleGeometry args={[0.105, 0.19, 4, 10]}/><meshStandardMaterial color={animal ? skin : "#344457"}/></mesh>
       <mesh position={[0, -0.34, -0.08]} scale={[0.15, 0.095, animal ? 0.24 : 0.2]} castShadow><sphereGeometry args={[1, 12, 8]}/><meshStandardMaterial color={animal ? "#efe3d1" : "#273345"}/></mesh>
-    </group>)}
+    </group>))}
     {variant === "fox" && <group ref={tail} position={[0, 0.59, 0.27]} rotation={[0.9, 0, 0]}>
       <mesh position={[0, 0.27, 0]} scale={[0.21, 0.41, 0.21]} castShadow><sphereGeometry args={[1, 12, 10]}/><meshStandardMaterial color={skin}/></mesh>
       <mesh position={[0, 0.59, 0]} rotation={[Math.PI, 0, 0]}><coneGeometry args={[0.15, 0.27, 12]}/><meshStandardMaterial color="#fff0d8"/></mesh>

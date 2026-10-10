@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -554,13 +555,13 @@ function RuleCard({
     <section className="rounded-3xl border border-white/10 bg-zinc-900/70 p-5 shadow-lg shadow-black/10">
       <div className="flex items-start gap-4">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-400/15 bg-emerald-400/10 text-sm font-black text-emerald-200">
-          {number}
+          {gameUi(number)}
         </span>
 
         <div className="min-w-0">
           <h2 className="font-black text-white">{ui(title)}</h2>
 
-          <div className="mt-2 text-sm leading-7 text-zinc-400">{children}</div>
+          <div className="mt-2 text-sm leading-7 text-zinc-400">{gameUi(children)}</div>
         </div>
       </div>
     </section>
@@ -585,7 +586,7 @@ function VisualBoardCard({
 
       {text && <p className="mt-2 text-sm leading-7 text-zinc-400">{ui(text)}</p>}
 
-      <div className="mt-4 flex justify-center">{children}</div>
+      <div className="mt-4 flex justify-center">{gameUi(children)}</div>
     </section>
   );
 }
@@ -602,11 +603,11 @@ function CostCard({
   useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3 text-center">
-      <div className="text-3xl leading-none">{symbol}</div>
+      <div className="text-3xl leading-none">{gameUi(symbol)}</div>
 
-      <p className="mt-2 text-xs font-black text-zinc-200">{name}</p>
+      <p className="mt-2 text-xs font-black text-zinc-200">{gameUi(name)}</p>
 
-      <p className="mt-1 text-lg font-black text-emerald-300">{cost}</p>
+      <p className="mt-1 text-lg font-black text-emerald-300">{gameUi(cost)}</p>
     </div>
   );
 }
@@ -659,23 +660,23 @@ function MiniBoard({
             ${info?.highlight ? "ring-2 ring-inset ring-amber-300" : ""}
           `}
         >
-          {isBackRank && isAllowed && (
+          {gameUi(isBackRank && isAllowed && (
             <span className="absolute right-0.5 top-0.5 z-10 text-[7px] font-black text-amber-200/80">
               ♔
             </span>
-          )}
+          ))}
 
-          {info?.piece && (
+          {gameUi(info?.piece && (
             <span className="relative z-20 text-[clamp(18px,4.3vw,34px)] leading-none">
-              {info.piece}
+              {gameUi(info.piece)}
             </span>
-          )}
+          ))}
 
-          {!isAllowed && (
+          {gameUi(!isAllowed && (
             <span className="absolute inset-0 z-10 bg-zinc-950/35" />
-          )}
+          ))}
 
-          {fileIndex === 0 && (
+          {gameUi(fileIndex === 0 && (
             <span
               className={`
                 pointer-events-none
@@ -688,11 +689,11 @@ function MiniBoard({
                 ${dark ? "text-zinc-300/60" : "text-zinc-700/60"}
               `}
             >
-              {rank}
+              {gameUi(rank)}
             </span>
-          )}
+          ))}
 
-          {rank === 1 && (
+          {gameUi(rank === 1 && (
             <span
               className={`
                 pointer-events-none
@@ -705,9 +706,9 @@ function MiniBoard({
                 ${dark ? "text-zinc-300/60" : "text-zinc-700/60"}
               `}
             >
-              {file}
+              {gameUi(file)}
             </span>
-          )}
+          ))}
         </div>,
       );
     }
@@ -716,7 +717,7 @@ function MiniBoard({
   return (
     <div className="w-full max-w-[340px]">
       <div className="grid grid-cols-8 overflow-hidden rounded-xl border border-white/10 shadow-2xl shadow-black/30">
-        {squares}
+        {gameUi(squares)}
       </div>
     </div>
   );
@@ -738,15 +739,15 @@ function PrivateSetupFlow({ language }: { language: Language }) {
           key={label}
           className="relative rounded-xl border border-white/5 bg-black/20 px-3 py-3 text-center"
         >
-          <div className="text-2xl">{icon}</div>
+          <div className="text-2xl">{gameUi(icon)}</div>
 
           <p className="mt-2 text-[10px] font-black text-zinc-300">{ui(label)}</p>
 
-          {index < steps.length - 1 && (
+          {gameUi(index < steps.length - 1 && (
             <span className="absolute -right-2 top-1/2 hidden -translate-y-1/2 text-zinc-700 sm:block">
               →
             </span>
-          )}
+          ))}
         </div>
       ))}
     </div>
@@ -779,7 +780,7 @@ function LegendItem({
           ${className}
         `}
       >
-        {sample}
+        {gameUi(sample)}
       </span>
 
       <span className="text-[10px] font-bold text-zinc-400">{ui(label)}</span>

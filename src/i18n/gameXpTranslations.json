@@ -1,0 +1,80 @@
+{
+  "de": {
+    "XP gained": "XP erhalten",
+    "Sign in to earn XP.": "Melde dich an, um XP zu erhalten.",
+    "Saving XP…": "XP werden gespeichert…",
+    "Added to your activity level.": "Zu deinem Aktivitätslevel hinzugefügt.",
+    "This game mode does not award profile XP.": "Dieser Spielmodus vergibt keine Profil-XP.",
+    "Practice game · no profile XP.": "Übungsspiel · keine Profil-XP.",
+    "Chess Coach used · 50% XP.": "Schach-Coach verwendet · 50% XP.",
+    "Chess Coach reduces this game’s XP by 50%.": "Der Schach-Coach reduziert die XP dieser Partie um 50%.",
+    "XP could not be saved. Try again.": "XP konnten nicht gespeichert werden. Versuche es erneut.",
+    "Retry saving XP": "XP erneut speichern",
+    "100 XP per recorded game · 50 XP with Chess Coach · 50 XP per completed puzzle": "100 XP pro erfasster Partie · 50 XP mit Schach-Coach · 50 XP pro gelöstem Rätsel"
+  },
+  "bar": {
+    "XP gained": "XP kriagt",
+    "Sign in to earn XP.": "Meld di o, damitst XP kriagst.",
+    "Saving XP…": "XP werdn gspeichert…",
+    "Added to your activity level.": "Zu deim Aktivitätslevel dazua.",
+    "This game mode does not award profile XP.": "Bei dem Spuimodus gibt’s koa Profil-XP.",
+    "Practice game · no profile XP.": "Übungsspui · koa Profil-XP.",
+    "Chess Coach used · 50% XP.": "Schach-Coach gnutzt · 50% XP.",
+    "Chess Coach reduces this game’s XP by 50%.": "Da Schach-Coach verringert die XP vo dera Partie um 50%.",
+    "XP could not be saved. Try again.": "XP ham ned gspeichert werdn kenna. Probier’s nomoi.",
+    "Retry saving XP": "XP nomoi speichern",
+    "100 XP per recorded game · 50 XP with Chess Coach · 50 XP per completed puzzle": "100 XP pro erfasster Partie · 50 XP mit Schach-Coach · 50 XP pro glöstem Rätsel"
+  },
+  "ko": {
+    "XP gained": "획득 XP",
+    "Sign in to earn XP.": "XP를 얻으려면 로그인하세요.",
+    "Saving XP…": "XP 저장 중…",
+    "Added to your activity level.": "활동 레벨에 추가되었습니다.",
+    "This game mode does not award profile XP.": "이 게임 모드에서는 프로필 XP를 받을 수 없습니다.",
+    "Practice game · no profile XP.": "연습 게임 · 프로필 XP 없음.",
+    "Chess Coach used · 50% XP.": "체스 코치 사용 · XP 50%.",
+    "Chess Coach reduces this game’s XP by 50%.": "체스 코치를 사용하면 이 게임의 XP가 50% 줄어듭니다.",
+    "XP could not be saved. Try again.": "XP를 저장할 수 없습니다. 다시 시도하세요.",
+    "Retry saving XP": "XP 저장 재시도",
+    "100 XP per recorded game · 50 XP with Chess Coach · 50 XP per completed puzzle": "기록된 게임당 XP 100 · 체스 코치 사용 시 XP 50 · 완료한 퍼즐당 XP 50"
+  },
+  "ru": {
+    "XP gained": "Получено XP",
+    "Sign in to earn XP.": "Войдите, чтобы получать XP.",
+    "Saving XP…": "Сохранение XP…",
+    "Added to your activity level.": "Добавлено к уровню активности.",
+    "This game mode does not award profile XP.": "В этом режиме XP профиля не начисляется.",
+    "Practice game · no profile XP.": "Тренировочная игра · без XP профиля.",
+    "Chess Coach used · 50% XP.": "Использован шахматный тренер · 50% XP.",
+    "Chess Coach reduces this game’s XP by 50%.": "Шахматный тренер уменьшает XP за эту партию на 50%.",
+    "XP could not be saved. Try again.": "Не удалось сохранить XP. Попробуйте ещё раз.",
+    "Retry saving XP": "Повторить сохранение XP",
+    "100 XP per recorded game · 50 XP with Chess Coach · 50 XP per completed puzzle": "100 XP за записанную партию · 50 XP с шахматным тренером · 50 XP за решённую задачу"
+  },
+  "es": {
+    "XP gained": "XP obtenida",
+    "Sign in to earn XP.": "Inicia sesión para obtener XP.",
+    "Saving XP…": "Guardando XP…",
+    "Added to your activity level.": "Añadida a tu nivel de actividad.",
+    "This game mode does not award profile XP.": "Este modo de juego no otorga XP de perfil.",
+    "Practice game · no profile XP.": "Partida de práctica · sin XP de perfil.",
+    "Chess Coach used · 50% XP.": "Entrenador de ajedrez utilizado · 50% de XP.",
+    "Chess Coach reduces this game’s XP by 50%.": "El entrenador de ajedrez reduce la XP de esta partida un 50%.",
+    "XP could not be saved. Try again.": "No se pudo guardar la XP. Inténtalo de nuevo.",
+    "Retry saving XP": "Reintentar guardar XP",
+    "100 XP per recorded game · 50 XP with Chess Coach · 50 XP per completed puzzle": "100 XP por partida registrada · 50 XP con entrenador de ajedrez · 50 XP por problema completado"
+  },
+  "pt": {
+    "XP gained": "XP obtida",
+    "Sign in to earn XP.": "Entre para ganhar XP.",
+    "Saving XP…": "Salvando XP…",
+    "Added to your activity level.": "Adicionada ao seu nível de atividade.",
+    "This game mode does not award profile XP.": "Este modo de jogo não concede XP de perfil.",
+    "Practice game · no profile XP.": "Partida de treino · sem XP de perfil.",
+    "Chess Coach used · 50% XP.": "Treinador de xadrez utilizado · 50% de XP.",
+    "Chess Coach reduces this game’s XP by 50%.": "O treinador de xadrez reduz a XP desta partida em 50%.",
+    "XP could not be saved. Try again.": "Não foi possível salvar a XP. Tente novamente.",
+    "Retry saving XP": "Tentar salvar XP novamente",
+    "100 XP per recorded game · 50 XP with Chess Coach · 50 XP per completed puzzle": "100 XP por partida registrada · 50 XP com treinador de xadrez · 50 XP por problema concluído"
+  }
+}

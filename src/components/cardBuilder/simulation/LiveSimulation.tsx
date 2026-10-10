@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 import { useLocalMatch, type LobbySeat } from "@/games/cards/client/useLocalMatch";
 import type { GameDefinition, SettingValue } from "@/games/cards/engine/types";
@@ -30,6 +31,7 @@ export default function LiveSimulation({
   onShowAll: (value: boolean) => void;
   onRestart: () => void;
 }) {
+  useGameLanguage();
   const seats: LobbySeat[] = Array.from({ length: players }, (_, index) =>
     mode === "player" && index === 0 ? { id: "you", name: "You", isBot: false } : { id: `bot-${index + 1}`, name: `Bot ${mode === "player" ? index : index + 1}`, isBot: true },
   );
@@ -37,8 +39,7 @@ export default function LiveSimulation({
   const state = match.state;
   if (!state) {
     return (
-      <p role="alert" className="text-sm text-red-300">
-        The game could not start{match.error ? `: ${match.error}` : "."}
+      <p role="alert" className="text-sm text-red-300">{gameUi(" The game could not start")}{gameUi(match.error ? `: ${match.error}` : ".")}
       </p>
     );
   }
@@ -55,20 +56,18 @@ export default function LiveSimulation({
         <GameTable def={def} state={state} viewerId={viewer} revealAll={mode === "ai" && showAll} error={match.error} onAction={(request) => viewer && match.act(viewer, request)} />
       </div>
       <aside className="space-y-3">
-        <Panel title={mode === "ai" ? "AI vs AI" : "Player vs AI"} eyebrow="Controls">
+        <Panel title={gameUi(mode === "ai" ? "AI vs AI" : "Player vs AI")} eyebrow="Controls">
           <div className="space-y-3">
             <div className="flex flex-wrap gap-2">
               <Button size="sm" tone={match.autoBots ? "ghost" : "primary"} onClick={() => match.setAutoBots(!match.autoBots)}>
-                {match.autoBots ? <Pause size={14} /> : <Play size={14} />} {match.autoBots ? "Pause" : "Resume"}
+                {match.autoBots ? <Pause size={14} /> : <Play size={14} />} {gameUi(match.autoBots ? "Pause" : "Resume")}
               </Button>
               <Button size="sm" onClick={match.botStep} disabled={!match.nextBot}>
-                <SkipForward size={14} /> Step
-              </Button>
+                <SkipForward size={14} />{gameUi(" Step ")}</Button>
               <Button size="sm" onClick={onRestart}>
-                <RotateCcw size={14} /> New game
-              </Button>
+                <RotateCcw size={14} />{gameUi(" New game ")}</Button>
             </div>
-            <div role="radiogroup" aria-label="Bot speed" className="flex flex-wrap gap-1">
+            <div role="radiogroup" aria-label={gameUi("Bot speed")} className="flex flex-wrap gap-1">
               {speeds.map((speed) => (
                 <button
                   key={speed.label}
@@ -78,19 +77,19 @@ export default function LiveSimulation({
                   onClick={() => match.setBotDelay(speed.delay)}
                   className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${match.botDelay === speed.delay ? "bg-amber-300 text-zinc-950" : "border border-white/10 text-zinc-400 hover:text-white"}`}
                 >
-                  {speed.label}
+                  {gameUi(speed.label)}
                 </button>
               ))}
             </div>
-            {mode === "ai" && <Toggle checked={showAll} onChange={onShowAll} label="Show every card" description="Watch the bots' hidden cards." />}
+            {mode === "ai" && <Toggle checked={showAll} onChange={onShowAll} label={gameUi("Show every card")} description={gameUi("Watch the bots' hidden cards.")} />}
             <div className="flex flex-wrap gap-1.5">
-              <Chip>seed {seed}</Chip>
-              <Chip>{state.revision} actions</Chip>
-              {state.status === "finished" && <Chip tone="emerald">finished</Chip>}
+              <Chip>{gameUi("seed ")}{gameUi(seed)}</Chip>
+              <Chip>{gameUi(state.revision)}{gameUi(" actions")}</Chip>
+              {state.status === "finished" && <Chip tone="emerald">{gameUi("finished")}</Chip>}
             </div>
           </div>
         </Panel>
-        <Panel title="Events & rules" eyebrow="Log">
+        <Panel title={gameUi("Events & rules")} eyebrow="Log">
           <EventLog state={state} />
         </Panel>
       </aside>

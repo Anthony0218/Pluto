@@ -28,7 +28,7 @@ type GameStat = {
   score_difference: number;
 };
 type ProfileStats = {
-  general: { games_played: number; wins: number };
+  general: { games_played: number; wins: number; local_chess_xp?: number };
   games: Record<string, GameStat>;
   streak: number;
   puzzles: number | null;
@@ -378,7 +378,7 @@ export default function ProfilePage() {
      PAGE
      ========================================================= */
 
-  const xp = activityXp(stats.general.games_played, stats.puzzles);
+  const xp = activityXp(stats.general.games_played, stats.puzzles, stats.general.local_chess_xp);
   const level = activityLevel(xp);
   const frame = avatarFrameFor(level);
   const nextFrame = nextAvatarFrame(level);
@@ -398,7 +398,7 @@ export default function ProfilePage() {
                 <button type="button" onClick={() => setAvatarPickerOpen(true)} className={`group relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-2xl bg-[#121d3d] p-1 sm:h-24 sm:w-24 ${frame ? "" : "border-2 border-indigo-300/70 shadow-[0_0_24px_rgba(129,140,248,.3)]"}`} style={avatarFrameStyle(frame, "#121d3d")} aria-label={frame ? `${ui("Change avatar")} · ${ui(`${frame.name} border`)}` : ui("Change avatar")}><ProfileAvatar avatarId={avatarId} className="h-full w-full rounded-xl" /></button>
                 <div className="min-w-0 flex-1"><p className="text-[9px] font-black uppercase tracking-[.22em] text-indigo-200 sm:text-[10px] sm:tracking-[.28em]">{ui("Pluto player profile")}</p><h1 className="mt-1 break-words text-2xl font-black leading-tight text-white sm:text-4xl">{username}</h1><p className="mt-1 text-xs text-indigo-100/80 sm:text-sm">{ui("Play. Learn. Grow together.")}</p></div>
               </div>
-              <div className="min-w-0"><div className="mb-1 flex flex-wrap justify-between gap-x-3 text-[11px] font-semibold text-indigo-100 sm:text-xs"><span>{ui("Activity level")} {level}</span><span>{xp % XP_PER_LEVEL} / 1,000 XP</span></div><div className="h-2 overflow-hidden rounded-full bg-indigo-200/15"><div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-300" style={{ width: `${(xp % XP_PER_LEVEL) / 10}%` }} /></div><p className="mt-1 text-[9px] leading-4 text-indigo-100/60 sm:text-[10px]">{ui("100 XP per completed game · 50 XP per completed puzzle")}</p>
+              <div className="min-w-0"><div className="mb-1 flex flex-wrap justify-between gap-x-3 text-[11px] font-semibold text-indigo-100 sm:text-xs"><span>{ui("Activity level")} {level}</span><span>{xp % XP_PER_LEVEL} / 1,000 XP</span></div><div className="h-2 overflow-hidden rounded-full bg-indigo-200/15"><div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-violet-300" style={{ width: `${(xp % XP_PER_LEVEL) / 10}%` }} /></div><p className="mt-1 text-[9px] leading-4 text-indigo-100/60 sm:text-[10px]">{ui("100 XP per recorded game · 50 XP with Chess Coach · 50 XP per completed puzzle")}</p>
               <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-semibold sm:text-[11px]" aria-label={ui("Avatar border")}>
                 <span className="text-indigo-100/70">{ui("Avatar border")}</span>
                 {AVATAR_FRAMES.map((tier) => <span key={tier.id} className={`inline-flex items-center gap-1 ${level >= tier.level ? "text-white" : "text-indigo-100/45"}`}><span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: tier.metal, opacity: level >= tier.level ? 1 : 0.4 }} aria-hidden />{ui(tier.name)} · {ui("Lv.")} {tier.level}{level >= tier.level && <span className="sr-only"> ({ui("unlocked")})</span>}</span>)}

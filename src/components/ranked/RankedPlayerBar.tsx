@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import TopRankBadge from "@/components/chess/TopRankBadge";
 import RankEmblem from "@/components/chess/RankEmblem";
@@ -75,9 +76,9 @@ export default function RankedPlayerBar({
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <p className="truncate text-sm font-bold text-zinc-100">{name}</p>
+            <p className="truncate text-sm font-bold text-zinc-100">{gameUi(name)}</p>
 
-            {me && (
+            {gameUi(me && (
               <span
                 className="
                   rounded-full
@@ -93,18 +94,18 @@ export default function RankedPlayerBar({
               >
                 {t("You")}
               </span>
-            )}
+            ))}
           </div>
 
           <p className="mt-0.5 text-[11px] text-zinc-500">
-            {color === "white" ? t("White") : t("Black")}
+            {gameUi(color === "white" ? t("White") : t("Black"))}
           </p>
-          {rating !== undefined && <p className="mt-1 text-xs font-bold text-amber-200">{ui("Elo")} {ratingChange ? `${ratingChange.before} → ${ratingChange.after} (${ratingChange.after - ratingChange.before >= 0 ? "+" : ""}${ratingChange.after - ratingChange.before})` : rating}</p>}
+          {rating !== undefined && <p className="mt-1 text-xs font-bold text-amber-200">{ui("Elo")} {gameUi(ratingChange ? `${ratingChange.before} → ${ratingChange.after} (${ratingChange.after - ratingChange.before >= 0 ? "+" : ""}${ratingChange.after - ratingChange.before})` : rating)}</p>}
         </div>
 
         {showTier && rating !== undefined && <RankEmblem family={getChessRank(rating).family} size="sm" />}
-        {leaderboardRank && <span className="text-xs font-bold text-amber-200">#{leaderboardRank}</span>}
-        {active && (
+        {leaderboardRank && <span className="text-xs font-bold text-amber-200">#{gameUi(leaderboardRank)}</span>}
+        {gameUi(active && (
           <div
             className="
               flex
@@ -133,7 +134,7 @@ export default function RankedPlayerBar({
             />
             {t("Turn")}
           </div>
-        )}
+        ))}
       </div>
     </div>
   );

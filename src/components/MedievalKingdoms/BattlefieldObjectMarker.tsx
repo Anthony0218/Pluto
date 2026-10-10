@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import type {
   BattlefieldObject,
 } from "../../games/MedievalKingdoms/types";
@@ -158,6 +159,7 @@ export default function BattlefieldObjectMarker({
   reachable: boolean;
   onClick: () => void;
 }) {
+  useGameLanguage();
   const isZone =
     zoneTypes.has(
       object.type,
@@ -205,10 +207,10 @@ export default function BattlefieldObjectMarker({
           `translate(-50%, -50%) rotate(${object.rotation ?? 0}deg)`,
       }}
       title={
-        object.name
+        gameUi(object.name)
       }
     >
-      {isZone ? (
+      {gameUi(isZone ? (
         <>
           <ZoneDecoration
             object={
@@ -218,21 +220,21 @@ export default function BattlefieldObjectMarker({
 
           <span className="relative z-10 text-[clamp(10px,1.25vw,22px)] text-[#f8e7bd]/80 drop-shadow">
             {
-              symbols[
+              gameUi(symbols[
                 object.type
-              ]
+              ])
             }
           </span>
         </>
       ) : (
         <span className="text-[clamp(12px,1.7vw,28px)] text-[#f8e7bd] drop-shadow">
           {
-            symbols[
+            gameUi(symbols[
               object.type
-            ]
+            ])
           }
         </span>
-      )}
+      ))}
 
       <span
         className={`
@@ -267,7 +269,7 @@ export default function BattlefieldObjectMarker({
         }}
       >
         {
-          object.name
+          gameUi(object.name)
         }
       </span>
     </button>

@@ -1,0 +1,50 @@
+/* ── Hero sky: the flyby's starfield, carried up behind the hero so the two sections read as one sky ── */
+.hero-sky {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  /* Stars thin out over the text column so the headline keeps its contrast. */
+  -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, .2) 0%, rgba(0, 0, 0, .2) 30%, #000 52%);
+  mask-image: linear-gradient(90deg, rgba(0, 0, 0, .2) 0%, rgba(0, 0, 0, .2) 30%, #000 52%);
+}
+@media (max-width: 1023px) { .hero-sky { opacity: .55; -webkit-mask-image: none; mask-image: none; } }
+.hero-sky-glow {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 46% 58% at 70% 45%, rgba(99, 102, 241, .16), transparent 70%),
+    radial-gradient(ellipse 30% 36% at 84% 22%, rgba(139, 92, 246, .12), transparent 70%);
+}
+/* Drift layer: one 480px tile, so sliding it by exactly one tile loops without a seam. It starts a tile above the section. */
+.hero-sky-drift {
+  position: absolute; left: 0; right: 0; top: -480px; bottom: 0;
+  background-image:
+    radial-gradient(1px 1px at 38px 52px, rgba(194, 216, 255, .75) 99%, transparent),
+    radial-gradient(1px 1px at 190px 140px, rgba(140, 168, 255, .65) 99%, transparent),
+    radial-gradient(1.2px 1.2px at 312px 36px, rgba(255, 255, 255, .6) 99%, transparent),
+    radial-gradient(1px 1px at 420px 260px, rgba(194, 216, 255, .6) 99%, transparent),
+    radial-gradient(1.4px 1.4px at 96px 330px, rgba(244, 214, 255, .55) 99%, transparent),
+    radial-gradient(1px 1px at 270px 420px, rgba(255, 255, 255, .55) 99%, transparent),
+    radial-gradient(1px 1px at 450px 400px, rgba(140, 168, 255, .55) 99%, transparent);
+  background-size: 480px 480px;
+}
+/* Twinkle layer: a handful of brighter stars that breathe in and out. */
+.hero-sky-twinkle {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1.6px 1.6px at 80px 110px, #fff 99%, transparent),
+    radial-gradient(1.4px 1.4px at 340px 300px, #c2d8ff 99%, transparent),
+    radial-gradient(1.8px 1.8px at 560px 60px, #f4d6ff 99%, transparent);
+  background-size: 640px 420px;
+  opacity: .5;
+}
+.hero-sky-twinkle--b {
+  background-image:
+    radial-gradient(1.5px 1.5px at 210px 190px, #fff 99%, transparent),
+    radial-gradient(1.6px 1.6px at 470px 360px, #b9ccff 99%, transparent);
+  background-size: 590px 470px;
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .hero-sky-drift { animation: hero-sky-drift 240s linear infinite; }
+  .hero-sky-twinkle { animation: hero-sky-twinkle 6s ease-in-out infinite alternate; }
+  .hero-sky-twinkle--b { animation-duration: 8s; animation-delay: -3s; }
+}
+@keyframes hero-sky-drift { to { transform: translate3d(0, 480px, 0); } }
+@keyframes hero-sky-twinkle { from { opacity: .15; } to { opacity: .85; } }

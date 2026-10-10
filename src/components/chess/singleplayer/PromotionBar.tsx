@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { createPortal } from "react-dom";
 import { ui, useUiLanguage } from "@/i18n/ui";
 type PromotionBarProps = {
@@ -139,7 +140,7 @@ export default function PromotionBar({ onPromote }: PromotionBarProps) {
                   sm:text-5xl
                 "
               >
-                {piece.symbol}
+                {gameUi(piece.symbol)}
               </span>
 
               <span

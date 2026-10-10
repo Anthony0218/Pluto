@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import FinalResults from "./FinalResults.tsx";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { recordCreatedGameInviteCode } from "@/components/social/GameInviteDelivery";
@@ -48,6 +49,7 @@ function useViewportFitCover() {
   }, []);
 }
 function PartyApp() {
+  useGameLanguage();
   const connection = usePartyConnection();
   const [params, setParams] = useSearchParams();
   const configuredRoom = useRef<string | null>(null);
@@ -101,21 +103,19 @@ function PartyApp() {
     >
       <header className="pp-header">
         <Link to="/games" className="pp-back">
-          <ArrowLeft size={17} /> Games
-        </Link>
-        <a href="/games/pluto-party" className="pp-wordmark">
-          pluto<span>party</span>
+          <ArrowLeft size={17} />{gameUi(" Games ")}</Link>
+        <a href="/games/pluto-party" className="pp-wordmark">{gameUi(" pluto")}<span>{gameUi("party")}</span>
           <Sparkles size={18} aria-hidden="true" />
         </a>
         <div className="pp-header-tools">
           <span className={`pp-connection is-${status}`} role="status">
             <i aria-hidden="true" />
-            {STATUS_LABEL[status]}
+            {gameUi(STATUS_LABEL[status])}
           </span>
           <button
             className="pp-icon-button"
             onClick={() => setSettingsOpen(true)}
-            aria-label="Settings"
+            aria-label={gameUi("Settings")}
             aria-haspopup="dialog"
           >
             <Settings2 size={19} />
@@ -124,8 +124,8 @@ function PartyApp() {
       </header>
       {error && errorCode !== "SESSION_REPLACED" && (
         <div className={`pp-alert ${errorCode === "RATE_LIMITED" ? "is-warning" : ""}`} role="alert">
-          {error}
-          <button onClick={clearError} aria-label="Dismiss message">
+          {gameUi(error)}
+          <button onClick={clearError} aria-label={gameUi("Dismiss message")}>
             <X size={18} />
           </button>
         </div>
@@ -134,26 +134,20 @@ function PartyApp() {
         <div className="pp-notice" role="status">
           {status === "connecting" ? (
             <>
-              <span className="pp-spinner small" aria-hidden="true" /> Connecting to the party server…
-            </>
+              <span className="pp-spinner small" aria-hidden="true" />{gameUi(" Connecting to the party server… ")}</>
           ) : status === "replaced" ? (
-            <>
-              Pluto Party is open in another tab.{" "}
-              <button className="pp-link-button" onClick={retry}>
-                Use this tab
-              </button>
+            <>{gameUi(" Pluto Party is open in another tab.")}{gameUi(" ")}
+              <button className="pp-link-button" onClick={retry}>{gameUi(" Use this tab ")}</button>
             </>
           ) : (
             <>
-              {status === "offline"
+              {gameUi(status === "offline"
                 ? "Can’t reach the party server. Retrying automatically…"
-                : "Reconnecting to the party server…"}{" "}
+                : "Reconnecting to the party server…")}{gameUi(" ")}
               {import.meta.env.DEV && status === "offline" && (
-                <span>(Local play: start it with npm run party:server.)</span>
-              )}{" "}
-              <button className="pp-link-button" onClick={retry}>
-                Retry now
-              </button>
+                <span>{gameUi("(Local play: start it with npm run party:server.)")}</span>
+              )}{gameUi(" ")}
+              <button className="pp-link-button" onClick={retry}>{gameUi(" Retry now ")}</button>
             </>
           )}
         </div>
@@ -170,7 +164,7 @@ function PartyApp() {
           minigame={lobby.match.minigame}
         />
       ) : lobby.match.mode === "festival" ? (
-        <section className="pp-match pp-festival-results">{lobby.match.phase === "GAME_OVER" ? <FinalResults connection={connection} lobby={lobby} match={lobby.match} alpine={false}/> : <div className="mg-results"><h2>Next minigame…</h2></div>}</section>
+        <section className="pp-match pp-festival-results">{lobby.match.phase === "GAME_OVER" ? <FinalResults connection={connection} lobby={lobby} match={lobby.match} alpine={false}/> : <div className="mg-results"><h2>{gameUi("Next minigame…")}</h2></div>}</section>
       ) : (
         <PartyMatch connection={connection} lobby={lobby} match={lobby.match} />
       )}

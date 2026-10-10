@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useMemo, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { AtlasCountryShape } from "../AtlasCountryShape";
@@ -6,6 +7,7 @@ import { GameOverPanel, TrialFeedback, TrialShell, type TrialModeProps } from ".
 import { useOptionHotkeys, useRecordWhenOver } from "./useTrialTimers";
 
 export function HistoryBattleGame({ pool, byId, seed, difficulty, best, topology, history, onRecord, onRestart, onExit }: TrialModeProps) {
+  useGameLanguage();
   const deck = useMemo(() => historyDeck(history, pool, seed, difficulty), [history, pool, seed, difficulty]);
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -30,28 +32,28 @@ export function HistoryBattleGame({ pool, byId, seed, difficulty, best, topology
   };
   useOptionHotkeys(round?.options.length ?? 0, (option) => { if (round) choose(round.options[option].id); }, !over && picked === null);
   const correct = picked !== null && picked === round?.answerId;
-  return <TrialShell title="History Battle" accent="rose" roundLabel={`Question ${Math.min(index + 1, deck.length)} / ${deck.length}`} score={score} progress={index / deck.length * 100} onExit={onExit}>
+  return <TrialShell title={gameUi("History Battle")} accent="rose" roundLabel={`Question ${Math.min(index + 1, deck.length)} / ${deck.length}`} score={score} progress={index / deck.length * 100} onExit={onExit}>
     {round && <div className="language-layout history-layout">
-      <div className="trial-panel history-battle"><span className="atlas-eyebrow">{HISTORY_KIND_LABELS[round.kind]}</span>
-        {subject && <p className="history-subject"><img src={subject.flag} alt="" />{subject.name}</p>}
-        <h1 className="trial-title">{round.prompt}</h1>
+      <div className="trial-panel history-battle"><span className="atlas-eyebrow">{gameUi(HISTORY_KIND_LABELS[round.kind])}</span>
+        {subject && <p className="history-subject"><img src={subject.flag} alt="" />{gameUi(subject.name)}</p>}
+        <h1 className="trial-title">{gameUi(round.prompt)}</h1>
         <div className="language-options history-options">{round.options.map((option, position) => {
           const flag = option.countryId ? byId.get(option.countryId)?.flag : null;
           return <button key={option.id} type="button" disabled={picked !== null} className={picked !== null ? option.id === round.answerId ? "is-correct" : option.id === picked ? "is-wrong" : "" : ""} onClick={() => choose(option.id)}>
-            <kbd>{position + 1}</kbd>{flag && <img src={flag} alt="" />}<span>{option.label}{picked !== null && option.detail && <small>{option.detail}</small>}</span>
+            <kbd>{gameUi(position + 1)}</kbd>{flag && <img src={flag} alt="" />}<span>{gameUi(option.label)}{picked !== null && option.detail && <small>{gameUi(option.detail)}</small>}</span>
           </button>;
         })}</div>
-        {picked !== null && <TrialFeedback tone={correct ? "good" : "bad"} title={correct ? `Correct · +${points}` : `It was ${answer?.label}`}
+        {picked !== null && <TrialFeedback tone={correct ? "good" : "bad"} title={gameUi(correct ? `Correct · +${points}` : `It was ${answer?.label}`)}
           detail={correct && streak > 1 ? `${streak} in a row` : undefined}
-          action={<button type="button" className="trial-next" onClick={() => { setPicked(null); setIndex(index + 1); }}>{index + 1 >= deck.length ? "Finish" : "Next"} <ChevronRight size={16} /></button>} />}
+          action={<button type="button" className="trial-next" onClick={() => { setPicked(null); setIndex(index + 1); }}>{gameUi(index + 1 >= deck.length ? "Finish" : "Next")} <ChevronRight size={16} /></button>} />}
       </div>
-      {picked !== null && country && <section className="language-reveal history-reveal" aria-label="Answer details">
-        <div className="language-country"><div><span className="atlas-eyebrow">On record</span><strong>{country.name}</strong><img src={country.flag} alt={`Flag of ${country.name}`} /></div>{country.geometryId && <AtlasCountryShape topology={topology} geometryId={country.geometryId} label={country.name} showLabel={false} />}</div>
-        <p className="history-fact">{round.fact}</p>
-        {history.countries[round.countryId]?.background && <div className="language-translation"><span className="atlas-eyebrow">Background</span><p>{history.countries[round.countryId].background}</p></div>}
-        <small className="history-source">Source: {round.source ?? HISTORY_SOURCE}</small>
+      {picked !== null && country && <section className="language-reveal history-reveal" aria-label={gameUi("Answer details")}>
+        <div className="language-country"><div><span className="atlas-eyebrow">{gameUi("On record")}</span><strong>{gameUi(country.name)}</strong><img src={country.flag} alt={gameUi(`Flag of ${country.name}`)} /></div>{country.geometryId && <AtlasCountryShape topology={topology} geometryId={country.geometryId} label={gameUi(country.name)} showLabel={false} />}</div>
+        <p className="history-fact">{gameUi(round.fact)}</p>
+        {history.countries[round.countryId]?.background && <div className="language-translation"><span className="atlas-eyebrow">{gameUi("Background")}</span><p>{gameUi(history.countries[round.countryId].background)}</p></div>}
+        <small className="history-source">{gameUi("Source: ")}{round.source ?? HISTORY_SOURCE}</small>
       </section>}
     </div>}
-    {over && <GameOverPanel title="History complete" score={score} best={best} stats={[{ label: "Correct", value: `${correctCount} / ${HISTORY_BATTLE.rounds}` }, { label: "Accuracy", value: `${Math.round(correctCount / HISTORY_BATTLE.rounds * 100)}%` }, { label: "Best streak", value: bestStreak }]} onRestart={onRestart} onExit={onExit} />}
+    {over && <GameOverPanel title={gameUi("History complete")} score={score} best={best} stats={[{ label: "Correct", value: `${correctCount} / ${HISTORY_BATTLE.rounds}` }, { label: "Accuracy", value: `${Math.round(correctCount / HISTORY_BATTLE.rounds * 100)}%` }, { label: "Best streak", value: bestStreak }]} onRestart={onRestart} onExit={onExit} />}
   </TrialShell>;
 }

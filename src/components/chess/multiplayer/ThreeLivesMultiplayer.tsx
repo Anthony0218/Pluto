@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -238,22 +239,24 @@ function hearts(value: number) {
 }
 
 function Panel({
+  gameControls = false,
   title,
   subtitle,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   subtitle?: string;
   children: ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       <div className="mb-4">
         <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
         {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}
       </div>
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -262,7 +265,7 @@ function ErrorBox({ children }: { children: ReactNode }) {
   useUiLanguage();
   return (
     <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
-      {children}
+      {gameUi(children)}
     </div>
   );
 }
@@ -288,33 +291,33 @@ function CapturedPieces({ rows }: { rows: ThreeLivesHistoryRow[] }) {
 
   const render = (pieces: PieceType[], color: "w" | "b") => (
     <div className="mt-2 flex min-h-8 flex-wrap gap-1">
-      {pieces.length === 0 ? (
+      {gameUi(pieces.length === 0 ? (
         <span className="text-xs text-zinc-700">—</span>
       ) : (
         pieces.map((piece, index) => (
           <span key={`${color}-${piece}-${index}`} className="text-2xl">
-            {color === "w" ? whiteSymbols[piece] : blackSymbols[piece]}
+            {gameUi(color === "w" ? whiteSymbols[piece] : blackSymbols[piece])}
           </span>
         ))
-      )}
+      ))}
     </div>
   );
 
   return (
     <>
       <div className="mb-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2 text-xs font-bold text-zinc-400">
-        {diff > 0
+        {gameUi(diff > 0
           ? `White +${diff}`
           : diff < 0
             ? `Black +${Math.abs(diff)}`
-            : "Material equal"}
+            : "Material equal")}
       </div>
       <div className="rounded-2xl border border-white/5 bg-black/20 p-3">
         <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">{ui("Black pieces captured")}</p>
-        {render(capturedBlack, "b")}
+        {gameUi(render(capturedBlack, "b"))}
         <div className="mt-3 border-t border-white/5 pt-3">
           <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">{ui("White pieces captured")}</p>
-          {render(capturedWhite, "w")}
+          {gameUi(render(capturedWhite, "w"))}
         </div>
       </div>
     </>
@@ -383,7 +386,7 @@ export function ThreeLivesMultiplayerLobby() {
 
         </ChessPageHeader>
 
-        {!user ? (
+        {gameUi(!user ? (
           <Panel title={ui("Sign in required")}>
             <p className="text-sm text-zinc-400">{ui("Multiplayer rooms use your existing Supabase account.")}</p>
           </Panel>
@@ -396,7 +399,7 @@ export function ThreeLivesMultiplayerLobby() {
                 onClick={() => void createRoom()}
                 className="mt-5 w-full rounded-xl bg-amber-300 px-5 py-3 font-black text-zinc-950 transition hover:bg-amber-200 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "create" ? ui("Creating...") : ui("Create Three Lives Room")}
+                {gameUi(loading === "create" ? ui("Creating...") : ui("Create Three Lives Room"))}
               </button>
             </Panel>
 
@@ -416,11 +419,11 @@ export function ThreeLivesMultiplayerLobby() {
                 onClick={() => void joinRoom()}
                 className="mt-3 w-full rounded-xl border border-amber-400/20 bg-amber-400/[0.07] px-5 py-3 font-black text-amber-200 transition hover:bg-amber-400/10 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "join" ? ui("Joining...") : ui("Join Three Lives Room")}
+                {gameUi(loading === "join" ? ui("Joining...") : ui("Join Three Lives Room"))}
               </button>
             </Panel>
           </div>
-        )}
+        ))}
 
         {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </div>
@@ -993,23 +996,23 @@ export function ThreeLivesMultiplayerGame() {
             <div className="flex items-center gap-2 rounded-full border border-red-400/15 bg-red-400/[0.06] px-3 py-1.5 text-xs font-bold">
               <span className="text-[#fff3d5]">♔</span>
               <span className="tracking-wide text-red-300">
-                {hearts(displayedPower.whiteHp)}
+                {gameUi(hearts(displayedPower.whiteHp))}
               </span>
               <span className="mx-1 text-zinc-700">·</span>
               <span className="text-zinc-400">♚</span>
               <span className="tracking-wide text-red-300">
-                {hearts(displayedPower.blackHp)}
+                {gameUi(hearts(displayedPower.blackHp))}
               </span>
             </div>
-            {gameState.status === "playing" && (
+            {gameUi(gameState.status === "playing" && (
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
-                {activeTurnColor === "white" ? ui("White") : ui("Black")}{ui("to move")}</div>
-            )}
+                {gameUi(activeTurnColor === "white" ? ui("White") : ui("Black"))}{ui("to move")}</div>
+            ))}
             <button
               onClick={() => void copyRoomCode()}
               className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs font-black text-zinc-300"
-            >{ui("Room")}{room.code} {copied ? "✓" : ""}
+            >{ui("Room")}{room.code} {gameUi(copied ? "✓" : "")}
             </button>
             <Link
               to="/games/chess/variants/three-lives/multiplayer"
@@ -1024,7 +1027,7 @@ export function ThreeLivesMultiplayerGame() {
               <Panel
                 title={ui("Players")}
                 subtitle={
-                  players.length < 2 ? "Waiting for opponent..." : "Connected"
+                  gameUi(players.length < 2 ? "Waiting for opponent..." : "Connected")
                 }
               >
                 <div className="space-y-2">
@@ -1038,19 +1041,19 @@ export function ThreeLivesMultiplayerGame() {
                           {player.display_name}
                         </span>
                         <span className="text-xl">
-                          {player.chosen_color === "black" ? "♚" : "♔"}
+                          {gameUi(player.chosen_color === "black" ? "♚" : "♔")}
                         </span>
                       </div>
                       <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-                        {player.user_id === user.id ? ui("You") : ui("Opponent")} ·{" "}
-                        {player.chosen_color ?? "waiting"}
+                        {gameUi(player.user_id === user.id ? ui("You") : ui("Opponent"))} ·{gameUi(" ")}
+                        {gameUi(player.chosen_color ?? "waiting")}
                       </p>
                     </div>
                   ))}
                 </div>
               </Panel>
 
-              <Panel title={ui("Game Controls")} subtitle={ui("Players, game and actions")}>
+              <Panel gameControls title={ui("Game Controls")} subtitle={ui("Players, game and actions")}>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -1071,16 +1074,16 @@ export function ThreeLivesMultiplayerGame() {
                 </div>
               </Panel>
 
-              {gameState.undo_requested_by && (
+              {gameUi(gameState.undo_requested_by && (
                 <Panel
                   title={ui("Undo request")}
                   subtitle={
-                    myUndoRequest
+                    gameUi(myUndoRequest
                       ? "Waiting for opponent"
-                      : "Opponent wants to undo the latest move"
+                      : "Opponent wants to undo the latest move")
                   }
                 >
-                  {opponentUndoRequest ? (
+                  {gameUi(opponentUndoRequest ? (
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         onClick={() => void respondUndo(true)}
@@ -1093,9 +1096,9 @@ export function ThreeLivesMultiplayerGame() {
                     </div>
                   ) : (
                     <p className="text-sm text-zinc-400">{ui("Request sent.")}</p>
-                  )}
+                  ))}
                 </Panel>
-              )}
+              ))}
 
               <Panel title={ui("Captured Pieces")} subtitle={ui("Material overview")}>
                 <CapturedPieces rows={historyRows} />
@@ -1105,7 +1108,7 @@ export function ThreeLivesMultiplayerGame() {
 
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
-              {gameState.status === "finished" && (
+              {gameUi(gameState.status === "finished" && (
                 <VisibleGameResult
                   winner={gameState.winner}
                   playerColor={myColor}
@@ -1117,21 +1120,21 @@ export function ThreeLivesMultiplayerGame() {
                       onClick={() => void requestRematch()}
                       className="rounded-xl bg-amber-300 px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40"
                     >
-                      {myRematchReady ? ui("Rematch requested") : ui("Play Again")}
+                      {gameUi(myRematchReady ? ui("Rematch requested") : ui("Play Again"))}
                     </button>
                   }
                 />
-              )}
+              ))}
 
               {historyPreviewPly !== null && (
                 <div className="mb-3 flex items-center justify-between rounded-xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3">
                   <div>
                     <p className="text-[9px] font-black uppercase tracking-widest text-amber-300">{ui("History Preview")}</p>
                     <p className="mt-1 text-sm font-bold text-white">
-                      {historyPreviewPly === 0 ? ui("Initial position") : `${historyRows[historyPreviewPly - 1]?.moveNumber}${historyRows[historyPreviewPly - 1]?.color === "w" ? "." : "..."} ${historyRows[historyPreviewPly - 1]?.san ?? ""}`}
+                      {gameUi(historyPreviewPly === 0 ? ui("Initial position") : `${historyRows[historyPreviewPly - 1]?.moveNumber}${historyRows[historyPreviewPly - 1]?.color === "w" ? "." : "..."} ${historyRows[historyPreviewPly - 1]?.san ?? ""}`)}
                     </p>
                     <p className="mt-1 text-xs text-red-300">
-                      ♔ {displayedPower.whiteHp} ♥ · ♚ {displayedPower.blackHp}{" "}
+                      ♔ {gameUi(displayedPower.whiteHp)} ♥ · ♚ {gameUi(displayedPower.blackHp)}{gameUi(" ")}
                       ♥
                     </p>
                   </div>
@@ -1170,7 +1173,7 @@ export function ThreeLivesMultiplayerGame() {
                       <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                       <h2 className="mt-2 text-2xl font-black text-white">
-                        {players.length}{ui("/2 players connected")}</h2>
+                        {gameUi(players.length)}{ui("/2 players connected")}</h2>
 
                       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
@@ -1183,21 +1186,21 @@ export function ThreeLivesMultiplayerGame() {
                       </div>
 
                       <p className="mt-4 text-xs font-bold text-zinc-400">
-                        {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
+                        {gameUi(copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code"))}
                       </p>
                     </button>
                     <RoomSlots total={2} names={players.map((player) => player.display_name)} overlay />
                   </div>
                 )}
 
-                {pendingPromotion && historyPreviewPly === null && (
+                {gameUi(pendingPromotion && historyPreviewPly === null && (
                   <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/45 p-4 backdrop-blur-[4px]">
                     <div className="w-full max-w-sm rounded-3xl border border-amber-400/20 bg-zinc-900/95 p-4 shadow-2xl">
                       <p className="mb-3 text-center text-sm font-black text-amber-200">{ui("Choose promotion")}</p>
                       <PromotionBar onPromote={promotePawn} />
                     </div>
                   </div>
-                )}
+                ))}
               </div>
             </div>
           </section>
@@ -1213,44 +1216,44 @@ export function ThreeLivesMultiplayerGame() {
                     <div className="flex items-center justify-between">
                       <span className="font-black text-zinc-200">{ui("White")}</span>
                       <span className="text-lg text-red-300">
-                        {hearts(displayedPower.whiteHp)}
+                        {gameUi(hearts(displayedPower.whiteHp))}
                       </span>
                     </div>
                     <p className="mt-1 text-[10px] text-zinc-600">
-                      {displayedPower.whiteHp}{ui("lives")}</p>
+                      {gameUi(displayedPower.whiteHp)}{ui("lives")}</p>
                   </div>
                   <div className="rounded-2xl border border-red-400/10 bg-red-400/[0.04] p-3">
                     <div className="flex items-center justify-between">
                       <span className="font-black text-zinc-200">{ui("Black")}</span>
                       <span className="text-lg text-red-300">
-                        {hearts(displayedPower.blackHp)}
+                        {gameUi(hearts(displayedPower.blackHp))}
                       </span>
                     </div>
                     <p className="mt-1 text-[10px] text-zinc-600">
-                      {displayedPower.blackHp}{ui("lives")}</p>
+                      {gameUi(displayedPower.blackHp)}{ui("lives")}</p>
                   </div>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <div className="rounded-xl border border-white/5 bg-black/20 p-3">
                     <p className="text-[9px] uppercase tracking-wider text-zinc-600">{ui("Active hearts")}</p>
                     <p className="mt-1 text-xl font-black">
-                      {displayedPower.activeHearts.length}
+                      {gameUi(displayedPower.activeHearts.length)}
                     </p>
                   </div>
                   <div className="rounded-xl border border-white/5 bg-black/20 p-3">
                     <p className="text-[9px] uppercase tracking-wider text-zinc-600">{ui("Pickups")}</p>
                     <p className="mt-1 text-xl font-black">
-                      {displayedPower.pickups.length}
+                      {gameUi(displayedPower.pickups.length)}
                     </p>
                   </div>
                 </div>
-                <p className="mt-3 font-mono text-[10px] text-zinc-700">{ui("Heart seed")}{seed}
+                <p className="mt-3 font-mono text-[10px] text-zinc-700">{ui("Heart seed")}{gameUi(seed)}
                 </p>
               </Panel>
 
               <Panel
                 title={ui("Move History")}
-                subtitle={`${historyRows.length} plies · click to preview`}
+                subtitle={gameUi(`${historyRows.length} plies · click to preview`)}
               >
                 <ChessMoveHistoryList
                   listClassName="max-h-[460px] rounded-2xl border border-white/5 bg-black/20"
@@ -1261,15 +1264,15 @@ export function ThreeLivesMultiplayerGame() {
                       type="button"
                       onClick={() => setHistoryPreviewPly(0)}
                       className={`w-full border-b border-white/5 px-3 py-2 text-left text-xs font-bold ${historyPreviewPly === 0 ? "bg-amber-400/10 text-amber-200" : "text-zinc-500 hover:bg-white/5"}`}
-                    >{ui("Start ·")}{" "}
-                      {buildThreeLivesPowerupState([], seed).activeHearts.length}{" "}{ui("hearts")}</button>
+                    >{ui("Start ·")}{gameUi(" ")}
+                      {gameUi(buildThreeLivesPowerupState([], seed).activeHearts.length)}{gameUi(" ")}{ui("hearts")}</button>
                   }
                   entries={historyRows.map((row) => ({
                     ply: row.ply,
                     side: row.color,
                     moveNumber: row.moveNumber,
                     title: `♔ ${row.life?.whiteHpAfter ?? THREE_LIVES_MAX_HP} · ♚ ${row.life?.blackHpAfter ?? THREE_LIVES_MAX_HP}`,
-                    content: <span className="truncate font-mono text-xs font-black text-zinc-200">{row.san}</span>,
+                    content: <span className="truncate font-mono text-xs font-black text-zinc-200">{gameUi(row.san)}</span>,
                     trailing: (
                       <>
                         {row.life?.damagedSide && <span className="text-xs text-red-300">−♥</span>}
@@ -1285,7 +1288,7 @@ export function ThreeLivesMultiplayerGame() {
         </main>
 
         {players.length < 2 && (
-          <div className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm font-semibold text-amber-100">{ui("Waiting for a second player. Share room code")}{" "}
+          <div className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm font-semibold text-amber-100">{ui("Waiting for a second player. Share room code")}{gameUi(" ")}
             <span className="font-mono font-black">{room.code}</span>.
           </div>
         )}

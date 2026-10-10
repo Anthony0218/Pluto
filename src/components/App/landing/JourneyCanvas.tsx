@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { planetArtSize, type PlanetPose } from "./planetPose";
+import { planetSurfaces } from "../planetary/planetSurfaces";
 
 // ── Procedural textures and shaders (no assets to download) ──
 
@@ -27,6 +28,41 @@ function bandTexture() {
   texture.wrapS = THREE.RepeatWrapping;
   return texture;
 }
+
+/** A game's picture (see planetSurfaces) painted into a texture. Card images are inlined first: an SVG drawn as an image cannot load files itself. */
+async function surfaceTexture(markup: string) {
+  const files = new Map<string, string>();
+  await Promise.all([...new Set([...markup.matchAll(/href="(\/images\/[^"]+)"/g)].map(match => match[1]))].map(async file => {
+    const blob = await (await fetch(file)).blob();
+    files.set(file, await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = reject; reader.readAsDataURL(blob); }));
+  }));
+  const inlined = markup.replace(/href="(\/images\/[^"]+)"/g, (_, file) => `href="${files.get(file)}"`);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512">${inlined}</svg>`;
+  const image = new Image();
+  await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`; });
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 512;
+  canvas.getContext("2d")!.drawImage(image, 0, 0, 512, 512);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 4;
+  return texture;
+}
+
+/** The picture is projected straight onto the face of the sphere (the same crop the CSS planets show), then lit like the planet beneath. */
+const surfaceShader = {
+  vertex: /* glsl */ `varying vec3 vNormal; void main() { vNormal = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragment: /* glsl */ `
+    varying vec3 vNormal; uniform sampler2D uMap; uniform float uOpacity; uniform vec3 uLight;
+    void main() {
+      vec3 n = normalize(vNormal);
+      vec3 color = texture2D(uMap, n.xy * 0.5 + 0.5).rgb;
+      vec3 light = normalize(uLight);
+      float shade = (0.34 + 0.8 * max(dot(n, light), 0.0)) * mix(0.5, 1.0, smoothstep(0.0, 0.55, n.z));
+      float shine = pow(max(reflect(-light, n).z, 0.0), 18.0) * 0.22;
+      gl_FragColor = vec4(color * shade + vec3(shine), uOpacity);
+    }
+  `,
+};
 
 const nebulaFragment = /* glsl */ `
   varying vec2 vUv;
@@ -87,13 +123,26 @@ function Scene({ pose, onReady }: { pose: PlanetPose; onReady: () => void }) {
   const pointer = useRef<{ x: number; y: number } | null>(null);
   const aim = useRef(RESTING_LIGHT.clone());
   const ready = useRef(false);
+  const surface = useRef<THREE.Mesh>(null);
+  const surfaceMaterial = useRef<THREE.ShaderMaterial>(null);
+  const surfaces = useRef<Record<string, THREE.Texture>>({});
   const colors = useMemo(() => ({ base: new THREE.Color(), dark: new THREE.Color(), glow: new THREE.Color(), ring: new THREE.Color(), light: new THREE.Color() }), []);
   const texture = useMemo(() => bandTexture(), []);
   const uniforms = useMemo(() => ({
     nebula: { uTime: { value: 0 }, uSize: { value: new THREE.Vector2(1, 1) }, uTint: { value: new THREE.Color() } },
     atmosphere: { uColor: { value: new THREE.Color() }, uOpacity: { value: 1 } },
     ring: { uColor: { value: new THREE.Color() }, uOpacity: { value: 1 } },
+    surface: { uMap: { value: new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1) }, uOpacity: { value: 0 }, uLight: { value: new THREE.Vector3(-0.6, 0.8, 0.8) } },
   }), []);
+
+  useEffect(() => {
+    let live = true;
+    const loaded = surfaces.current;
+    Object.entries(planetSurfaces).forEach(([tone, markup]) => {
+      surfaceTexture(markup).then(texture => { if (live) loaded[tone] = texture; else texture.dispose(); }).catch(() => { /* That game keeps the plain planet. */ });
+    });
+    return () => { live = false; Object.values(loaded).forEach(texture => texture.dispose()); surfaces.current = {}; };
+  }, []);
 
   useEffect(() => {
     const move = (event: PointerEvent) => { if (event.pointerType !== "touch") pointer.current = { x: event.clientX, y: event.clientY }; };
@@ -138,6 +187,18 @@ function Scene({ pose, onReady }: { pose: PlanetPose; onReady: () => void }) {
     aim.current.lerp(wanted, 1 - Math.exp(-delta * 7));
     sun.current?.position.set(aim.current.x * 4, aim.current.y * 4, 3.2);
 
+    // A game's picture covers the planet while the journey is at that game's sections.
+    const picture = surface.current, shown = pose.surface.get(), texture = surfaces.current[shown.tone];
+    if (picture && surfaceMaterial.current) {
+      const strength = shown.weight * opacity;
+      picture.visible = !!texture && strength > 0.01;
+      if (picture.visible) {
+        const uniform = surfaceMaterial.current.uniforms;
+        uniform.uMap.value = texture; uniform.uOpacity.value = strength;
+        uniform.uLight.value.set(aim.current.x, aim.current.y, 0.8).normalize();
+      }
+    }
+
     if (atmosphere.current) { atmosphere.current.uniforms.uColor.value.copy(colors.glow); atmosphere.current.uniforms.uOpacity.value = opacity; }
     if (ringMaterial.current) { ringMaterial.current.uniforms.uColor.value.copy(colors.ring); ringMaterial.current.uniforms.uOpacity.value = opacity; }
     if (ring.current) ring.current.rotation.z = THREE.MathUtils.degToRad(pose.tilt.get());
@@ -156,6 +217,10 @@ function Scene({ pose, onReady }: { pose: PlanetPose; onReady: () => void }) {
       <mesh ref={sphere}>
         <sphereGeometry args={[1, 96, 64]} />
         <meshStandardMaterial map={texture} roughness={0.62} metalness={0} transparent />
+      </mesh>
+      <mesh ref={surface} scale={1.004} renderOrder={1} visible={false}>
+        <sphereGeometry args={[1, 96, 64]} />
+        <shaderMaterial ref={surfaceMaterial} uniforms={uniforms.surface} vertexShader={surfaceShader.vertex} fragmentShader={surfaceShader.fragment} transparent depthWrite={false} />
       </mesh>
       <mesh scale={1.16} renderOrder={1}>
         <sphereGeometry args={[1, 48, 32]} />

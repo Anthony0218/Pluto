@@ -232,6 +232,56 @@ export function gradePlayedMove(
 }
 
 /* =========================================================
+   GRADE AMONG THE ENGINE'S OWN TOP MOVES
+   =========================================================
+   Two separate searches of the same position (the coach's hint and the
+   grading) rarely agree to the centipawn, and the grade of a move was
+   taken from a third search of the position after it. So the move the
+   coach had just recommended could come out as Good or Inaccuracy.
+   When the played move is one of the moves a single search ranked, its
+   grade comes from that search alone: the top move is Best, the others
+   lose exactly the evaluation the search gave them.
+   ========================================================= */
+
+type RankedMove = { uci: string; score: number; mate: number | null };
+
+function mateFromEvaluation(evaluation: string) {
+  const mate = /^(-)?M(\d+)$/.exec(evaluation);
+
+  return mate ? Number(mate[2]) * (mate[1] ? -1 : 1) : null;
+}
+
+const rankSuggestions = (suggestions: MoveSuggestion[]): RankedMove[] =>
+  suggestions.map((suggestion) => ({ uci: suggestion.uci, score: evaluationScore(suggestion.evaluation), mate: mateFromEvaluation(suggestion.evaluation) }));
+
+const rankLines = (lines: StockfishAnalysisLine[]): RankedMove[] =>
+  lines.filter((line) => line.pv.length > 0).map((line) => ({ uci: line.pv[0], score: engineScore(line), mate: line.mate }));
+
+/** The grade of `playedUci` from one search's ranking, or null when the search did not rank that move. */
+export function gradeAmongRanked(fenAfter: string, playedUci: string, ranked: RankedMove[]) {
+  const index = ranked.findIndex((move) => move.uci === playedUci);
+
+  if (index < 0) {
+    return null;
+  }
+
+  const deliveredMate = new Chess(fenAfter).isCheckmate();
+
+  const centipawnLoss = Math.max(0, ranked[0].score - ranked[index].score);
+
+  const missedMate = !deliveredMate && ranked[0].mate !== null && ranked[0].mate > 0 && !(ranked[index].mate !== null && ranked[index].mate > 0);
+
+  let quality = classifyMove(centipawnLoss, deliveredMate || index === 0);
+
+  // Letting a forced mate go is never better than an inaccuracy, even while still winning.
+  if (missedMate && qualityOrder.indexOf(quality) < qualityOrder.indexOf("Inaccuracy")) {
+    quality = "Inaccuracy";
+  }
+
+  return { quality, centipawnLoss, missedMate, bestMoveUci: ranked[0].uci };
+}
+
+/* =========================================================
    MOVE QUALITY
    ========================================================= */
 
@@ -353,49 +403,59 @@ export async function gradeMove(
   analyzePosition: AnalyzePosition,
 
   moveTime = 400,
-): Promise<MoveReview | null> {
-  /*
-   * MultiPV 3 here as well so live
-   * feedback already has the three
-   * alternatives available.
+
+  /**
+   * The moves the coach showed for `beforeFen`, if it did. Read when the grading
+   * starts (the hint's own search may still be running when the move is made), so
+   * playing a recommended move is graded by the very search that recommended it.
    */
-  const beforeLines = await analyzePosition(beforeFen, {
-    multiPV: 3,
+  shown?: () => MoveSuggestion[] | undefined,
+): Promise<MoveReview | null> {
+  let bestMoves = shown?.() ?? [];
 
-    moveTime,
-  });
+  let graded: { quality: MoveQuality; centipawnLoss: number; missedMate: boolean; bestMoveUci: string | null } | null = bestMoves.length > 0 ? gradeAmongRanked(afterFen, playedUci, rankSuggestions(bestMoves)) : null;
 
-  if (beforeLines.length === 0) {
-    return null;
-  }
-
-  const bestLine = beforeLines[0];
-
-  const afterGame = new Chess(afterFen);
-
-  let afterLine: StockfishAnalysisLine | undefined;
-
-  if (!afterGame.isGameOver()) {
-    const afterLines = await analyzePosition(afterFen, {
-      multiPV: 1,
+  if (!graded) {
+    /*
+     * MultiPV 3 here as well so live
+     * feedback already has the three
+     * alternatives available.
+     */
+    const beforeLines = await analyzePosition(beforeFen, {
+      multiPV: 3,
 
       moveTime,
     });
 
-    afterLine = afterLines[0];
+    if (beforeLines.length === 0) {
+      return null;
+    }
+
+    bestMoves = linesToSuggestions(beforeFen, beforeLines, 3);
+
+    graded = gradeAmongRanked(afterFen, playedUci, rankLines(beforeLines));
+
+    if (!graded) {
+      // Not one of the top moves: compare with the best line and the position after the move.
+      const afterGame = new Chess(afterFen);
+
+      let afterLine: StockfishAnalysisLine | undefined;
+
+      if (!afterGame.isGameOver()) {
+        const afterLines = await analyzePosition(afterFen, {
+          multiPV: 1,
+
+          moveTime,
+        });
+
+        afterLine = afterLines[0];
+      }
+
+      graded = gradePlayedMove(beforeFen, afterFen, playedUci, beforeLines[0], afterLine);
+    }
   }
 
-  const { quality, centipawnLoss, missedMate, bestMoveUci } = gradePlayedMove(
-    beforeFen,
-
-    afterFen,
-
-    playedUci,
-
-    bestLine,
-
-    afterLine,
-  );
+  const { quality, centipawnLoss, missedMate, bestMoveUci } = graded;
 
   const bestMoveSan = bestMoveUci ? uciToSan(beforeFen, bestMoveUci) : null;
 
@@ -435,7 +495,7 @@ export async function gradeMove(
 
     bestMoveSan,
 
-    bestMoves: linesToSuggestions(beforeFen, beforeLines, 3),
+    bestMoves,
   };
 }
 

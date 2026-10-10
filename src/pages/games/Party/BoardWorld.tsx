@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { routePreview } from "../../../games/party/engine/routePreview.ts";
 import { memo, useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -18,14 +19,16 @@ function point(map: BoardMap, n: { x: number; y: number; region: number }): [num
   return [(n.x - map.size.width / 2) / 40, height(map, n.region) + .17, (n.y - map.size.height / 2) / 40];
 }
 function Tree({ position, pine = false, scale = 1 }: { position: [number, number, number]; pine?: boolean; scale?: number }) {
+  useGameLanguage();
   return <group position={position} scale={scale}>
     <mesh position={[0, .7, 0]} rotation={[0, 0, pine ? 0 : -.12]}><cylinderGeometry args={[.07, .13, 1.4, 7]}/><meshStandardMaterial color="#866247"/></mesh>
-    {pine ? [0, 1, 2].map((i) => <mesh key={i} position={[0, .8 + i * .38, 0]}><coneGeometry args={[.55 - i * .12, .9, 7]}/><meshStandardMaterial color={i === 2 ? "#b4dad3" : "#438875"}/></mesh>) : Array.from({ length: 6 }, (_, i) => <group key={i} rotation={[0, i * Math.PI / 3, 0]} position={[0, 1.42, 0]}>
+    {gameUi(pine ? [0, 1, 2].map((i) => <mesh key={i} position={[0, .8 + i * .38, 0]}><coneGeometry args={[.55 - i * .12, .9, 7]}/><meshStandardMaterial color={i === 2 ? "#b4dad3" : "#438875"}/></mesh>) : Array.from({ length: 6 }, (_, i) => <group key={i} rotation={[0, i * Math.PI / 3, 0]} position={[0, 1.42, 0]}>
       <mesh position={[.43, -.07, 0]} rotation={[0, 0, -.2]} scale={[.7, .08, .2]}><sphereGeometry args={[1, 8, 6]}/><meshStandardMaterial color={i % 2 ? "#5ab890" : "#85cd86"}/></mesh>
-    </group>)}
+    </group>))}
   </group>;
 }
 function Hut({ color = "#ffbd80", tent = false }: { color?: string; tent?: boolean }) {
+  useGameLanguage();
   return <group>
     {!tent && <mesh position={[0, .38, 0]}><boxGeometry args={[1.05, .75, .85]}/><meshStandardMaterial color={color}/></mesh>}
     <mesh position={[0, tent ? .48 : .96, 0]} rotation={[0, Math.PI / 4, 0]} scale={[1.3, 1, 1]}><coneGeometry args={[.95, tent ? 1 : .55, 4]}/><meshStandardMaterial color={tent ? color : "#956963"}/></mesh>
@@ -45,6 +48,7 @@ function Boat({ motion }: { motion: boolean }) {
   </group>;
 }
 function Landmark({ map, region, motion }: { map: BoardMap; region: number; motion: boolean }) {
+  useGameLanguage();
   const motif = map.regions[region].motif;
   if (motif === "volcano") return <group>
     <mesh position={[0, .8, 0]}><coneGeometry args={[1.3, 1.65, 8]}/><meshStandardMaterial color="#7e7877"/></mesh>
@@ -82,6 +86,7 @@ function Landmark({ map, region, motion }: { map: BoardMap; region: number; moti
     : <group><Tree position={[-.35, 0, -.3]}/><Tree position={[.65, 0, .4]} scale={.8}/>{region === 0 && <group position={[-.75, 0, .7]} scale={.48}><Hut color="#9bcddc"/></group>}</group>;
 }
 const Scenery = memo(function Scenery({ map, preview }: { map: BoardMap; preview: boolean }) {
+  useGameLanguage();
   const motion = useSceneMotion(), mountain = map.theme === "mountain";
   return <>
     <color attach="background" args={[mountain ? "#c4e0ec" : "#9cdad9"]}/>
@@ -98,7 +103,7 @@ const Scenery = memo(function Scenery({ map, preview }: { map: BoardMap; preview
         <mesh position={[0, .015, 0]} scale={[rx * .94, 1, rz * .91]}><cylinderGeometry args={[1, 1, .13, 24]}/><meshStandardMaterial color={r.color} roughness={.92}/></mesh>
         <Landmark map={map} region={i} motion={motion && !preview}/>
         {[0, 1, 2].map((j) => <Tree key={j} pine={mountain} scale={.6 + j * .13} position={[Math.cos(j * 2.2 + i) * rx * .8, .09, Math.sin(j * 2.2 + i) * rz * .8]}/>)}
-        {!preview && <Html position={[0, .3, rz + .3]} center style={{ pointerEvents: "none" }}><span className="pp-world-label">{r.name}</span></Html>}
+        {!preview && <Html position={[0, .3, rz + .3]} center style={{ pointerEvents: "none" }}><span className="pp-world-label">{gameUi(r.name)}</span></Html>}
       </group>;
     })}
     {!preview && <AtmosphereParticles kind={mountain ? "snow" : "dust"} motion={motion} area={32}/>}
@@ -155,16 +160,19 @@ function BoardCamera({ map, focus, zoom, cameraReset, overview }: { map: BoardMa
   return <><OrthographicCamera ref={camera} makeDefault position={[0, 23, 23]} near={.1} far={150}/><OrbitControls ref={controls} makeDefault minPolarAngle={.2} maxPolarAngle={Math.PI / 2.2} enableDamping onStart={() => { goal.current = null; }} minZoom={6} maxZoom={95}/></>;
 }
 function PathArrow({ from, to, label, onSelect, onHover }: { from: [number, number, number]; to: [number, number, number]; label: string; onSelect: () => void; onHover: (hover: boolean) => void }) {
+  useGameLanguage();
   const button = useRef<HTMLButtonElement>(null), camera = useThree((s) => s.camera);
   useFrame(() => { if (!button.current) return; const a = new Vector3(...from).project(camera), b = new Vector3(...to).project(camera); button.current.style.setProperty("--arrow-angle", `${Math.atan2(-(b.y - a.y), b.x - a.x) * 180 / Math.PI}deg`); });
-  return <Html position={[from[0] + (to[0] - from[0]) * .8, Math.max(from[1], to[1]) + .6, from[2] + (to[2] - from[2]) * .8]} center zIndexRange={[15, 13]}><button ref={button} className="pp-map-path-arrow" aria-label={label} title={label} onPointerEnter={() => onHover(true)} onPointerLeave={() => onHover(false)} onFocus={() => onHover(true)} onBlur={() => onHover(false)} onClick={(e) => { e.stopPropagation(); onSelect(); }}><span>➜</span><small>{label.split(";")[0].replace(/^Space \d+: /, "")}{label.includes(";") ? " · more landings" : ""}</small></button></Html>;
+  return <Html position={[from[0] + (to[0] - from[0]) * .8, Math.max(from[1], to[1]) + .6, from[2] + (to[2] - from[2]) * .8]} center zIndexRange={[15, 13]}><button ref={button} className="pp-map-path-arrow" aria-label={gameUi(label)} title={gameUi(label)} onPointerEnter={() => onHover(true)} onPointerLeave={() => onHover(false)} onFocus={() => onHover(true)} onBlur={() => onHover(false)} onClick={(e) => { e.stopPropagation(); onSelect(); }}><span>➜</span><small>{gameUi(label.split(";")[0].replace(/^Space \d+: /, ""))}{gameUi(label.includes(";") ? " · more landings" : "")}</small></button></Html>;
 }
 function MapEventMarker({ position, text, showLabel = true, labelOnly = false, color }: { position: [number, number, number]; text: string; showLabel?: boolean; labelOnly?: boolean; color?: string }) {
+  useGameLanguage();
   const root = useRef<Group>(null), motion = useSceneMotion();
   useFrame(({ clock }) => { if (root.current && motion) root.current.position.y = position[1] + .3 + Math.sin(clock.elapsedTime * 3) * .12; });
-  return <group ref={root} position={position}>{!labelOnly && <mesh rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[.5, .7, 32]}/><meshBasicMaterial color={color ?? (text.includes("⚠") ? "#ff866d" : "#ffe191")} transparent opacity={.7}/></mesh>}{showLabel && <Html position={[0, labelOnly ? 2.2 : 1.05, 0]} center style={{ pointerEvents: "none" }}><span className="pp-map-event-marker">{text}</span></Html>}</group>;
+  return <group ref={root} position={position}>{!labelOnly && <mesh rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[.5, .7, 32]}/><meshBasicMaterial color={color ?? (text.includes("⚠") ? "#ff866d" : "#ffe191")} transparent opacity={.7}/></mesh>}{showLabel && <Html position={[0, labelOnly ? 2.2 : 1.05, 0]} center style={{ pointerEvents: "none" }}><span className="pp-map-event-marker">{gameUi(text)}</span></Html>}</group>;
 }
 export function BoardWorld({ map, match, overlay, preview, onSelect, focus, zoom, cameraReset, overview, landing, onProjectReward, explosion }: { map: BoardMap; match: Match | null; overlay: BoardOverlay | null; preview: boolean; onSelect: (id: string) => void; focus: string | null; zoom: number; cameraReset: string; overview: boolean; landing: BoardLanding | null; onProjectReward: (x: number, y: number) => void; explosion: { id: number; nodeId: string; kind: "melon" | "fallout" } | null }) {
+  useGameLanguage();
   const paths = new Set(match?.phase === "PATH_SELECTION" ? legalPaths(match, map) : []), motion = useSceneMotion();
   const byId = useMemo(() => new Map(map.nodes.map((n) => [n.id, n])), [map]);
   const activeId = match ? activePlayer(match).id : null;
@@ -181,7 +189,7 @@ export function BoardWorld({ map, match, overlay, preview, onSelect, focus, zoom
     <BoardFieldResources>{map.nodes.map((n) => <BoardField key={n.id} node={n} map={map} position={point(map, n)} selected={overlay?.selected === n.id} reachable={paths.has(n.id) || !!route?.landings.includes(n.id)} hot={!!match?.radiationZones.some((z) => z.nodeIds.includes(n.id))} amount={overlay?.damage.get(n.id) ?? 0} onSelect={onSelect} landing={landing?.nodeId === n.id ? landing : null} motion={motion && !preview} eventActive={!!match?.boardEffects?.some((e) => e.nodeIds.includes(n.id))}/>)}</BoardFieldResources>
     {landing && byId.has(landing.nodeId) && <LandingEffects key={landing.id} landing={landing} position={point(map, byId.get(landing.nodeId)!)} motion={motion} onProject={onProjectReward}/>}
     {landing?.targetNodeId && byId.has(landing.targetNodeId) && <LandingEffects key={landing.id + "arrival"} landing={{ ...landing, label: "Arrived!" }} position={point(map, byId.get(landing.targetNodeId)!)} motion={motion} onProject={() => {}}/>}
-    {match?.phase === "PATH_SELECTION" && activeNode && [...paths].map((id) => { const preview = routePreview(match, map, id); return <PathArrow key={id} from={point(map, activeNode)} to={point(map, byId.get(id)!)} label={preview.summaries.join("; ")} onSelect={() => onSelect(id)} onHover={(hover) => setHoveredPath(hover ? id : null)}/>; })}
+    {gameUi(match?.phase === "PATH_SELECTION" && activeNode && [...paths].map((id) => { const preview = routePreview(match, map, id); return <PathArrow key={id} from={point(map, activeNode)} to={point(map, byId.get(id)!)} label={gameUi(preview.summaries.join("; "))} onSelect={() => onSelect(id)} onHover={(hover) => setHoveredPath(hover ? id : null)}/>; }))}
     {match?.boardEffects?.flatMap((effect) => {
       const label = ({ treasure: "💎 +5", eruption: "⚠ −10 HP", breeze: "🍃 +2", sanctuary: "💚 +5 HP", sale: "🛍 −2 coins", relic: "◆ ITEM" })[effect.kind];
       const color = ({ treasure: "#ffe191", eruption: "#ff866d", breeze: "#b7f38c", sanctuary: "#80f3db", sale: "#d9a6ff", relic: "#99caff" })[effect.kind];
@@ -204,6 +212,6 @@ export function BoardWorld({ map, match, overlay, preview, onSelect, focus, zoom
       position[0] += crowd ? Math.cos(i * Math.PI / 2) * .28 : 0; position[2] += crowd ? Math.sin(i * Math.PI / 2) * .28 : 0; position[1] += .1;
       return <Pawn key={p.id} target={position} avatarId={p.avatarId} color={COLORS[p.avatarId]} active={p.id === activeId} landing={landing?.playerId === p.id ? landing : null} animate={motion}/>; })}
     {match?.animals.map((a) => { const n = byId.get(a.currentNodeId); if (!n) return null; const p = point(map, n); return <group key={a.id} position={[p[0] - .3, p[1], p[2] - .35]} scale={.27}><PartyCharacter avatarId={0} color="#ede7bd"/></group>; })}
-    {explosion && byId.has(explosion.nodeId) && <Html key={explosion.id} position={point(map, byId.get(explosion.nodeId)!)} center style={{ pointerEvents: "none" }}><span className="pp-world-explosion">{explosion.kind === "fallout" ? "☢" : "✹"}</span></Html>}
+    {explosion && byId.has(explosion.nodeId) && <Html key={explosion.id} position={point(map, byId.get(explosion.nodeId)!)} center style={{ pointerEvents: "none" }}><span className="pp-world-explosion">{gameUi(explosion.kind === "fallout" ? "☢" : "✹")}</span></Html>}
   </>;
 }

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useState } from "react";
 import { Bot, Play, RotateCcw, SkipForward, Undo2, User } from "lucide-react";
 import { randomSeed, useLocalMatch, type LobbySeat } from "@/games/cards/client/useLocalMatch";
@@ -13,6 +14,7 @@ const seatsFor = (count: number, previous: LobbySeat[] = []): LobbySeat[] =>
 
 /** Lobby + local table: used by the Play page and the editor's Preview/Test step. */
 export default function TestMatch({ def, autoStart = false }: { def: GameDefinition; autoStart?: boolean }) {
+  useGameLanguage();
   const [seats, setSeats] = useState<LobbySeat[]>(() => seatsFor(def.players.min));
   const [settings, setSettings] = useState<Record<string, SettingValue>>(() => resolveSettings(def));
   const [seed, setSeed] = useState<number>(() => randomSeed());
@@ -34,17 +36,17 @@ export default function TestMatch({ def, autoStart = false }: { def: GameDefinit
 
   if (!state) {
     return (
-      <Panel title="Set up a test game" eyebrow="Lobby">
+      <Panel title={gameUi("Set up a test game")} eyebrow="Lobby">
         <div className="grid gap-5 md:grid-cols-2">
           <div className="space-y-3">
-            <Field label="Players" hint={`${def.name} allows ${def.players.min === def.players.max ? def.players.min : `${def.players.min}–${def.players.max}`} players.`}>
-              <NumberField value={seats.length} min={def.players.min} max={def.players.max} label="Players" onChange={(count) => setSeats((previous) => seatsFor(count, previous))} />
+            <Field label={gameUi("Players")} hint={`${def.name} allows ${def.players.min === def.players.max ? def.players.min : `${def.players.min}–${def.players.max}`} players.`}>
+              <NumberField value={seats.length} min={def.players.min} max={def.players.max} label={gameUi("Players")} onChange={(count) => setSeats((previous) => seatsFor(count, previous))} />
             </Field>
             <ul className="space-y-2">
               {seats.map((seat, index) => (
                 <li key={seat.id} className="flex items-center gap-2">
                   <input
-                    aria-label={`Seat ${index + 1} name`}
+                    aria-label={gameUi(`Seat ${index + 1} name`)}
                     className={inputClass}
                     value={seat.name}
                     maxLength={24}
@@ -53,38 +55,35 @@ export default function TestMatch({ def, autoStart = false }: { def: GameDefinit
                   <Button
                     size="sm"
                     tone={seat.isBot ? "ghost" : "blue"}
-                    aria-label={`Seat ${index + 1}: ${seat.isBot ? "bot" : "human"} (click to switch)`}
+                    aria-label={gameUi(`Seat ${index + 1}: ${seat.isBot ? "bot" : "human"} (click to switch)`)}
                     onClick={() => setSeats((previous) => previous.map((entry, i) => (i === index ? { ...entry, isBot: !entry.isBot } : entry)))}
                   >
                     {seat.isBot ? <Bot size={14} /> : <User size={14} />}
-                    {seat.isBot ? "Bot" : "Human"}
+                    {gameUi(seat.isBot ? "Bot" : "Human")}
                   </Button>
                 </li>
               ))}
             </ul>
-            <p className="text-xs text-zinc-500">Several humans play hotseat on this device — switch who you are looking at during the game.</p>
+            <p className="text-xs text-zinc-500">{gameUi("Several humans play hotseat on this device — switch who you are looking at during the game.")}</p>
           </div>
           <div className="space-y-4">
-            {def.settings?.length ? <SettingsForm def={def} values={settings} onChange={setSettings} /> : <p className="text-sm text-zinc-500">This game has no lobby settings.</p>}
-            <Field label="Random seed" hint="The same seed and moves always produce the same game.">
+            {def.settings?.length ? <SettingsForm def={def} values={settings} onChange={setSettings} /> : <p className="text-sm text-zinc-500">{gameUi("This game has no lobby settings.")}</p>}
+            <Field label={gameUi("Random seed")} hint="The same seed and moves always produce the same game.">
               <div className="flex gap-2">
-                <input aria-label="Random seed" className={inputClass} inputMode="numeric" value={seed} onChange={(event) => setSeed(Number(event.target.value.replace(/\D/g, "")) || 0)} />
-                <Button size="sm" onClick={() => setSeed(randomSeed())}>
-                  New
-                </Button>
+                <input aria-label={gameUi("Random seed")} className={inputClass} inputMode="numeric" value={seed} onChange={(event) => setSeed(Number(event.target.value.replace(/\D/g, "")) || 0)} />
+                <Button size="sm" onClick={() => setSeed(randomSeed())}>{gameUi(" New ")}</Button>
               </div>
             </Field>
           </div>
         </div>
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <Button tone="primary" onClick={() => begin()}>
-            <Play size={16} /> Start game
-          </Button>
-          {match.error && (
+            <Play size={16} />{gameUi(" Start game ")}</Button>
+          {gameUi(match.error && (
             <p role="alert" className="text-sm text-red-300">
-              {match.error}
+              {gameUi(match.error)}
             </p>
-          )}
+          ))}
         </div>
       </Panel>
     );
@@ -94,50 +93,43 @@ export default function TestMatch({ def, autoStart = false }: { def: GameDefinit
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
       <div className="min-w-0 space-y-3">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">Viewing as</span>
+          <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">{gameUi("Viewing as")}</span>
           {humans.map((player) => (
             <Button key={player.id} size="sm" tone={!showAll && viewer === player.id ? "primary" : "ghost"} onClick={() => (setShowAll(false), setViewer(player.id))}>
               {player.name}
             </Button>
           ))}
-          <Button size="sm" tone={showAll ? "primary" : "ghost"} onClick={() => setShowAll(true)} title="Spectator view (no hidden cards are revealed)">
-            Spectator
-          </Button>
+          <Button size="sm" tone={showAll ? "primary" : "ghost"} onClick={() => setShowAll(true)} title={gameUi("Spectator view (no hidden cards are revealed)")}>{gameUi(" Spectator ")}</Button>
         </div>
         <GameTable def={def} state={state} viewerId={activeViewer} error={match.error} onAction={(request) => activeViewer && match.act(activeViewer, request)} />
       </div>
       <aside className="space-y-3">
-        <Panel title="Test controls" eyebrow="Debug">
+        <Panel title={gameUi("Test controls")} eyebrow="Debug">
           <div className="space-y-3">
-            <Toggle checked={match.autoBots} onChange={match.setAutoBots} label="Bots play automatically" />
+            <Toggle checked={match.autoBots} onChange={match.setAutoBots} label={gameUi("Bots play automatically")} />
             <div className="flex flex-wrap gap-2">
               <Button size="sm" onClick={match.botStep} disabled={!match.nextBot}>
-                <SkipForward size={14} /> Bot step
-              </Button>
+                <SkipForward size={14} />{gameUi(" Bot step ")}</Button>
               <Button size="sm" onClick={match.undo} disabled={!match.canUndo}>
-                <Undo2 size={14} /> Undo
-              </Button>
+                <Undo2 size={14} />{gameUi(" Undo ")}</Button>
               <Button size="sm" onClick={() => begin()}>
-                <RotateCcw size={14} /> Restart
-              </Button>
-              <Button size="sm" onClick={() => match.reset()}>
-                Lobby
-              </Button>
+                <RotateCcw size={14} />{gameUi(" Restart ")}</Button>
+              <Button size="sm" onClick={() => match.reset()}>{gameUi(" Lobby ")}</Button>
             </div>
             <div className="flex flex-wrap gap-1.5">
-              <Chip>seed {seed}</Chip>
-              <Chip>revision {state.revision}</Chip>
+              <Chip>{gameUi("seed ")}{gameUi(seed)}</Chip>
+              <Chip>{gameUi("revision ")}{gameUi(state.revision)}</Chip>
               {Object.entries(state.variables)
                 .filter(([, value]) => value !== null && value !== false)
                 .map(([key, value]) => (
                   <Chip key={key} tone="violet">
-                    {key}: {String(state.players.find((player) => player.id === value)?.name ?? value)}
+                    {gameUi(key)}: {gameUi(String(state.players.find((player) => player.id === value)?.name ?? value))}
                   </Chip>
                 ))}
             </div>
           </div>
         </Panel>
-        <Panel title="Events & rules" eyebrow="Log">
+        <Panel title={gameUi("Events & rules")} eyebrow="Log">
           <EventLog state={state} />
         </Panel>
       </aside>

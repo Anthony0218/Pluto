@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import type { PlayMode, Player } from "./naturaData";
 import {
   FLYING_FISH_H,
@@ -403,8 +404,8 @@ function drawFlyingFish(
     ctx.lineWidth = 5;
     ctx.strokeStyle = "rgba(0,0,0,.42)";
     ctx.fillStyle = "#fff6e6";
-    ctx.strokeText("CAUGHT!", player.x, player.y - 48);
-    ctx.fillText("CAUGHT!", player.x, player.y - 48);
+    ctx.strokeText(gameUi("CAUGHT!"), player.x, player.y - 48);
+    ctx.fillText(gameUi("CAUGHT!"), player.x, player.y - 48);
     ctx.restore();
   }
 }
@@ -535,8 +536,8 @@ export function drawFlyingFishScene(
     ctx.strokeStyle = "rgba(0,40,70,.34)";
     ctx.fillStyle = "#fff8e9";
     const word = game.phase === "sky" ? "SURFACE!" : "DIVE!";
-    ctx.strokeText(word, FLYING_FISH_W / 2, FLYING_FISH_H / 2);
-    ctx.fillText(word, FLYING_FISH_W / 2, FLYING_FISH_H / 2);
+    ctx.strokeText(gameUi(word), FLYING_FISH_W / 2, FLYING_FISH_H / 2);
+    ctx.fillText(gameUi(word), FLYING_FISH_W / 2, FLYING_FISH_H / 2);
     ctx.restore();
   }
 }

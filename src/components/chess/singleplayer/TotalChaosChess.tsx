@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -623,11 +624,11 @@ export default function TotalChaosChess({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              {!finishedGame && (
+              {gameUi(!finishedGame && (
                 <span className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-300">
-                  {game.turn() === "w" ? t("White to move") : t("Black to move")}
+                  {gameUi(game.turn() === "w" ? t("White to move") : t("Black to move"))}
                 </span>
-              )}
+              ))}
             </div>
           </div>
 
@@ -636,7 +637,7 @@ export default function TotalChaosChess({
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel
+              <Panel gameControls
                 title={t("Game Controls")}
                 subtitle={t("Players and actions")}
               >
@@ -703,7 +704,7 @@ export default function TotalChaosChess({
 
               <Panel
                 title={t("Move History")}
-                subtitle={`${records.length} plies`}
+                subtitle={gameUi(`${records.length} plies`)}
               >
                 <ChessMoveHistoryList
                   listClassName="max-h-80 rounded-xl border border-white/5 bg-black/20"
@@ -713,7 +714,7 @@ export default function TotalChaosChess({
                     ply: record.ply,
                     side: record.color,
                     moveNumber: record.moveNumber,
-                    content: <span className="truncate text-xs font-black text-zinc-200">{record.san}</span>,
+                    content: <span className="truncate text-xs font-black text-zinc-200">{gameUi(record.san)}</span>,
                   }))}
                   onSelect={(ply) => {
                     setHistoryPreviewPly(ply);
@@ -733,9 +734,9 @@ export default function TotalChaosChess({
                   </p>
 
                   <p className="mt-1 text-sm font-bold text-white">
-                    {historyPreview.moveNumber}
-                    {historyPreview.color === "w" ? "." : "..."}{" "}
-                    {historyPreview.san}
+                    {gameUi(historyPreview.moveNumber)}
+                    {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                    {gameUi(historyPreview.san)}
                   </p>
                 </div>
 
@@ -749,7 +750,7 @@ export default function TotalChaosChess({
               </div>
             )}
 
-            {pendingPromotion && !historyPreview && (
+            {gameUi(pendingPromotion && !historyPreview && (
               <div className="mb-3">
                 <PromotionBar
                   onPromote={(piece) =>
@@ -761,9 +762,9 @@ export default function TotalChaosChess({
                   }
                 />
               </div>
-            )}
+            ))}
 
-            {finishedGame && !historyPreview && (
+            {gameUi(finishedGame && !historyPreview && (
               <VisibleGameResult
                 actions={
                   <button
@@ -775,7 +776,7 @@ export default function TotalChaosChess({
                   </button>
                 }
               />
-            )}
+            ))}
 
             <div className="relative">
               <Board
@@ -862,22 +863,24 @@ export default function TotalChaosChess({
 }
 
 function Panel({
+  gameControls = false,
   title,
   subtitle,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   subtitle: string;
   children: ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       <h2 className="font-black text-zinc-100">{ui(title)}</h2>
 
       <p className="mt-1 mb-4 text-xs text-zinc-600">{ui(subtitle)}</p>
 
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -889,7 +892,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <span className="text-[10px] font-bold text-zinc-600">{ui(label)}</span>
 
       <span className="max-w-[52%] truncate font-mono text-xs font-black text-pink-200">
-        {value}
+        {gameUi(value)}
       </span>
     </div>
   );
@@ -899,7 +902,7 @@ function MiniStat({ label, value }: { label: string; value: number }) {
   useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3 text-center">
-      <div className="text-2xl font-black text-pink-200">{value}</div>
+      <div className="text-2xl font-black text-pink-200">{gameUi(value)}</div>
 
       <div className="mt-1 text-[9px] font-bold leading-4 text-zinc-600">
         {ui(label)}
@@ -913,7 +916,7 @@ function RuleLine({ icon, text }: { icon: string; text: string }) {
   return (
     <div className="flex items-start gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs leading-5 text-zinc-400">
       <span className="flex min-w-7 justify-center font-black text-pink-300">
-        {icon}
+        {gameUi(icon)}
       </span>
 
       <span>{ui(text)}</span>

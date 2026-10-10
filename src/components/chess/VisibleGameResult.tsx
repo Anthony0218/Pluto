@@ -1,6 +1,8 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import ChessMatchStatus from "@/components/chess/singleplayer/ChessMatchStatus";
+import GameXpReward from "@/components/games/GameXpReward";
 import { ui, useUiLanguage } from "@/i18n/ui";
-import { useEffect, useRef, type ReactNode } from "react";
+import { type ReactNode } from "react";
 
 type VisibleGameResultProps = {
   winner?: string | null;
@@ -33,7 +35,6 @@ export default function VisibleGameResult({
   actions,
 }: VisibleGameResultProps) {
   useUiLanguage();
-  const resultRef = useRef<HTMLDivElement>(null);
   const isDraw = winner === "draw";
   const winnerName = winner ? `${winner[0].toUpperCase()}${winner.slice(1)}` : null;
   const result = isDraw
@@ -47,22 +48,21 @@ export default function VisibleGameResult({
         : "Game over";
   const reasonLabel = reason ? reasonLabels[reason.toLowerCase()] ?? reason : null;
 
-  useEffect(() => {
-    resultRef.current?.scrollIntoView({ block: "start" });
-  }, []);
-
   return (
-    <div ref={resultRef} className="mb-3 scroll-mt-24">
-      <ChessMatchStatus
-        event={isDraw ? "draw" : reason === "checkmate" ? "checkmate" : "variant"}
-        label="Game over"
-        message={<strong className="text-lg font-black text-white">{ui(result)}</strong>}
-        detail={reasonLabel && reasonLabel !== result ? ui(reasonLabel) : undefined}
-        className="!mt-0"
-      />
+    <div className="mb-3">
+      <div className="chess-status-row">
+        <ChessMatchStatus
+          event={isDraw ? "draw" : reason === "checkmate" ? "checkmate" : "variant"}
+          label={gameUi("Game over")}
+          message={<strong className="text-lg font-black text-white">{ui(result)}</strong>}
+          detail={reasonLabel && reasonLabel !== result ? ui(reasonLabel) : undefined}
+          className="!mt-0"
+        />
+        <GameXpReward />
+      </div>
       {actions && (
         <div className="chess-variant-result-actions mt-2 flex flex-wrap gap-2">
-          {actions}
+          {gameUi(actions)}
         </div>
       )}
     </div>

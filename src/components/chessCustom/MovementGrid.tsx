@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { formatOffset } from "@/games/chess/custom/engine/movement";
 import type { Coord, MovementRule, PieceDefinition, TeamDefinition } from "@/games/chess/custom/engine/types";
 import { gridRadius } from "@/games/chess/custom/editor/editorUtils";
@@ -53,6 +54,7 @@ export default function MovementGrid({
   compact?: boolean;
   layerDelta?: number;
 }) {
+  useGameLanguage();
   const radius = fixedRadius ?? gridRadius([...moveRules, ...captureRules]);
   const reach = new Map<string, Reach>();
   reachOf(moveRules, radius, layerDelta, "move", activeRuleId, reach);
@@ -83,8 +85,8 @@ export default function MovementGrid({
                 type="button"
                 role="gridcell"
                 disabled={!onToggle || center}
-                title={label}
-                aria-label={label}
+                title={gameUi(label)}
+                aria-label={gameUi(label)}
                 onClick={() => onToggle?.({ x, y, z: layerDelta })}
                 className={`relative aspect-square transition ${onToggle && !center ? "cursor-pointer hover:brightness-150" : "cursor-default"}`}
                 style={{
@@ -92,27 +94,27 @@ export default function MovementGrid({
                   boxShadow: entry?.active ? `inset 0 0 0 2px rgba(${color}, 0.95)` : entry?.firstMove ? "inset 0 0 0 2px rgba(252, 211, 77, 0.85)" : undefined,
                 }}
               >
-                {center && (
+                {gameUi(center && (
                   <span className="absolute inset-[8%] flex items-center justify-center rounded-md bg-amber-300/20 ring-1 ring-amber-300/60">
                     <PieceToken def={piece} team={team} />
                   </span>
-                )}
-                {entry?.firstMove && !center && <span className="absolute right-[8%] top-[4%] rounded-sm bg-amber-300/90 px-0.5 text-[7px] font-black leading-[10px] text-zinc-950">1st</span>}
+                ))}
+                {entry?.firstMove && !center && <span className="absolute right-[8%] top-[4%] rounded-sm bg-amber-300/90 px-0.5 text-[7px] font-black leading-[10px] text-zinc-950">{gameUi("1st")}</span>}
               </button>
             );
           }),
         )}
       </div>
-      {!compact && (
+      {gameUi(!compact && (
         <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] text-zinc-400">
           <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-sky-400/70" />{ui("Move")}</span>
           <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-red-500/70" />{ui("Capture")}</span>
           <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-purple-500/70" />{ui("Both")}</span>
           <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm ring-2 ring-amber-300/80" />{ui("First move")}</span>
-          <span className="ml-auto text-zinc-500">↑ {piece.movement.some((rule) => rule.relativeTo === "team") ? ui("forward for the owning team") : ui("towards the top")}</span>
+          <span className="ml-auto text-zinc-500">↑ {gameUi(piece.movement.some((rule) => rule.relativeTo === "team") ? ui("forward for the owning team") : ui("towards the top"))}</span>
           {hasTeleport && <span className="w-full text-fuchsia-300">✧ {ui("Also teleports between teleport tiles.")}</span>}
         </div>
-      )}
+      ))}
     </div>
   );
 }

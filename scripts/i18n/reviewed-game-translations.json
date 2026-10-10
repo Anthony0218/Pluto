@@ -1,0 +1,902 @@
+[
+  [
+    "Card rank",
+    "Card rank",
+    "Kartenrang",
+    "Kartnrang",
+    "카드 값",
+    "Достоинство карты",
+    "Valor de la carta",
+    "Valor da carta"
+  ],
+  [
+    "Dealer",
+    "Dealer",
+    "Geber",
+    "Geber",
+    "딜러",
+    "Сдающий",
+    "Repartidor",
+    "Distribuidor"
+  ],
+  [
+    "Follow suit",
+    "Follow suit",
+    "Farbe bedienen",
+    "Farb zuagebn",
+    "먼저 나온 무늬를 따라 내기",
+    "Ходить в масть",
+    "Asistir al palo",
+    "Seguir o naipe"
+  ],
+  [
+    "Hand",
+    "Hand",
+    "Hand",
+    "Hand",
+    "패",
+    "Карты на руках",
+    "Mano",
+    "Mão"
+  ],
+  [
+    "Hotseat",
+    "Hotseat",
+    "Hotseat",
+    "Hotseat",
+    "한 기기에서 번갈아 플레이",
+    "По очереди на одном устройстве",
+    "Por turnos en un dispositivo",
+    "Por turnos no mesmo dispositivo"
+  ],
+  [
+    "Play",
+    "Play",
+    "Spielen",
+    "Spuin",
+    "플레이",
+    "Играть",
+    "Jugar",
+    "Jogar"
+  ],
+  [
+    "Rufspiel, Farbwenz, Wenz, Solo, Tout und Sie — mit verbindlichem Zugeben.",
+    "Rufspiel, Farbwenz, Wenz, Solo, Tout and Sie — with compulsory following suit.",
+    "Rufspiel, Farbwenz, Wenz, Solo, Tout und Sie — mit verbindlichem Zugeben.",
+    "Rufspiel, Farbwenz, Wenz, Solo, Tout und Sie — mit Pflicht zum Zugeben.",
+    "Rufspiel, Farbwenz, Wenz, Solo, Tout, Sie — 먼저 나온 무늬의 카드를 반드시 따라 내야 합니다.",
+    "Rufspiel, Farbwenz, Wenz, Solo, Tout и Sie — с обязательным ходом в масть.",
+    "Rufspiel, Farbwenz, Wenz, Solo, Tout y Sie — con obligación de asistir al palo.",
+    "Rufspiel, Farbwenz, Wenz, Solo, Tout e Sie — com obrigação de seguir o naipe."
+  ],
+  [
+    "Schafkopf",
+    "Schafkopf",
+    "Schafkopf",
+    "Schafkopf",
+    "Schafkopf",
+    "Schafkopf",
+    "Schafkopf",
+    "Schafkopf"
+  ],
+  [
+    "Schlicht",
+    "Simple",
+    "Schlicht",
+    "Schlicht",
+    "간단히",
+    "Простой вид",
+    "Vista sencilla",
+    "Vista simples"
+  ],
+  [
+    "Spielen →",
+    "Play →",
+    "Spielen →",
+    "Spuin →",
+    "플레이 →",
+    "Играть →",
+    "Jugar →",
+    "Jogar →"
+  ],
+  [
+    "Suit",
+    "Suit",
+    "Farbe",
+    "Farb",
+    "무늬",
+    "Масть",
+    "Palo",
+    "Naipe"
+  ],
+  [
+    "Suits",
+    "Suits",
+    "Farben",
+    "Farbn",
+    "무늬",
+    "Масти",
+    "Palos",
+    "Naipes"
+  ],
+  [
+    "Tisch öffnen →",
+    "Open table →",
+    "Tisch öffnen →",
+    "Tisch aufmacha →",
+    "테이블 열기 →",
+    "Открыть стол →",
+    "Abrir mesa →",
+    "Abrir mesa →"
+  ],
+  [
+    "Trick",
+    "Trick",
+    "Stich",
+    "Stich",
+    "트릭",
+    "Взятка",
+    "Baza",
+    "Vaza"
+  ],
+  [
+    "Tricks",
+    "Tricks",
+    "Stiche",
+    "Stich",
+    "트릭",
+    "Взятки",
+    "Bazas",
+    "Vazas"
+  ],
+  [
+    "Vier Spieler. Acht Stiche. Ein gutes Blatt.",
+    "Four players. Eight tricks. A good hand.",
+    "Vier Spieler. Acht Stiche. Ein gutes Blatt.",
+    "Vier Spuila. Acht Stich. A guads Blatt.",
+    "네 명의 플레이어. 여덟 번의 트릭. 좋은 패.",
+    "Четыре игрока. Восемь взяток. Хорошие карты.",
+    "Cuatro jugadores. Ocho bazas. Una buena mano.",
+    "Quatro jogadores. Oito vazas. Uma boa mão."
+  ],
+  [
+    "Your hand",
+    "Your hand",
+    "Deine Hand",
+    "Dei Hand",
+    "내 패",
+    "Ваши карты",
+    "Tu mano",
+    "Sua mão"
+  ],
+  [
+    "Runde",
+    "Round",
+    "Runde",
+    "Rund",
+    "라운드",
+    "Раунд",
+    "Ronda",
+    "Rodada"
+  ],
+  [
+    "Runde {0}",
+    "Round {0}",
+    "Runde {0}",
+    "Rund {0}",
+    "라운드 {0}",
+    "Раунд {0}",
+    "Ronda {0}",
+    "Rodada {0}"
+  ],
+  [
+    "Stich",
+    "Trick",
+    "Stich",
+    "Stich",
+    "트릭",
+    "Взятка",
+    "Baza",
+    "Vaza"
+  ],
+  [
+    "Stiche",
+    "Tricks",
+    "Stiche",
+    "Stich",
+    "트릭",
+    "Взятки",
+    "Bazas",
+    "Vazas"
+  ],
+  [
+    "Stich {0} von 8",
+    "Trick {0} of 8",
+    "Stich {0} von 8",
+    "Stich {0} vo 8",
+    "8번 중 {0}번째 트릭",
+    "Взятка {0} из 8",
+    "Baza {0} de 8",
+    "Vaza {0} de 8"
+  ],
+  [
+    "Deine Hand",
+    "Your hand",
+    "Deine Hand",
+    "Dei Hand",
+    "내 패",
+    "Ваши карты",
+    "Tu mano",
+    "Sua mão"
+  ],
+  [
+    "Deine Hand · ← / → wählen · Enter spielen",
+    "Your hand · ← / → to select · Enter to play",
+    "Deine Hand · ← / → wählen · Enter spielen",
+    "Dei Hand · ← / → aussuacha · Enter spuin",
+    "내 패 · ← / → 선택 · Enter로 카드 내기",
+    "Ваши карты · ← / → выбрать · Enter сыграть",
+    "Tu mano · ← / → seleccionar · Enter jugar",
+    "Sua mão · ← / → selecionar · Enter jogar"
+  ],
+  [
+    "Zweite Hand",
+    "Deal the remaining cards",
+    "Zweite Hand",
+    "Zweite Hand",
+    "나머지 카드 받기",
+    "Получить остальные карты",
+    "Recibir las cartas restantes",
+    "Receber as cartas restantes"
+  ],
+  [
+    "Mit vier Karten klopfen?",
+    "Klopfen with the first four cards?",
+    "Mit vier Karten klopfen?",
+    "Mit vier Kartn klopfen?",
+    "처음 네 장으로 Klopfen하시겠습니까?",
+    "Объявить Klopfen с первыми четырьмя картами?",
+    "¿Declarar Klopfen con las primeras cuatro cartas?",
+    "Declarar Klopfen com as primeiras quatro cartas?"
+  ],
+  [
+    "Weiter",
+    "Pass",
+    "Weiter",
+    "Weida",
+    "패스",
+    "Пас",
+    "Paso",
+    "Passar"
+  ],
+  [
+    "Bedienen geht vor",
+    "Following suit comes first",
+    "Bedienen geht vor",
+    "Zugebn geht vor",
+    "먼저 나온 무늬를 따라 내는 것이 우선입니다",
+    "Сначала нужно ходить в масть",
+    "Primero hay que asistir al palo",
+    "Seguir o naipe tem prioridade"
+  ],
+  [
+    "{0} zugeben: Du musst bedienen.",
+    "Follow {0}: you must follow suit.",
+    "{0} zugeben: Du musst bedienen.",
+    "{0} zuagebn: Du muasst bedienen.",
+    "{0} 무늬를 따라 내야 합니다.",
+    "Ходите в масть {0}.",
+    "Debes asistir al palo {0}.",
+    "Você deve seguir o naipe {0}."
+  ],
+  [
+    "Platz {0}",
+    "Seat {0}",
+    "Platz {0}",
+    "Platz {0}",
+    "자리 {0}",
+    "Место {0}",
+    "Asiento {0}",
+    "Lugar {0}"
+  ],
+  [
+    "west",
+    "West",
+    "Westen",
+    "Westn",
+    "서쪽",
+    "запад",
+    "oeste",
+    "oeste"
+  ],
+  [
+    "north",
+    "North",
+    "Norden",
+    "Nordn",
+    "북쪽",
+    "север",
+    "norte",
+    "norte"
+  ],
+  [
+    "east",
+    "East",
+    "Osten",
+    "Ostn",
+    "동쪽",
+    "восток",
+    "este",
+    "leste"
+  ],
+  [
+    "south",
+    "South",
+    "Süden",
+    "Südn",
+    "남쪽",
+    "юг",
+    "sur",
+    "sul"
+  ],
+  [
+    "dein Platz",
+    "Your seat",
+    "dein Platz",
+    "dei Platz",
+    "내 자리",
+    "Ваше место",
+    "Tu asiento",
+    "Seu lugar"
+  ],
+  [
+    "Dein Platz",
+    "Your seat",
+    "Dein Platz",
+    "Dei Platz",
+    "내 자리",
+    "Ваше место",
+    "Tu asiento",
+    "Seu lugar"
+  ],
+  [
+    "Your Rank",
+    "Your rank",
+    "Dein Rang",
+    "Dei Rang",
+    "내 등급",
+    "Ваш ранг",
+    "Tu rango",
+    "Sua classificação"
+  ],
+  [
+    "Can Move",
+    "Can move",
+    "Kann ziehen",
+    "Ko ziang",
+    "이동 가능",
+    "Может двигаться",
+    "Puede moverse",
+    "Pode mover"
+  ],
+  [
+    "Can Attack",
+    "Can attack",
+    "Kann angreifen",
+    "Ko ogreifn",
+    "공격 가능",
+    "Может атаковать",
+    "Puede atacar",
+    "Pode atacar"
+  ],
+  [
+    "HIT",
+    "HIT",
+    "TREFFER",
+    "TREFFER",
+    "명중",
+    "ПОПАДАНИЕ",
+    "IMPACTO",
+    "ACERTO"
+  ],
+  [
+    "MISS",
+    "MISS",
+    "VERFEHLT",
+    "DANEBN",
+    "빗나감",
+    "ПРОМАХ",
+    "FALLO",
+    "ERRO"
+  ],
+  [
+    "Perfect!",
+    "Perfect!",
+    "Perfekt!",
+    "Perfekt!",
+    "완벽합니다!",
+    "Идеально!",
+    "¡Perfecto!",
+    "Perfeito!"
+  ],
+  [
+    "Strong",
+    "Strong",
+    "Stark",
+    "Stark",
+    "강함",
+    "Сильно",
+    "Fuerte",
+    "Forte"
+  ],
+  [
+    "Good",
+    "Good",
+    "Gut",
+    "Guad",
+    "좋음",
+    "Хорошо",
+    "Bien",
+    "Bom"
+  ],
+  [
+    "Weak",
+    "Weak",
+    "Schwach",
+    "Schwach",
+    "약함",
+    "Слабо",
+    "Débil",
+    "Fraco"
+  ],
+  [
+    "none",
+    "None",
+    "Keine",
+    "Koane",
+    "없음",
+    "Нет",
+    "Ninguno",
+    "Nenhum"
+  ],
+  [
+    "Higher or Lower",
+    "Higher or Lower",
+    "Höher oder niedriger",
+    "Hecha oda niedriga",
+    "더 높을까, 더 낮을까",
+    "Больше или меньше",
+    "Mayor o menor",
+    "Maior ou menor"
+  ],
+  [
+    "Flag Battle",
+    "Flag Battle",
+    "Flaggenduell",
+    "Flaggnduell",
+    "국기 대결",
+    "Битва флагов",
+    "Duelo de banderas",
+    "Duelo de bandeiras"
+  ],
+  [
+    "Training History",
+    "Training history",
+    "Trainingsverlauf",
+    "Trainingsverlauf",
+    "훈련 기록",
+    "История тренировок",
+    "Historial de entrenamiento",
+    "Histórico de treino"
+  ],
+  [
+    "Completed puzzles",
+    "Completed puzzles",
+    "Gelöste Aufgaben",
+    "Glöste Aufgabn",
+    "해결한 문제",
+    "Решённые задачи",
+    "Problemas resueltos",
+    "Problemas resolvidos"
+  ],
+  [
+    "Endgames",
+    "Endgames",
+    "Endspiele",
+    "Endspui",
+    "엔드게임",
+    "Эндшпили",
+    "Finales",
+    "Finais"
+  ],
+  [
+    "Rename",
+    "Rename",
+    "Umbenennen",
+    "Umbennen",
+    "이름 변경",
+    "Переименовать",
+    "Renombrar",
+    "Renomear"
+  ],
+  [
+    "AI strength",
+    "AI strength",
+    "KI-Stärke",
+    "KI-Stärk",
+    "AI 난이도",
+    "Сила ИИ",
+    "Nivel de la IA",
+    "Força da IA"
+  ],
+  [
+    "Default",
+    "Default",
+    "Standard",
+    "Standard",
+    "기본값",
+    "По умолчанию",
+    "Predeterminado",
+    "Padrão"
+  ],
+  [
+    "Battle Complete",
+    "Battle complete",
+    "Schlacht abgeschlossen",
+    "Schlacht fertig",
+    "전투 완료",
+    "Битва завершена",
+    "Batalla completada",
+    "Batalha concluída"
+  ],
+  [
+    "Battle Available",
+    "Battle available",
+    "Schlacht verfügbar",
+    "Schlacht verfügbar",
+    "전투 가능",
+    "Битва доступна",
+    "Batalla disponible",
+    "Batalha disponível"
+  ],
+  [
+    "View result →",
+    "View result →",
+    "Ergebnis ansehen →",
+    "Ergebnis oschaun →",
+    "결과 보기 →",
+    "Посмотреть результат →",
+    "Ver resultado →",
+    "Ver resultado →"
+  ],
+  [
+    "Enter realm",
+    "Enter realm",
+    "Reich betreten",
+    "Reich betretn",
+    "왕국 입장",
+    "Войти в королевство",
+    "Entrar al reino",
+    "Entrar no reino"
+  ],
+  [
+    "Choose a realm",
+    "Choose a realm",
+    "Reich auswählen",
+    "Reich aussuacha",
+    "왕국 선택",
+    "Выберите королевство",
+    "Elige un reino",
+    "Escolha um reino"
+  ],
+  [
+    "← Games",
+    "← Games",
+    "← Spiele",
+    "← Spui",
+    "← 게임",
+    "← Игры",
+    "← Juegos",
+    "← Jogos"
+  ],
+  [
+    "jigo",
+    "jigo",
+    "jigo",
+    "jigo",
+    "jigo",
+    "jigo",
+    "jigo",
+    "jigo"
+  ],
+  [
+    "Höchster Trumpf im Sauspiel und Farbsolo.",
+    "Highest trump in Sauspiel and Farbsolo.",
+    "Höchster Trumpf im Sauspiel und Farbsolo.",
+    "Hechster Trumpf im Sauspiel und Farbsolo.",
+    "Sauspiel과 Farbsolo에서 가장 높은 으뜸패입니다.",
+    "Старший козырь в Sauspiel и Farbsolo.",
+    "El triunfo más alto en Sauspiel y Farbsolo.",
+    "O trunfo mais alto em Sauspiel e Farbsolo."
+  ],
+  [
+    "Zweithöchster Ober.",
+    "Second-highest Ober.",
+    "Zweithöchster Ober.",
+    "Zwoathechster Ober.",
+    "두 번째로 높은 Ober입니다.",
+    "Второй по старшинству Ober.",
+    "El segundo Ober más alto.",
+    "O segundo Ober mais alto."
+  ],
+  [
+    "Dritthöchster Ober.",
+    "Third-highest Ober.",
+    "Dritthöchster Ober.",
+    "Dritthechster Ober.",
+    "세 번째로 높은 Ober입니다.",
+    "Третий по старшинству Ober.",
+    "El tercer Ober más alto.",
+    "O terceiro Ober mais alto."
+  ],
+  [
+    "Vierter Ober.",
+    "Fourth-highest Ober.",
+    "Vierter Ober.",
+    "Vierter Ober.",
+    "네 번째로 높은 Ober입니다.",
+    "Четвёртый по старшинству Ober.",
+    "El cuarto Ober más alto.",
+    "O quarto Ober mais alto."
+  ],
+  [
+    "Die Sau in Eichel.",
+    "The Sau of Eichel.",
+    "Die Sau in Eichel.",
+    "De Sau in Eichel.",
+    "Eichel의 Sau입니다.",
+    "Sau масти Eichel.",
+    "La Sau de Eichel.",
+    "A Sau de Eichel."
+  ],
+  [
+    "Gras heißt auch Grün oder Blatt.",
+    "Gras is also called Grün or Blatt.",
+    "Gras heißt auch Grün oder Blatt.",
+    "Gras hoaßt aa Grün oda Blatt.",
+    "Gras는 Grün 또는 Blatt라고도 부릅니다.",
+    "Gras также называют Grün или Blatt.",
+    "Gras también se llama Grün o Blatt.",
+    "Gras também é chamado de Grün ou Blatt."
+  ],
+  [
+    "Herz ist im Sauspiel Trumpf und kann nicht gerufen werden.",
+    "Herz is trump in Sauspiel and cannot be called.",
+    "Herz ist im Sauspiel Trumpf und kann nicht gerufen werden.",
+    "Herz is im Sauspiel Trumpf und ko ned grufn werdn.",
+    "Sauspiel에서 Herz는 으뜸패이므로 부를 수 없습니다.",
+    "В Sauspiel Herz — козырь, и эту масть нельзя объявить.",
+    "Herz es triunfo en Sauspiel y no se puede pedir.",
+    "Herz é trunfo em Sauspiel e não pode ser chamado."
+  ],
+  [
+    "Weitere Rufnamen: Kugel-Bauer-Theres und Hundsgfickte.",
+    "Other names: Kugel-Bauer-Theres and Hundsgfickte.",
+    "Weitere Rufnamen: Kugel-Bauer-Theres und Hundsgfickte.",
+    "Andere Rufnam: Kugel-Bauer-Theres und Hundsgfickte.",
+    "다른 이름: Kugel-Bauer-Theres, Hundsgfickte.",
+    "Другие названия: Kugel-Bauer-Theres и Hundsgfickte.",
+    "Otros nombres: Kugel-Bauer-Theres y Hundsgfickte.",
+    "Outros nomes: Kugel-Bauer-Theres e Hundsgfickte."
+  ],
+  [
+    "Die Kartenpunkte; alle 32 Karten zusammen zählen 120 Augen.",
+    "Card points; all 32 cards together are worth 120 Augen.",
+    "Die Kartenpunkte; alle 32 Karten zusammen zählen 120 Augen.",
+    "De Kartnpunkte; olle 32 Kartn zamm zähln 120 Augen.",
+    "카드 점수입니다. 32장의 카드는 총 120 Augen입니다.",
+    "Очки карт; все 32 карты в сумме дают 120 Augen.",
+    "Los puntos de las cartas; las 32 cartas suman 120 Augen.",
+    "Os pontos das cartas; as 32 cartas somam 120 Augen."
+  ],
+  [
+    "Eine Karte mit 11 Augen.",
+    "A card worth 11 Augen.",
+    "Eine Karte mit 11 Augen.",
+    "A Kartn mit 11 Augen.",
+    "11 Augen짜리 카드입니다.",
+    "Карта стоимостью 11 Augen.",
+    "Una carta de 11 Augen.",
+    "Uma carta de 11 Augen."
+  ],
+  [
+    "Ass oder Zehn; diese bringen viele Augen in einen Stich.",
+    "An Ass or ten; these add many Augen to a trick.",
+    "Ass oder Zehn; diese bringen viele Augen in einen Stich.",
+    "Ass oda Zehn; de bringan vui Augen in an Stich.",
+    "Ass 또는 10입니다. 트릭에 많은 Augen을 더합니다.",
+    "Ass или десятка; они приносят много Augen во взятку.",
+    "Ass o diez; aportan muchos Augen a una baza.",
+    "Ass ou dez; acrescentam muitos Augen a uma vaza."
+  ],
+  [
+    "Sticht jede Fehlfarbe; welche Karten Trumpf sind, bestimmt die Spielart.",
+    "Beats any non-trump suit; the contract determines which cards are trumps.",
+    "Sticht jede Fehlfarbe; welche Karten Trumpf sind, bestimmt die Spielart.",
+    "Sticht jede Fehlfarbe; welche Kartn Trumpf san, bestimmt de Spielart.",
+    "으뜸패가 아닌 모든 무늬를 이깁니다. 어떤 카드가 으뜸패인지는 게임 종류에 따라 정해집니다.",
+    "Бьёт любую некозырную масть; контракт определяет, какие карты являются козырями.",
+    "Gana a cualquier palo que no sea triunfo; el contrato determina las cartas de triunfo.",
+    "Vence qualquer naipe que não seja trunfo; o contrato determina quais cartas são trunfos."
+  ],
+  [
+    "Eine Farbe, die in der aktuellen Spielart kein Trumpf ist.",
+    "A suit that is not trump in the current contract.",
+    "Eine Farbe, die in der aktuellen Spielart kein Trumpf ist.",
+    "A Farb, de in da aktuellen Spielart koa Trumpf is.",
+    "현재 게임 종류에서 으뜸패가 아닌 무늬입니다.",
+    "Масть, которая не является козырной в текущем контракте.",
+    "Un palo que no es triunfo en el contrato actual.",
+    "Um naipe que não é trunfo no contrato atual."
+  ],
+  [
+    "Die gerufene Farbe ausspielen, um die Rufsau und damit den Partner sichtbar zu machen.",
+    "Lead the called suit to reveal the Rufsau and therefore your partner.",
+    "Die gerufene Farbe ausspielen, um die Rufsau und damit den Partner sichtbar zu machen.",
+    "De grufne Farb ausspuin, damit de Rufsau und da Partner sichtbar werdn.",
+    "부른 무늬를 먼저 내어 Rufsau와 파트너를 드러내는 것입니다.",
+    "Ход объявленной мастью, чтобы выявить Rufsau и своего партнёра.",
+    "Salir con el palo pedido para revelar la Rufsau y, con ella, al compañero.",
+    "Sair com o naipe chamado para revelar a Rufsau e, assim, o parceiro."
+  ],
+  [
+    "Einer der drei höchsten Ober.",
+    "One of the three highest Ober cards.",
+    "Einer der drei höchsten Ober.",
+    "Oana vo de drei hechsten Ober.",
+    "가장 높은 세 Ober 중 하나입니다.",
+    "Один из трёх старших Ober.",
+    "Uno de los tres Ober más altos.",
+    "Um dos três Ober mais altos."
+  ],
+  [
+    "Eine punktreiche Karte in einen sicheren Partnerstich legen.",
+    "Play a high-value card into a trick your partner will safely win.",
+    "Eine punktreiche Karte in einen sicheren Partnerstich legen.",
+    "A punktreiche Kartn in an sicheren Partnerstich legen.",
+    "파트너가 확실히 이길 트릭에 점수가 높은 카드를 내는 것입니다.",
+    "Сыграть карту с большим числом очков во взятку, которую уверенно берёт партнёр.",
+    "Jugar una carta de muchos puntos en una baza que el compañero ganará con seguridad.",
+    "Jogar uma carta de muitos pontos numa vaza que o parceiro ganhará com segurança."
+  ],
+  [
+    "Der Rufsau-Besitzer spielt mit mindestens vier aktuellen Rufkarten eine niedrigere Rufkarte aus.",
+    "With at least four cards of the called suit still in hand, the Rufsau holder leads a lower card of that suit.",
+    "Der Rufsau-Besitzer spielt mit mindestens vier aktuellen Rufkarten eine niedrigere Rufkarte aus.",
+    "Da Rufsau-Besitzer spuit mit mindestens vier aktuellen Rufkartn a niedrigere Rufkartn aus.",
+    "Rufsau 보유자가 부른 무늬를 네 장 이상 가진 상태에서 그 무늬의 낮은 카드를 먼저 내는 것입니다.",
+    "Имея на руках не менее четырёх карт объявленной масти, держатель Rufsau ходит младшей картой этой масти.",
+    "Con al menos cuatro cartas del palo pedido en la mano, el dueño de la Rufsau sale con una carta inferior de ese palo.",
+    "Com pelo menos quatro cartas do naipe chamado na mão, o dono da Rufsau sai com uma carta mais baixa desse naipe."
+  ],
+  [
+    "Zu wenige Augen / kein einziger gewonnener Stich. Die genauen Grenzen stehen bei den Spielregeln.",
+    "Too few Augen / no tricks won. The exact thresholds are in the game rules.",
+    "Zu wenige Augen / kein einziger gewonnener Stich. Die genauen Grenzen stehen bei den Spielregeln.",
+    "Zwenig Augen / koa einziger gwunnener Stich. De genauen Grenzn stehn bei de Spielregeln.",
+    "Augen이 너무 적음 / 이긴 트릭이 없음. 정확한 기준은 게임 규칙에 나와 있습니다.",
+    "Слишком мало Augen / ни одной выигранной взятки. Точные пороги указаны в правилах игры.",
+    "Muy pocos Augen / ninguna baza ganada. Los límites exactos figuran en las reglas del juego.",
+    "Poucos Augen / nenhuma vaza ganha. Os limites exatos estão nas regras do jogo."
+  ],
+  [
+    "Lückenlose Folge der höchsten Trümpfe in einer Partei.",
+    "An uninterrupted sequence of the highest trumps held by one side.",
+    "Lückenlose Folge der höchsten Trümpfe in einer Partei.",
+    "Lückenlose Folge vo de hechsten Trümpf in oana Partei.",
+    "한 팀이 연속으로 보유한 가장 높은 으뜸패들입니다.",
+    "Непрерывная последовательность старших козырей у одной стороны.",
+    "Una secuencia sin huecos de los triunfos más altos en un mismo equipo.",
+    "Uma sequência sem lacunas dos trunfos mais altos na mesma equipe."
+  ],
+  [
+    "Verdoppelt den Spielwert vor der Spielansage.",
+    "Doubles the game value before the contract is announced.",
+    "Verdoppelt den Spielwert vor der Spielansage.",
+    "Verdoppelt den Spielwert vor da Spielansag.",
+    "게임 종류를 선언하기 전에 게임 가치를 두 배로 만듭니다.",
+    "Удваивает стоимость игры до объявления контракта.",
+    "Duplica el valor del juego antes de anunciar el contrato.",
+    "Duplica o valor do jogo antes de anunciar o contrato."
+  ],
+  [
+    "Aufeinanderfolgende Spritzansagen; jede verdoppelt den Spielwert.",
+    "Successive Spritzen declarations; each doubles the game value.",
+    "Aufeinanderfolgende Spritzansagen; jede verdoppelt den Spielwert.",
+    "Aufeinanderfolgende Spritzansagn; jede verdoppelt den Spielwert.",
+    "연속된 Spritzen 선언입니다. 각 선언마다 게임 가치가 두 배가 됩니다.",
+    "Последовательные объявления Spritzen; каждое удваивает стоимость игры.",
+    "Declaraciones sucesivas de Spritzen; cada una duplica el valor del juego.",
+    "Declarações sucessivas de Spritzen; cada uma duplica o valor do jogo."
+  ],
+  [
+    "Der Ansager muss alle acht Stiche gewinnen.",
+    "The declarer must win all eight tricks.",
+    "Der Ansager muss alle acht Stiche gewinnen.",
+    "Da Ansager muaß olle acht Stich gwinna.",
+    "선언자는 여덟 번의 트릭을 모두 이겨야 합니다.",
+    "Объявивший должен выиграть все восемь взяток.",
+    "El declarante debe ganar las ocho bazas.",
+    "O declarante deve ganhar as oito vazas."
+  ],
+  [
+    "Die Namen unterscheiden sich regional. „Roter“ bezeichnet hier den Herz-Ober; der eindeutige Kartenname steht immer daneben.",
+    "Names vary by region. Here, Roter means the Herz-Ober; the unambiguous card name always appears beside it.",
+    "Die Namen unterscheiden sich regional. „Roter“ bezeichnet hier den Herz-Ober; der eindeutige Kartenname steht immer daneben.",
+    "De Nam san regional verschieden. „Roter“ hoaßt do Herz-Ober; da eindeutige Kartnnam steht oiwei daneben.",
+    "이름은 지역마다 다릅니다. 여기서 Roter는 Herz-Ober를 뜻하며, 정확한 카드 이름이 항상 옆에 표시됩니다.",
+    "Названия различаются по регионам. Здесь Roter означает Herz-Ober; рядом всегда указано однозначное название карты.",
+    "Los nombres varían según la región. Aquí Roter significa Herz-Ober; al lado siempre aparece el nombre inequívoco de la carta.",
+    "Os nomes variam por região. Aqui Roter significa Herz-Ober; o nome inequívoco da carta sempre aparece ao lado."
+  ],
+  [
+    "Vier Spieler erhalten je acht Karten. In acht Stichen werden 120 Augen verteilt. Die Spielerpartei braucht ohne Spritzen 61 Augen, die Gegenseite 60. Nach Spritzen braucht die zuletzt spritzende Partei 61. Beim Tout zählt jeder Stich, beim Bettel darf der Ansager keinen gewinnen.",
+    "Four players receive eight cards each. The eight tricks contain 120 Augen in total. Without Spritzen, the declaring side needs 61 Augen and the opposing side 60. After Spritzen, the side that declared it last needs 61. In Tout, every trick matters; in Bettel, the declarer must not win any.",
+    "Vier Spieler erhalten je acht Karten. In acht Stichen werden 120 Augen verteilt. Die Spielerpartei braucht ohne Spritzen 61 Augen, die Gegenseite 60. Nach Spritzen braucht die zuletzt spritzende Partei 61. Beim Tout zählt jeder Stich, beim Bettel darf der Ansager keinen gewinnen.",
+    "Vier Spuila kriagn je acht Kartn. In acht Stich werdn 120 Augen verteilt. De Spielerpartei braucht ohne Spritzen 61 Augen, de Gegenseit 60. Nach Spritzen braucht de zuletzt spritzende Partei 61. Beim Tout zählt jeder Stich, beim Bettel darf da Ansager koan gwinna.",
+    "네 명의 플레이어가 각각 여덟 장을 받습니다. 여덟 트릭의 총점은 120 Augen입니다. Spritzen이 없으면 선언 팀은 61 Augen, 상대 팀은 60 Augen이 필요합니다. Spritzen 후에는 마지막으로 Spritzen을 선언한 팀이 61 Augen을 얻어야 합니다. Tout에서는 모든 트릭을 이겨야 하고, Bettel에서는 선언자가 어떤 트릭도 이겨서는 안 됩니다.",
+    "Четыре игрока получают по восемь карт. За восемь взяток разыгрывается 120 Augen. Без Spritzen объявившей стороне нужно 61 Augen, противникам — 60. После Spritzen стороне, которая объявила его последней, нужно 61. В Tout важна каждая взятка; в Bettel объявивший не должен выиграть ни одной.",
+    "Cuatro jugadores reciben ocho cartas cada uno. Las ocho bazas suman 120 Augen. Sin Spritzen, el equipo declarante necesita 61 Augen y el contrario 60. Tras Spritzen, el último equipo que lo anunció necesita 61. En Tout hay que ganar todas las bazas; en Bettel, el declarante no puede ganar ninguna.",
+    "Quatro jogadores recebem oito cartas cada um. As oito vazas somam 120 Augen. Sem Spritzen, a equipe declarante precisa de 61 Augen e a adversária de 60. Após Spritzen, a última equipe que o declarou precisa de 61. Em Tout, todas as vazas contam; em Bettel, o declarante não pode ganhar nenhuma."
+  ],
+  [
+    "Der Spieler links vom Geber beginnt. Danach spielt der Stichgewinner aus. Die angespielte Farbe oder Trumpf muss bedient werden; wer frei ist, darf abwerfen oder stechen. Es gibt keine allgemeine Pflicht zum Überstechen.",
+    "The player to the dealer’s left leads first. After that, the winner of each trick leads the next. Players must follow the led suit or trump if possible; otherwise they may discard or play a trump. There is no general obligation to play a higher trump.",
+    "Der Spieler links vom Geber beginnt. Danach spielt der Stichgewinner aus. Die angespielte Farbe oder Trumpf muss bedient werden; wer frei ist, darf abwerfen oder stechen. Es gibt keine allgemeine Pflicht zum Überstechen.",
+    "Da Spuila links vom Geber fangt o. Danach spuit da Stichgwinner aus. De angspuite Farb oda Trumpf muaß bedient werdn; wer frei is, darf abwerfn oda stechn. Es gibt koa allgemeine Pflicht zum Überstechn.",
+    "딜러 왼쪽의 플레이어가 먼저 냅니다. 그다음부터는 트릭을 이긴 플레이어가 먼저 냅니다. 먼저 나온 무늬나 으뜸패가 있으면 반드시 따라 내야 합니다. 없으면 다른 카드를 버리거나 으뜸패를 낼 수 있습니다. 더 높은 으뜸패를 내야 하는 일반적인 의무는 없습니다.",
+    "Первым ходит игрок слева от сдающего. Затем ходит победитель предыдущей взятки. При наличии карт нужно ходить в заданную масть или козырем, если был сыгран козырь; иначе можно сбросить карту или сыграть козырь. Общей обязанности перебивать более высоким козырем нет.",
+    "Sale primero el jugador a la izquierda del repartidor. Después sale quien ganó la baza anterior. Hay que asistir al palo o al triunfo de salida si se tiene; de lo contrario se puede descartar o jugar triunfo. No existe una obligación general de superar el triunfo jugado.",
+    "O jogador à esquerda do distribuidor sai primeiro. Depois sai quem ganhou a vaza anterior. É obrigatório seguir o naipe ou trunfo de saída quando possível; caso contrário, pode-se descartar ou jogar um trunfo. Não há obrigação geral de superar um trunfo já jogado."
+  ],
+  [
+    "Sauspiel: Ansager und Besitzer der gerufenen Sau gegen zwei Gegner. Solo, Wenz, Geier, Farbwenz und Farbgeier: einer gegen drei. Im Solo sind Ober, Unter und die Solofarbe Trumpf; im Wenz nur Unter, im Geier nur Ober. Farbwenz und Farbgeier ergänzen die jeweilige Trumpffarbe. Beim Ramsch verliert, wer die meisten Augen sammelt. Sie wird mit allen Obern und Untern sofort gewertet. Zusätzliche Varianten hängen von euren Einstellungen ab; Hochzeit ist derzeit nicht spielbar.",
+    "Sauspiel: the declarer and the holder of the called Sau play against two opponents. Solo, Wenz, Geier, Farbwenz and Farbgeier: one against three. In Solo, all Ober, Unter and cards of the declared suit are trumps; in Wenz only Unter, in Geier only Ober. Farbwenz and Farbgeier also include the declared trump suit. In Ramsch, the player with the most Augen loses. Sie is scored immediately when the hand contains all Ober and Unter cards. Additional variants depend on your settings; Hochzeit is currently unavailable.",
+    "Sauspiel: Ansager und Besitzer der gerufenen Sau gegen zwei Gegner. Solo, Wenz, Geier, Farbwenz und Farbgeier: einer gegen drei. Im Solo sind Ober, Unter und die Solofarbe Trumpf; im Wenz nur Unter, im Geier nur Ober. Farbwenz und Farbgeier ergänzen die jeweilige Trumpffarbe. Beim Ramsch verliert, wer die meisten Augen sammelt. Sie wird mit allen Obern und Untern sofort gewertet. Zusätzliche Varianten hängen von euren Einstellungen ab; Hochzeit ist derzeit nicht spielbar.",
+    "Sauspiel: Ansager und Besitzer vo da grufnen Sau gegen zwoa Gegner. Solo, Wenz, Geier, Farbwenz und Farbgeier: oana gegen drei. Im Solo san Ober, Unter und de Solofarb Trumpf; im Wenz nur Unter, im Geier nur Ober. Farbwenz und Farbgeier ergänzn de jeweilige Trumpffarb. Beim Ramsch verliert, wer de meisten Augen sammelt. Sie werd mit ollen Obern und Untern sofort gwertet. Weitere Varianten hängan vo eiern Einstellungen ab; Hochzeit is derzeit ned spuilbar.",
+    "Sauspiel: 선언자와 부른 Sau의 보유자가 두 상대와 겨룹니다. Solo, Wenz, Geier, Farbwenz, Farbgeier: 한 명이 세 명과 겨룹니다. Solo에서는 Ober, Unter, 선언한 무늬가 으뜸패이고, Wenz에서는 Unter만, Geier에서는 Ober만 으뜸패입니다. Farbwenz와 Farbgeier에는 선언한 으뜸패 무늬도 추가됩니다. Ramsch에서는 Augen이 가장 많은 플레이어가 집니다. 모든 Ober와 Unter를 가진 Sie는 즉시 계산됩니다. 추가 변형은 설정에 따라 달라지며, 현재 Hochzeit은 플레이할 수 없습니다.",
+    "Sauspiel: объявивший и держатель объявленной Sau играют против двух соперников. Solo, Wenz, Geier, Farbwenz и Farbgeier: один против троих. В Solo козыри — Ober, Unter и объявленная масть; в Wenz только Unter, в Geier только Ober. Farbwenz и Farbgeier также добавляют объявленную козырную масть. В Ramsch проигрывает игрок с наибольшим числом Augen. Sie со всеми Ober и Unter оценивается сразу. Дополнительные варианты зависят от настроек; Hochzeit пока недоступен.",
+    "Sauspiel: el declarante y el dueño de la Sau pedida contra dos rivales. Solo, Wenz, Geier, Farbwenz y Farbgeier: uno contra tres. En Solo son triunfos los Ober, los Unter y el palo declarado; en Wenz solo los Unter y en Geier solo los Ober. Farbwenz y Farbgeier añaden también el palo de triunfo declarado. En Ramsch pierde quien reúne más Augen. Sie se puntúa inmediatamente con todos los Ober y Unter en la mano. Las variantes adicionales dependen de la configuración; Hochzeit aún no está disponible.",
+    "Sauspiel: o declarante e o dono da Sau chamada contra dois adversários. Solo, Wenz, Geier, Farbwenz e Farbgeier: um contra três. Em Solo, Ober, Unter e o naipe declarado são trunfos; em Wenz apenas Unter, em Geier apenas Ober. Farbwenz e Farbgeier também acrescentam o naipe de trunfo declarado. Em Ramsch perde quem acumula mais Augen. Sie é pontuado imediatamente com todos os Ober e Unter na mão. As variantes adicionais dependem das configurações; Hochzeit ainda não está disponível."
+  ],
+  [
+    "Augen",
+    "Augen",
+    "Augen",
+    "Augen",
+    "Augen",
+    "Augen",
+    "Augen",
+    "Augen"
+  ],
+  [
+    "Fehlfarbe",
+    "Fehlfarbe",
+    "Fehlfarbe",
+    "Fehlfarbe",
+    "Fehlfarbe",
+    "Fehlfarbe",
+    "Fehlfarbe",
+    "Fehlfarbe"
+  ],
+  [
+    "Suchen / Suchsau",
+    "Suchen / Suchsau",
+    "Suchen / Suchsau",
+    "Suchen / Suchsau",
+    "Suchen / Suchsau",
+    "Suchen / Suchsau",
+    "Suchen / Suchsau",
+    "Suchen / Suchsau"
+  ]
+]

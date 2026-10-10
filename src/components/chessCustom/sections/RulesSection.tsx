@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { ArrowRight, Check } from "lucide-react";
 import {
   KING_BEHAVIORS,
@@ -19,6 +20,7 @@ const RULE_INFO: Record<GameRuleType, { label: string; description: string }> = 
 };
 
 export default function RulesSection() {
+  useGameLanguage();
   const { variant, dispatch, goToStep } = useEditor();
   const { settings } = variant;
   const behavior = matchKingBehavior(settings);
@@ -32,7 +34,7 @@ export default function RulesSection() {
       <SectionHeading
         step="rules"
         eyebrow="Rules"
-        title="The rulebook"
+        title={gameUi("The rulebook")}
         description={ui("Kings don't have to follow standard chess. Choose how royal pieces behave and what happens when one falls — the consequence is compiled into ordinary, editable events.")}
       />
 
@@ -64,7 +66,7 @@ export default function RulesSection() {
             <p className={labelClass}>{ui("Check rules")}</p>
             <div className="mt-1.5">
               <Segmented<RoyalMode>
-                label="Royal mode"
+                label={gameUi("Royal mode")}
                 value={settings.royalMode}
                 onChange={(royalMode) => update((current) => ({ ...current, settings: { ...current.settings, royalMode } }))}
                 options={[
@@ -78,7 +80,7 @@ export default function RulesSection() {
               <p className={labelClass}>{ui("With several kings")}</p>
               <div className="mt-1.5">
                 <Segmented
-                  label="Royal scope"
+                  label={gameUi("Royal scope")}
                   value={settings.royalScope}
                   onChange={(royalScope) => update((current) => ({ ...current, settings: { ...current.settings, royalScope } }))}
                   options={[
@@ -110,7 +112,7 @@ export default function RulesSection() {
               <div>
                 <p className={labelClass}>{ui("First to move")}</p>
                 <Select
-                  label="First to move"
+                  label={gameUi("First to move")}
                   className="mt-1.5"
                   value={variant.setup.startingTeam}
                   onChange={(startingTeam) => update((current) => ({ ...current, setup: { ...current.setup, startingTeam } }))}
@@ -120,7 +122,7 @@ export default function RulesSection() {
               <div>
                 <p className={labelClass}>{ui("No legal moves")}</p>
                 <Select
-                  label="No legal moves"
+                  label={gameUi("No legal moves")}
                   className="mt-1.5"
                   value={settings.noLegalMoves}
                   onChange={(noLegalMoves) => update((current) => ({ ...current, settings: { ...current.settings, noLegalMoves } }))}
@@ -132,15 +134,15 @@ export default function RulesSection() {
               </div>
               <div>
                 <p className={labelClass}>{ui("Turn limit (moves, 0 = none)")}</p>
-                <NumberField label="Turn limit" value={settings.maxPlies} min={0} max={2000} step={10} onChange={(maxPlies) => update((current) => ({ ...current, settings: { ...current.settings, maxPlies } }), "max-plies")} />
+                <NumberField label={gameUi("Turn limit")} value={settings.maxPlies} min={0} max={2000} step={10} onChange={(maxPlies) => update((current) => ({ ...current, settings: { ...current.settings, maxPlies } }), "max-plies")} />
               </div>
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-2">
               {variant.teams.map((team, index) => (
                 <span key={team.id} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-xs text-zinc-300">
-                  <span className="text-zinc-500">{index + 1}.</span>
+                  <span className="text-zinc-500">{gameUi(index + 1)}.</span>
                   <span className="h-2.5 w-2.5 rounded-full ring-1 ring-white/30" style={{ background: team.color }} />
-                  {team.name}
+                  {gameUi(team.name)}
                 </span>
               ))}
               <Button size="sm" onClick={() => goToStep("teams")}>
@@ -156,16 +158,16 @@ export default function RulesSection() {
           eyebrow={ui("King capture consequence")}
           actions={
             <Button size="sm" onClick={() => goToStep("events")}>
-              {generated} {ui("generated event(s)")}
+              {gameUi(generated)} {ui("generated event(s)")}
               <ArrowRight size={13} />
             </Button>
           }
         >
-          {settings.royalMode === "checkmate" && (
+          {gameUi(settings.royalMode === "checkmate" && (
             <p className="mb-3 rounded-lg border border-sky-400/20 bg-sky-400/[0.06] px-3 py-2 text-xs leading-5 text-sky-100">
               {ui("Under Standard Checkmate kings are rarely captured — this still applies to test positions and events.")}
             </p>
-          )}
+          ))}
           <div className="grid gap-2 sm:grid-cols-2">
             {KING_CONSEQUENCES.map((id) => {
               const active = settings.kingCapture.consequence === id;
@@ -183,17 +185,17 @@ export default function RulesSection() {
               );
             })}
           </div>
-          {(settings.kingCapture.consequence === "loseAfterTurns" || settings.kingCapture.consequence === "respawn") && (
+          {gameUi((settings.kingCapture.consequence === "loseAfterTurns" || settings.kingCapture.consequence === "respawn") && (
             <div className="mt-4">
               <p className={labelClass}>{ui("Turns")}</p>
-              <NumberField label="Turns" value={settings.kingCapture.turns} min={1} max={30} onChange={(turns) => setConsequence({ turns }, "king-turns")} />
+              <NumberField label={gameUi("Turns")} value={settings.kingCapture.turns} min={1} max={30} onChange={(turns) => setConsequence({ turns }, "king-turns")} />
             </div>
-          )}
+          ))}
           {settings.kingCapture.consequence === "successor" && (
             <div className="mt-4">
               <p className={labelClass}>{ui("Preferred successor")}</p>
               <Select
-                label="Preferred successor"
+                label={gameUi("Preferred successor")}
                 className="mt-1.5"
                 value={settings.kingCapture.successor}
                 onChange={(successor) => setConsequence({ successor })}

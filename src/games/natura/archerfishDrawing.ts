@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import { ARCHER_BRANCHES, ARCHER_HEIGHT as H, ARCHER_WIDTH as W, SHOT_COOLDOWN, WATERLINE, archerTrajectory, insectLanding } from "./archerfish";
 import type { ArcherFish, ArcherGame } from "./archerfish";
 
@@ -39,7 +40,7 @@ function drawFish(ctx: CanvasRenderingContext2D, fish: ArcherFish, index: number
   ctx.beginPath(); ctx.moveTo(-4, 10); ctx.lineTo(6, 19); ctx.lineTo(13, 9); ctx.stroke();
   ctx.restore();
   ctx.textAlign = "center"; ctx.font = "700 12px system-ui"; ctx.fillStyle = color;
-  ctx.fillText(index === 0 ? "1 · CORAL" : "2 · GOLD", fish.x, WATERLINE + 79);
+  ctx.fillText(gameUi(index === 0 ? "1 · CORAL" : "2 · GOLD"), fish.x, WATERLINE + 79);
   ctx.fillStyle = "#0e3b40"; ctx.fillRect(fish.x - 20, WATERLINE + 87, 40, 3);
   ctx.fillStyle = color; ctx.fillRect(fish.x - 20, WATERLINE + 87, 40 * (1 - fish.shotCooldown / SHOT_COOLDOWN), 3);
 }
@@ -128,11 +129,11 @@ export function drawArcherGame(ctx: CanvasRenderingContext2D, game: ArcherGame, 
     ctx.beginPath(); ctx.ellipse(ripple.x, WATERLINE, 10 + ripple.age * 55, 3 + ripple.age * 10, 0, 0, Math.PI * 2); ctx.stroke();
     if (ripple.owner !== null) {
       ctx.fillStyle = COLORS[ripple.owner]; ctx.font = "bold 23px system-ui"; ctx.textAlign = "center";
-      ctx.fillText("+1", ripple.x, WATERLINE - 18 - ripple.age * 30);
+      ctx.fillText(gameUi("+1"), ripple.x, WATERLINE - 18 - ripple.age * 30);
     }
     ctx.restore();
   });
   ctx.textAlign = "left"; ctx.font = "600 11px system-ui"; ctx.fillStyle = "#c8e4cd80";
-  ctx.fillText("MANGROVE ESTUARY / TOXOTES", 25, H - 23);
-  ctx.textAlign = "right"; ctx.fillText("SHOOT ABOVE · RACE BELOW", W - 25, H - 23);
+  ctx.fillText(gameUi("MANGROVE ESTUARY / TOXOTES"), 25, H - 23);
+  ctx.textAlign = "right"; ctx.fillText(gameUi("SHOOT ABOVE · RACE BELOW"), W - 25, H - 23);
 }

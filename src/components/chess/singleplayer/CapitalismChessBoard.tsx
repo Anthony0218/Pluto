@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -1305,7 +1306,7 @@ export default function CapitalismChessBoard({
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
 
-                {game.turn() === "w" ? t("White to move") : t("Black to move")}
+                {gameUi(game.turn() === "w" ? t("White to move") : t("Black to move"))}
               </div>
             )}
           </div>
@@ -1328,13 +1329,13 @@ export default function CapitalismChessBoard({
 
           <EconomyRule
             icon="$"
-            title={`Bounty jackpot ${BOUNTY_REWARD_MIN}–${BOUNTY_REWARD_MAX}`}
+            title={gameUi(`Bounty jackpot ${BOUNTY_REWARD_MIN}–${BOUNTY_REWARD_MAX}`)}
             detail={t("Reward is random — even a Pawn can be worth a fortune")}
           />
 
           <EconomyRule
             icon="★"
-            title={`Mission bonus ${MISSION_REWARD_MIN}–${MISSION_REWARD_MAX}`}
+            title={gameUi(`Mission bonus ${MISSION_REWARD_MIN}–${MISSION_REWARD_MAX}`)}
             detail={t("Each new mission gets a random contract reward")}
           />
         </section>
@@ -1346,7 +1347,7 @@ export default function CapitalismChessBoard({
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel>
+              <Panel gameControls>
                 <PanelTitle
                   title={t("Game Controls")}
                   subtitle={t("Players and actions")}
@@ -1381,12 +1382,12 @@ export default function CapitalismChessBoard({
 
                 <div className="mb-3 flex items-center justify-between rounded-xl bg-amber-400/[0.06] px-3 py-2">
                   <span className="text-xs font-black text-zinc-300">
-                    {currentSide === "white" ? `♔ ${t("White")}` : `♚ ${t("Black")}`}
+                    {gameUi(currentSide === "white" ? `♔ ${t("White")}` : `♚ ${t("Black")}`)}
                   </span>
 
                   <span className="flex items-center gap-1.5 text-sm font-black text-amber-200">
                     <CoinIcon size="sm" />
-                    {capitalState.coins[currentSide]}
+                    {gameUi(capitalState.coins[currentSide])}
                   </span>
                 </div>
 
@@ -1450,8 +1451,8 @@ export default function CapitalismChessBoard({
                 </div>
 
                 <div className="mb-3 rounded-xl bg-amber-400/[0.06] px-3 py-2 text-xs font-black text-amber-200">
-                  {currentSide === "white" ? `♔ ${t("White")}` : `♚ ${t("Black")}`}{" "}
-                  · {capitalState.coins[currentSide]} $
+                  {gameUi(currentSide === "white" ? `♔ ${t("White")}` : `♚ ${t("Black")}`)}{gameUi(" ")}
+                  · {gameUi(capitalState.coins[currentSide])} $
                 </div>
 
                 <div className="space-y-2">
@@ -1518,13 +1519,13 @@ export default function CapitalismChessBoard({
                       }
                     `}
                   >
-                    {materialDifference > 0 &&
-                      `${t("White")} +${materialDifference}`}
+                    {gameUi(materialDifference > 0 &&
+                      `${t("White")} +${materialDifference}`)}
 
-                    {materialDifference < 0 &&
-                      `${t("Black")} +${Math.abs(materialDifference)}`}
+                    {gameUi(materialDifference < 0 &&
+                      `${t("Black")} +${Math.abs(materialDifference)}`)}
 
-                    {materialDifference === 0 && t("Equal")}
+                    {gameUi(materialDifference === 0 && t("Equal"))}
                   </span>
                 </div>
 
@@ -1546,7 +1547,7 @@ export default function CapitalismChessBoard({
                   />
 
                   <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
-                    {records.length}
+                    {gameUi(records.length)}
                   </span>
                 </div>
 
@@ -1560,13 +1561,13 @@ export default function CapitalismChessBoard({
                     moveNumber: record.moveNumber,
                     content: (
                       <>
-                        <span className="text-base leading-none">{historyPieceSymbol(record.color, record.piece)}</span>
-                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>
+                        <span className="text-base leading-none">{gameUi(historyPieceSymbol(record.color, record.piece))}</span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(record.san)}</span>
                       </>
                     ),
                     trailing:
                       record.economy.totalEarned > 0 ? (
-                        <span className="rounded-full bg-amber-400/10 px-1.5 py-0.5 font-black text-amber-300">+{record.economy.totalEarned} $</span>
+                        <span className="rounded-full bg-amber-400/10 px-1.5 py-0.5 font-black text-amber-300">+{gameUi(record.economy.totalEarned)} $</span>
                       ) : null,
                   }))}
                   onSelect={(ply) => {
@@ -1601,14 +1602,14 @@ export default function CapitalismChessBoard({
                     </p>
 
                     <p className="mt-1 text-sm font-bold text-white">
-                      {t("Move")} {historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
+                      {t("Move")} {gameUi(historyPreview.moveNumber)}
+                      {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                      {gameUi(historyPreview.san)}
                     </p>
 
                     {historyPreview.economy.totalEarned > 0 && (
                       <p className="mt-1 text-[10px] font-bold text-amber-300">
-                        +{historyPreview.economy.totalEarned} $
+                        +{gameUi(historyPreview.economy.totalEarned)} $
                       </p>
                     )}
                   </div>
@@ -1684,7 +1685,7 @@ export default function CapitalismChessBoard({
                 </div>
 
                 <p className="mt-3 text-center text-[9px] text-zinc-700">
-                  <span className="inline-flex items-center gap-1">{ui("Start:")}<CoinIcon size="xs" /> {STARTING_COINS}
+                  <span className="inline-flex items-center gap-1">{ui("Start:")}<CoinIcon size="xs" /> {gameUi(STARTING_COINS)}
                   </span>
                 </p>
               </section>
@@ -1808,7 +1809,7 @@ export default function CapitalismChessBoard({
                         </span>
 
                         <span className="text-sm font-black text-amber-200">
-                          {stats.whiteSpent + stats.blackSpent} $
+                          {gameUi(stats.whiteSpent + stats.blackSpent)} $
                         </span>
                       </div>
                     </div>
@@ -1845,11 +1846,11 @@ export default function CapitalismChessBoard({
 
                         <div className="mt-2 flex items-center justify-between gap-3">
                           <span className="font-mono text-xs font-black text-zinc-200">
-                            {stats.biggestPayday.san}
+                            {gameUi(stats.biggestPayday.san)}
                           </span>
 
                           <span className="text-sm font-black text-amber-200">
-                            +{stats.biggestPayday.economy.totalEarned} $
+                            +{gameUi(stats.biggestPayday.economy.totalEarned)} $
                           </span>
                         </div>
                       </button>
@@ -1891,16 +1892,16 @@ export default function CapitalismChessBoard({
                             >
                               <div className="min-w-0">
                                 <p className="font-mono text-xs font-black text-zinc-200">
-                                  {record.san}
+                                  {gameUi(record.san)}
                                 </p>
 
                                 <p className="mt-1 truncate text-[9px] text-zinc-700">
-                                  {economyMomentLabel(record, t)}
+                                  {gameUi(economyMomentLabel(record, t))}
                                 </p>
                               </div>
 
                               <span className="shrink-0 text-xs font-black text-amber-300">
-                                +{record.economy.totalEarned} $
+                                +{gameUi(record.economy.totalEarned)} $
                               </span>
                             </button>
                           ))}
@@ -1962,23 +1963,23 @@ function EconomyRule({
   return (
     <div className="flex items-center gap-3">
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/10 text-lg font-black text-amber-300">
-        {icon}
+        {gameUi(icon)}
       </span>
 
       <div>
         <p className="text-xs font-black text-zinc-200">{ui(title)}</p>
 
-        <p className="mt-1 text-[10px] text-zinc-600">{detail}</p>
+        <p className="mt-1 text-[10px] text-zinc-600">{gameUi(detail)}</p>
       </div>
     </div>
   );
 }
 
-function Panel({ children }: { children: ReactNode }) {
+function Panel({ gameControls = false, children }: { gameControls?: boolean; children: ReactNode }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
-      {children}
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+      {gameUi(children)}
     </section>
   );
 }
@@ -2062,7 +2063,7 @@ function CapturedPiecesGrid({
               key={`${color}-${piece}-${index}`}
               className="flex h-7 w-7 items-center justify-center text-2xl leading-none"
             >
-              {color === "w" ? whiteSymbols[piece] : blackSymbols[piece]}
+              {gameUi(color === "w" ? whiteSymbols[piece] : blackSymbols[piece])}
             </span>
           ))
         )}
@@ -2077,7 +2078,7 @@ function CapturedPiecesGrid({
           {t("Black")}
         </p>
 
-        {renderPieces(capturedBlack, "b")}
+        {gameUi(renderPieces(capturedBlack, "b"))}
       </div>
 
       <div className="border-t border-white/5 pt-3">
@@ -2085,7 +2086,7 @@ function CapturedPiecesGrid({
           {t("White")}
         </p>
 
-        {renderPieces(capturedWhite, "w")}
+        {gameUi(renderPieces(capturedWhite, "w"))}
       </div>
     </div>
   );
@@ -2152,7 +2153,7 @@ function ShopPieceRow({
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <span className="text-3xl leading-none">
-            {pieceSymbol(color, piece)}
+            {gameUi(pieceSymbol(color, piece))}
           </span>
 
           <div className="min-w-0">
@@ -2160,7 +2161,7 @@ function ShopPieceRow({
 
             <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-black text-amber-300">
               <CoinIcon size="xs" />
-              {cost}
+              {gameUi(cost)}
             </span>
           </div>
         </div>
@@ -2171,7 +2172,7 @@ function ShopPieceRow({
 
             return (
               <button
-                key={square}
+                key={gameUi(square)}
                 type="button"
                 disabled={!enabled}
                 onClick={() => onBuy(square)}
@@ -2192,7 +2193,7 @@ function ShopPieceRow({
                     }
                   `}
               >
-                {square}
+                {gameUi(square)}
               </button>
             );
           })}
@@ -2227,11 +2228,11 @@ function TreasuryCard({
       `}
     >
       <p className="truncate text-[10px] font-black uppercase tracking-widest text-zinc-600">
-        {side === "white" ? "♔" : "♚"} {name}
+        {gameUi(side === "white" ? "♔" : "♚")} {name}
       </p>
 
       <div className="mt-3 flex items-end justify-between gap-2">
-        <span className="text-3xl font-black text-amber-300">{coins}</span>
+        <span className="text-3xl font-black text-amber-300">{gameUi(coins)}</span>
 
         <CoinIcon size="md" />
       </div>
@@ -2265,13 +2266,13 @@ function ContractCard({
     <div className="rounded-2xl border border-white/5 bg-black/20 p-3">
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs font-black text-zinc-300">
-          {side === "white" ? `♔ ${t("White")}` : `♚ ${t("Black")}`}
+          {gameUi(side === "white" ? `♔ ${t("White")}` : `♚ ${t("Black")}`)}
         </p>
 
         <span className="text-xs font-black text-amber-300">
           <span className="inline-flex items-center gap-1">
             <CoinIcon size="xs" />
-            {state.coins[side]}
+            {gameUi(state.coins[side])}
           </span>
         </span>
       </div>
@@ -2283,12 +2284,12 @@ function ContractCard({
           </span>
 
           <span className="text-[10px] font-black text-amber-200">
-            {bountyReward !== null ? `+${bountyReward} $` : "—"}
+            {gameUi(bountyReward !== null ? `+${bountyReward} $` : "—")}
           </span>
         </div>
 
         <p className="mt-1 text-xs font-black text-zinc-200">
-          {target && targetPiece ? `${pieceSymbol(targetPiece.color, targetPiece.type)} ${target}` : t("No target")}
+          {gameUi(target && targetPiece ? `${pieceSymbol(targetPiece.color, targetPiece.type)} ${target}` : t("No target"))}
         </p>
       </div>
 
@@ -2299,7 +2300,7 @@ function ContractCard({
           </span>
 
           <span className="text-[10px] font-black text-emerald-300">
-            +{missionRewardLabel} $
+            +{gameUi(missionRewardLabel)} $
           </span>
         </div>
 
@@ -2314,7 +2315,7 @@ function ContractCard({
             </span>
 
             <span className="font-mono text-xs font-black text-sky-100">
-              ★ {t("Target")} {mission.targetSquare}
+              ★ {t("Target")} {gameUi(mission.targetSquare)}
             </span>
           </div>
         )}
@@ -2391,11 +2392,11 @@ function PowerButton({
             }
           `}
         >
-          {armed ? t("Armed") : used ? t("Used") : `${cost} $`}
+          {gameUi(armed ? t("Armed") : used ? t("Used") : `${cost} $`)}
         </span>
       </div>
 
-      <p className="mt-1.5 text-[10px] leading-4 text-zinc-600">{detail}</p>
+      <p className="mt-1.5 text-[10px] leading-4 text-zinc-600">{gameUi(detail)}</p>
     </button>
   );
 }
@@ -2415,16 +2416,16 @@ function StatCard({
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-sm">{icon}</span>
+        <span className="text-sm">{gameUi(icon)}</span>
 
-        <span className="text-xl font-black text-zinc-100">{value}</span>
+        <span className="text-xl font-black text-zinc-100">{gameUi(value)}</span>
       </div>
 
       <p className="mt-2 text-[10px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
       </p>
 
-      <p className="mt-1 text-[10px] text-zinc-700">{detail}</p>
+      <p className="mt-1 text-[10px] text-zinc-700">{gameUi(detail)}</p>
     </div>
   );
 }
@@ -2435,7 +2436,7 @@ function MarketRow({ label, value }: { label: string; value: number }) {
     <div className="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5">
       <span className="text-xs text-zinc-500">{ui(label)}</span>
 
-      <span className="text-xs font-black text-amber-300">{value} $</span>
+      <span className="text-xs font-black text-amber-300">{gameUi(value)} $</span>
     </div>
   );
 }

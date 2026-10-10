@@ -6,6 +6,7 @@ import DemoFrame from "./DemoFrame";
 
 // The real tools, loaded only when their section is near the viewport.
 const apps = {
+  "todo-list": lazy(() => import("@/components/tools/TodoList")),
   calculator: lazy(() => import("@/components/tools/Calculator")),
   "percentage-calculator": lazy(() => import("@/components/tools/PercentageWorkbench")),
   "unit-converter": lazy(() => import("@/components/tools/UnitConverter")),

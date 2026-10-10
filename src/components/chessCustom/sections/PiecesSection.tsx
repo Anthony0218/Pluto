@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { Copy, Crown, Plus, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ALL_DIRECTIONS, createExamplePieces, createId } from "@/games/chess/custom/engine/presets";
@@ -62,6 +63,7 @@ function newPiece(taken: string[]): PieceDefinition {
 }
 
 function PieceEditor({ piece }: { piece: PieceDefinition }) {
+  useGameLanguage();
   const { variant, dispatch, setSelectedPieceId } = useEditor();
   const [activeRuleId, setActiveRuleId] = useState<string | undefined>();
   const [brush, setBrush] = useState<SquareBrush>("both");
@@ -119,12 +121,12 @@ function PieceEditor({ piece }: { piece: PieceDefinition }) {
                 <button
                   key={icon}
                   type="button"
-                  aria-label={`Icon ${icon}`}
+                  aria-label={gameUi(`Icon ${icon}`)}
                   aria-pressed={piece.icon === icon}
                   onClick={() => patch({ icon })}
                   className={`flex h-8 w-8 items-center justify-center rounded-lg border text-lg transition ${piece.icon === icon ? "border-amber-300/70 bg-amber-300/15" : "border-white/[0.08] bg-white/[0.03] hover:border-white/20"}`}
                 >
-                  {icon}
+                  {gameUi(icon)}
                 </button>
               ))}
               <input aria-label={ui("Custom icon")} value={GLYPHS.includes(piece.icon) || EMOJI.includes(piece.icon) ? "" : piece.icon} placeholder="…" maxLength={4} onChange={(event) => event.target.value && patch({ icon: event.target.value }, "icon")} className="h-8 w-14 rounded-lg border border-white/10 bg-black/40 px-2 text-center text-sm text-zinc-100 outline-none focus:border-amber-300/50" />
@@ -138,16 +140,16 @@ function PieceEditor({ piece }: { piece: PieceDefinition }) {
           <div className="mt-4 flex flex-wrap items-end gap-5">
             <div>
               <p className={labelClass}>{ui("Value")}</p>
-              <NumberField label="Value" value={piece.value} min={0} max={100} step={0.5} onChange={(value) => patch({ value }, "value")} />
+              <NumberField label={gameUi("Value")} value={piece.value} min={0} max={100} step={0.5} onChange={(value) => patch({ value }, "value")} />
             </div>
             <div>
               <p className={labelClass} title={ui("Suggested copies per team — shown as a counter in the Test Position palette")}>{ui("Spawn amount")}</p>
-              <NumberField label="Spawn amount" value={piece.spawnAmount ?? 1} min={0} max={16} onChange={(spawnAmount) => patch({ spawnAmount }, "spawn")} />
+              <NumberField label={gameUi("Spawn amount")} value={piece.spawnAmount ?? 1} min={0} max={16} onChange={(spawnAmount) => patch({ spawnAmount }, "spawn")} />
             </div>
             <div className="min-w-[180px] flex-1">
               <p className={labelClass}>{ui("Team")}</p>
               <Select
-                label="Team"
+                label={gameUi("Team")}
                 value={piece.teams?.length === 1 ? piece.teams[0] : "all"}
                 onChange={(value) => patch({ teams: value === "all" ? undefined : [value] })}
                 options={[{ id: "all", label: "Both teams" }, ...variant.teams.map((entry) => ({ id: entry.id, label: `${entry.name} only` }))]}
@@ -163,15 +165,15 @@ function PieceEditor({ piece }: { piece: PieceDefinition }) {
         <Panel title={ui("3D model")} eyebrow={ui("Simulation appearance")}>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label={ui("Base model")}>
-              <Select label="Base model" value={piece.model.base} onChange={(base) => patch({ model: { ...piece.model, base } })} options={MODEL_BASES.map((id) => ({ id, label: id[0].toUpperCase() + id.slice(1) }))} />
+              <Select label={gameUi("Base model")} value={piece.model.base} onChange={(base) => patch({ model: { ...piece.model, base } })} options={MODEL_BASES.map((id) => ({ id, label: id[0].toUpperCase() + id.slice(1) }))} />
             </Field>
             <Field label={ui("Accent")}>
-              <Select label="Accent" value={piece.model.accent ?? "none"} onChange={(accent) => patch({ model: { ...piece.model, accent } })} options={ACCENTS} />
+              <Select label={gameUi("Accent")} value={piece.model.accent ?? "none"} onChange={(accent) => patch({ model: { ...piece.model, accent } })} options={ACCENTS} />
             </Field>
             <Field label={ui("Accent colour")}>
               <input type="color" value={piece.model.tint ?? "#fbbf24"} onChange={(event) => patch({ model: { ...piece.model, tint: event.target.value } }, "tint")} className="h-9 w-full cursor-pointer rounded-lg border border-white/10 bg-black/40 p-1" />
             </Field>
-            <Field label={`${ui("Scale")} · ${(piece.model.scale ?? 1).toFixed(2)}×`}>
+            <Field label={gameUi(`${ui("Scale")} · ${(piece.model.scale ?? 1).toFixed(2)}×`)}>
               <input type="range" min={0.7} max={1.3} step={0.05} value={piece.model.scale ?? 1} onChange={(event) => patch({ model: { ...piece.model, scale: Number(event.target.value) } }, "scale")} className="w-full accent-amber-300" />
             </Field>
           </div>
@@ -202,7 +204,7 @@ function PieceEditor({ piece }: { piece: PieceDefinition }) {
             <div className="mt-4 space-y-3">
               <Segmented
                 size="sm"
-                label="Promotion zone"
+                label={gameUi("Promotion zone")}
                 value={piece.promotion.zone}
                 onChange={(zone) => patch({ promotion: { ...piece.promotion!, zone } })}
                 options={[
@@ -223,7 +225,7 @@ function PieceEditor({ piece }: { piece: PieceDefinition }) {
                       className={`inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-xs font-semibold transition ${on ? "border-amber-300/60 bg-amber-300/15 text-amber-100" : "border-white/10 text-zinc-400 hover:text-white"}`}
                     >
                       <span className="h-5 w-5"><PieceToken def={entry} team={team} /></span>
-                      {entry.name}
+                      {gameUi(entry.name)}
                     </button>
                   );
                 })}
@@ -239,7 +241,7 @@ function PieceEditor({ piece }: { piece: PieceDefinition }) {
           <div className="mt-3 flex gap-2"><Button size="sm" tone={movementView === "2d" ? "blue" : "ghost"} onClick={() => setMovementView("2d")}>2D</Button><Button size="sm" tone={movementView === "3d" ? "blue" : "ghost"} onClick={() => setMovementView("3d")}>3D</Button></div>
           <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] 2xl:grid-cols-1">
             <div className="mx-auto w-full max-w-[380px]">
-              {(movementView === "3d" ? [{ z: 1, name: "Layer Above" }, { z: 0, name: "Current Layer" }, { z: -1, name: "Layer Below" }] : [{ z: 0, name: "Current Layer" }]).map((layer) => <div key={layer.z} className="mb-4"><p className="mb-2 text-xs font-semibold text-amber-200">{layer.name}</p><MovementGrid
+              {(movementView === "3d" ? [{ z: 1, name: "Layer Above" }, { z: 0, name: "Current Layer" }, { z: -1, name: "Layer Below" }] : [{ z: 0, name: "Current Layer" }]).map((layer) => <div key={layer.z} className="mb-4"><p className="mb-2 text-xs font-semibold text-amber-200">{gameUi(layer.name)}</p><MovementGrid
                 piece={piece}
                 team={team}
                 moveRules={piece.movement}
@@ -262,6 +264,7 @@ function PieceEditor({ piece }: { piece: PieceDefinition }) {
 }
 
 export default function PiecesSection() {
+  useGameLanguage();
   const { variant, dispatch, selectedPieceId, setSelectedPieceId } = useEditor();
   const [examplesOpen, setExamplesOpen] = useState(false);
   const selected = variant.pieces.find((piece) => piece.id === selectedPieceId) ?? null;
@@ -282,7 +285,7 @@ export default function PiecesSection() {
       <SectionHeading
         step="pieces"
         eyebrow="Pieces"
-        title="Design your army"
+        title={gameUi("Design your army")}
         description={ui("Every piece — standard or invented — is defined by movement patterns, capture patterns and abilities. Clone a classic and bend it, or start from scratch.")}
       />
       <div className="grid gap-5 lg:grid-cols-[250px_minmax(0,1fr)]">
@@ -293,11 +296,11 @@ export default function PiecesSection() {
               {ui("New piece")}
             </Button>
             <div className="relative flex-1">
-              <Button size="sm" className="w-full" disabled={!examples.length} onClick={() => setExamplesOpen((open) => !open)} title={examples.length ? undefined : ui("Every example piece is already in this variant")}>
+              <Button size="sm" className="w-full" disabled={!examples.length} onClick={() => setExamplesOpen((open) => !open)} title={gameUi(examples.length ? undefined : ui("Every example piece is already in this variant"))}>
                 <Sparkles size={14} />
                 {ui("Examples")}
               </Button>
-              {examplesOpen && (
+              {gameUi(examplesOpen && (
                 <div role="menu" className="absolute right-0 top-full z-30 mt-1 w-64 rounded-xl border border-white/10 bg-[#111418] p-1 shadow-2xl">
                   {examples.map((example) => (
                     <button
@@ -312,13 +315,13 @@ export default function PiecesSection() {
                     >
                       <span className="h-7 w-7 shrink-0"><PieceToken def={example} team={team} /></span>
                       <span>
-                        <span className="block text-sm font-semibold text-zinc-100">{example.name}</span>
-                        <span className="line-clamp-2 block text-[11px] leading-4 text-zinc-500">{example.description}</span>
+                        <span className="block text-sm font-semibold text-zinc-100">{gameUi(example.name)}</span>
+                        <span className="line-clamp-2 block text-[11px] leading-4 text-zinc-500">{gameUi(example.description)}</span>
                       </span>
                     </button>
                   ))}
                 </div>
-              )}
+              ))}
             </div>
           </div>
           <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-1" aria-label={ui("Piece library")}>
@@ -336,10 +339,10 @@ export default function PiecesSection() {
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-1.5 truncate text-sm font-semibold text-zinc-100">
                         {piece.name}
-                        {piece.royal && <Crown size={12} className="shrink-0 text-amber-300" aria-label="Royal" />}
+                        {piece.royal && <Crown size={12} className="shrink-0 text-amber-300" aria-label={gameUi("Royal")} />}
                       </span>
                       <span className="block truncate text-[11px] text-zinc-500">
-                        {ui("Value")} {piece.value} · {piece.movement.length} {ui("patterns")}
+                        {ui("Value")} {gameUi(piece.value)} · {gameUi(piece.movement.length)} {ui("patterns")}
                       </span>
                     </span>
                   </button>
@@ -348,17 +351,17 @@ export default function PiecesSection() {
             })}
           </ul>
           <div className="flex flex-wrap gap-1.5">
-            <Chip tone="amber">{variant.pieces.filter((piece) => piece.royal).length} {ui("royal")}</Chip>
-            <Chip>{variant.pieces.length} {ui("types")}</Chip>
+            <Chip tone="amber">{gameUi(variant.pieces.filter((piece) => piece.royal).length)} {ui("royal")}</Chip>
+            <Chip>{gameUi(variant.pieces.length)} {ui("types")}</Chip>
           </div>
         </div>
-        {selected ? (
+        {gameUi(selected ? (
           <PieceEditor piece={selected} />
         ) : (
           <EmptyState icon={<Crown size={20} />} title={ui("No piece selected")} action={<Button tone="primary" onClick={() => add(newPiece([]))}>{ui("Create a piece")}</Button>}>
             {ui("Pick a piece from the library, or create a new one.")}
           </EmptyState>
-        )}
+        ))}
       </div>
     </div>
   );

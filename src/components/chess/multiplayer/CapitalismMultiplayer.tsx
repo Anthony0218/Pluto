@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -259,21 +260,21 @@ function MissionCard({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-            {side === "white" ? ui("White mission") : ui("Black mission")}
+            {gameUi(side === "white" ? ui("White mission") : ui("Black mission"))}
           </p>
           <p className="mt-1 text-sm font-black text-zinc-100">
             {ui(definition.label)}
           </p>
           <p className="mt-1 text-[11px] leading-4 text-zinc-500">
-            {definition.detail}
+            {gameUi(definition.detail)}
           </p>
-          {mission.id === "king_journey" && mission.targetSquare && (
-            <p className="mt-2 font-mono text-xs font-black uppercase text-violet-300">{ui("Target")}{mission.targetSquare}
+          {gameUi(mission.id === "king_journey" && mission.targetSquare && (
+            <p className="mt-2 font-mono text-xs font-black uppercase text-violet-300">{ui("Target")}{gameUi(mission.targetSquare)}
             </p>
-          )}
+          ))}
         </div>
         <span className="rounded-lg bg-emerald-400/10 px-2 py-1 text-xs font-black text-emerald-300">
-          +{mission.reward}
+          +{gameUi(mission.reward)}
         </span>
       </div>
     </div>
@@ -281,17 +282,19 @@ function MissionCard({
 }
 
 function Panel({
+  gameControls = false,
   title,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   children: React.ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20">
       <h2 className="font-black text-zinc-100">{ui(title)}</h2>
-      <div className="mt-4">{children}</div>
+      <div className="mt-4">{gameUi(children)}</div>
     </section>
   );
 }
@@ -391,11 +394,11 @@ export function CapitalismMultiplayerLobby() {
             className="mt-2 w-full rounded-xl border border-white/10 bg-black/25 px-4 py-3 outline-none focus:border-amber-400/40"
           />
 
-          {error && (
+          {gameUi(error && (
             <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
               {ui(error)}
             </div>
-          )}
+          ))}
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
@@ -409,7 +412,7 @@ export function CapitalismMultiplayerLobby() {
                 disabled={busy !== null}
                 className="mt-4 w-full rounded-xl bg-amber-400 px-4 py-3 font-black text-amber-950 disabled:opacity-50"
               >
-                {busy === "create" ? ui("Creating...") : ui("Create Capitalism room")}
+                {gameUi(busy === "create" ? ui("Creating...") : ui("Create Capitalism room"))}
               </button>
             </section>
 
@@ -432,7 +435,7 @@ export function CapitalismMultiplayerLobby() {
                 disabled={busy !== null || !joinCode.trim()}
                 className="mt-4 w-full rounded-xl border border-amber-300/20 bg-amber-400/10 px-4 py-3 font-black text-amber-200 disabled:opacity-50"
               >
-                {busy === "join" ? ui("Joining...") : ui("Join room")}
+                {gameUi(busy === "join" ? ui("Joining...") : ui("Join room"))}
               </button>
             </section>
           </div>
@@ -1208,15 +1211,15 @@ export function CapitalismMultiplayerGame() {
 
 
           <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-sm font-black">
-            {gameState.status === "waiting" ? ui("Waiting for opponent…") : gameState.status === "finished" ? ui("Game finished") : canAct ? ui("Your turn · market open") : ui("Opponent's turn")}
+            {gameUi(gameState.status === "waiting" ? ui("Waiting for opponent…") : gameState.status === "finished" ? ui("Game finished") : canAct ? ui("Your turn · market open") : ui("Opponent's turn"))}
           </div>
         </ChessPageHeader>
 
-        {error && (
+        {gameUi(error && (
           <div className="mb-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
             {ui(error)}
           </div>
-        )}
+        ))}
 
         <div className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="space-y-4">
@@ -1225,14 +1228,14 @@ export function CapitalismMultiplayerGame() {
                 <div className="rounded-xl border border-white/5 bg-black/20 p-3 text-center">
                   <p className="text-xs font-black text-zinc-400">{ui("White")}</p>
                   <p className="mt-1 text-3xl font-black text-amber-300">
-                    {displayedCapital.coins.white}
+                    {gameUi(displayedCapital.coins.white)}
                   </p>
                   <p className="text-[10px] text-zinc-600">{ui("coins")}</p>
                 </div>
                 <div className="rounded-xl border border-white/5 bg-black/20 p-3 text-center">
                   <p className="text-xs font-black text-zinc-400">{ui("Black")}</p>
                   <p className="mt-1 text-3xl font-black text-amber-300">
-                    {displayedCapital.coins.black}
+                    {gameUi(displayedCapital.coins.black)}
                   </p>
                   <p className="text-[10px] text-zinc-600">{ui("coins")}</p>
                 </div>
@@ -1255,8 +1258,8 @@ export function CapitalismMultiplayerGame() {
                   ply: record.ply,
                   side: record.color,
                   moveNumber: record.moveNumber,
-                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>,
-                  trailing: <span className="font-black text-emerald-300">{record.economy.totalEarned > 0 ? `+$${record.economy.totalEarned}` : ""}</span>,
+                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(record.san)}</span>,
+                  trailing: <span className="font-black text-emerald-300">{gameUi(record.economy.totalEarned > 0 ? `+$${record.economy.totalEarned}` : "")}</span>,
                 }))}
                 onSelect={(ply) => {
                   setHistoryPreviewPly(ply);
@@ -1268,11 +1271,11 @@ export function CapitalismMultiplayerGame() {
           </aside>
 
           <section className="mx-auto w-full max-w-[820px] min-w-0">
-            {historyPreviewPly !== null && (
+            {gameUi(historyPreviewPly !== null && (
               <div className="mb-3 flex items-center justify-between rounded-xl border border-amber-400/20 bg-amber-400/[0.07] px-4 py-3">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-wider text-amber-300">{ui("History Preview")}</p>
-                  <p className="text-sm text-zinc-400">{ui("Economy and board after move")}{historyPreviewPly}
+                  <p className="text-sm text-zinc-400">{ui("Economy and board after move")}{gameUi(historyPreviewPly)}
                   </p>
                 </div>
                 <button
@@ -1281,9 +1284,9 @@ export function CapitalismMultiplayerGame() {
                   className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black"
                 >{ui("Back to live board")}</button>
               </div>
-            )}
+            ))}
 
-            {promotion && historyPreviewPly === null && (
+            {gameUi(promotion && historyPreviewPly === null && (
               <div className="relative mb-3">
                 <PromotionBar
                   onPromote={(piece) =>
@@ -1291,9 +1294,9 @@ export function CapitalismMultiplayerGame() {
                   }
                 />
               </div>
-            )}
+            ))}
 
-            {liveFinish && historyPreviewPly === null && (
+            {gameUi(liveFinish && historyPreviewPly === null && (
               <VisibleGameResult
                 winner={liveFinish.winner}
                 playerColor={myColor}
@@ -1305,11 +1308,11 @@ export function CapitalismMultiplayerGame() {
                     disabled={myRematchReady || Boolean(actionBusy)}
                     className="mt-5 w-full rounded-xl bg-amber-400 px-4 py-3 font-black text-amber-950 disabled:opacity-50"
                   >
-                    {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
+                    {gameUi(myRematchReady ? ui("Waiting for opponent…") : ui("Play again"))}
                   </button>
                 }
               />
-            )}
+            ))}
 
             <div className="relative">
               <Board
@@ -1345,7 +1348,7 @@ export function CapitalismMultiplayerGame() {
                     <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                     <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}{ui("/2 players connected")}</h2>
+                      {gameUi(players.length)}{ui("/2 players connected")}</h2>
 
                     <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
@@ -1358,7 +1361,7 @@ export function CapitalismMultiplayerGame() {
                     </div>
 
                     <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
+                      {gameUi(copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code"))}
                     </p>
                   </button>
                     <RoomSlots total={2} names={players.map((player) => player.display_name)} overlay />
@@ -1386,10 +1389,10 @@ export function CapitalismMultiplayerGame() {
                     }`}
                   >
                     <div className="text-xl">
-                      {mySide === "black" ? item.black : item.white}
+                      {gameUi(mySide === "black" ? item.black : item.white)}
                     </div>
                     <div className="text-[9px] font-black text-zinc-500">
-                      ${SHOP_PIECE_COSTS[item.type]}
+                      ${gameUi(SHOP_PIECE_COSTS[item.type])}
                     </div>
                   </button>
                 ))}
@@ -1417,15 +1420,15 @@ export function CapitalismMultiplayerGame() {
                         void purchasePiece(selectedShopPiece, square)
                       }
                       className="rounded-xl border border-amber-300/15 bg-amber-400/[0.07] px-3 py-2 text-xs font-black text-amber-200 disabled:cursor-not-allowed disabled:opacity-30"
-                    >{ui("Spawn on")}{square.toUpperCase()}
+                    >{ui("Spawn on")}{gameUi(square.toUpperCase())}
                     </button>
                   );
                 })}
               </div>
 
-              {myAvailableSquares.length === 0 && (
+              {gameUi(myAvailableSquares.length === 0 && (
                 <p className="mt-3 text-[10px] text-zinc-600">{ui("No shop square is empty for your side right now.")}</p>
-              )}
+              ))}
             </Panel>
 
             <Panel title={ui("Royal Powers")}>
@@ -1449,11 +1452,11 @@ export function CapitalismMultiplayerGame() {
                           {ui(power.label)}
                         </span>
                         <span className="text-xs font-black text-amber-300">
-                          ${ROYAL_POWER_COSTS[power.id]}
+                          ${gameUi(ROYAL_POWER_COSTS[power.id])}
                         </span>
                       </div>
                       <p className="mt-1 text-[10px] leading-4 text-zinc-500">
-                        {power.detail}
+                        {gameUi(power.detail)}
                       </p>
                     </button>
                   );
@@ -1469,19 +1472,19 @@ export function CapitalismMultiplayerGame() {
                 >
                   <div>
                     <p className="text-[10px] font-black uppercase text-zinc-600">
-                      {side}{ui("hunts")}</p>
+                      {gameUi(side)}{ui("hunts")}</p>
                     <p className="mt-1 font-mono text-sm font-black uppercase text-zinc-200">
-                      {displayedCapital.bountyTargets[side] ?? "—"}
+                      {gameUi(displayedCapital.bountyTargets[side] ?? "—")}
                     </p>
                   </div>
                   <span className="text-lg font-black text-amber-300">
-                    ${displayedCapital.bountyRewards[side]}
+                    ${gameUi(displayedCapital.bountyRewards[side])}
                   </span>
                 </div>
               ))}
             </Panel>
 
-            <Panel title={ui("Game Actions")}>
+            <Panel gameControls title={ui("Game Actions")}>
               <div className="grid gap-2">
                 <button
                   type="button"

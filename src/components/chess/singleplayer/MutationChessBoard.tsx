@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -993,7 +994,7 @@ export default function MutationChessBoard({
                 text-violet-200
               "
             >
-              ✦ {pliesUntilMutation} {t("plies")}
+              ✦ {gameUi(pliesUntilMutation)} {t("plies")}
             </div>
 
             {!gameOver && (
@@ -1015,7 +1016,7 @@ export default function MutationChessBoard({
               >
                 <span className="h-2 w-2 animate-pulse rounded-full bg-violet-400" />
 
-                {game.turn() === "w" ? t("White to move") : t("Black to move")}
+                {gameUi(game.turn() === "w" ? t("White to move") : t("Black to move"))}
               </div>
             )}
           </div>
@@ -1077,7 +1078,7 @@ export default function MutationChessBoard({
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel>
+              <Panel gameControls>
                 <PanelTitle
                   title={t("Game Controls")}
                   subtitle={t("Players and actions")}
@@ -1116,13 +1117,13 @@ export default function MutationChessBoard({
                       }
                     `}
                   >
-                    {materialDifference > 0 &&
-                      `${t("White")} +${materialDifference}`}
+                    {gameUi(materialDifference > 0 &&
+                      `${t("White")} +${materialDifference}`)}
 
-                    {materialDifference < 0 &&
-                      `${t("Black")} +${Math.abs(materialDifference)}`}
+                    {gameUi(materialDifference < 0 &&
+                      `${t("Black")} +${Math.abs(materialDifference)}`)}
 
-                    {materialDifference === 0 && t("Equal")}
+                    {gameUi(materialDifference === 0 && t("Equal"))}
                   </span>
                 </div>
 
@@ -1144,7 +1145,7 @@ export default function MutationChessBoard({
                   />
 
                   <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
-                    {records.length}
+                    {gameUi(records.length)}
                   </span>
                 </div>
 
@@ -1158,13 +1159,13 @@ export default function MutationChessBoard({
                     moveNumber: record.moveNumber,
                     content: (
                       <>
-                        <span className="text-base leading-none">{historyPieceSymbol(record.color, record.piece)}</span>
-                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>
+                        <span className="text-base leading-none">{gameUi(historyPieceSymbol(record.color, record.piece))}</span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(record.san)}</span>
                       </>
                     ),
                     trailing: record.mutation ? (
-                      <span className="truncate rounded-full bg-violet-400/10 px-1.5 py-0.5 font-black text-violet-300" title={mutationShortLabel(record.mutation)}>
-                        ✦ {mutationShortLabel(record.mutation)}
+                      <span className="truncate rounded-full bg-violet-400/10 px-1.5 py-0.5 font-black text-violet-300" title={gameUi(mutationShortLabel(record.mutation))}>
+                        ✦ {gameUi(mutationShortLabel(record.mutation))}
                       </span>
                     ) : null,
                   }))}
@@ -1200,14 +1201,14 @@ export default function MutationChessBoard({
                     </p>
 
                     <p className="mt-1 text-sm font-bold text-white">
-                      {t("Move")} {historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
+                      {t("Move")} {gameUi(historyPreview.moveNumber)}
+                      {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                      {gameUi(historyPreview.san)}
                     </p>
 
                     {historyPreview.mutation && (
                       <p className="mt-1 text-[10px] font-bold text-violet-300">
-                        ✦ {formatMutation(historyPreview.mutation, t)}
+                        ✦ {gameUi(formatMutation(historyPreview.mutation, t))}
                       </p>
                     )}
                   </div>
@@ -1243,13 +1244,13 @@ export default function MutationChessBoard({
                 <span className="text-sm text-zinc-500">{t("Material")}</span>
 
                 <span className="text-sm font-bold text-zinc-200">
-                  {materialDifference > 0 &&
-                    `${t("White")} +${materialDifference}`}
+                  {gameUi(materialDifference > 0 &&
+                    `${t("White")} +${materialDifference}`)}
 
-                  {materialDifference < 0 &&
-                    `${t("Black")} +${Math.abs(materialDifference)}`}
+                  {gameUi(materialDifference < 0 &&
+                    `${t("Black")} +${Math.abs(materialDifference)}`)}
 
-                  {materialDifference === 0 && t("Equal")}
+                  {gameUi(materialDifference === 0 && t("Equal"))}
                 </span>
               </div>
             </div>
@@ -1281,7 +1282,7 @@ export default function MutationChessBoard({
 
                   <div className="mt-2 flex items-end justify-between gap-4">
                     <span className="text-4xl font-black leading-none text-white">
-                      {pliesUntilMutation}
+                      {gameUi(pliesUntilMutation)}
                     </span>
 
                     <div className="text-right">
@@ -1290,7 +1291,7 @@ export default function MutationChessBoard({
                       </p>
 
                       <p className="mt-1 text-[10px] text-zinc-600">
-                        ≈ {fullMovesUntilMutation} {t("full moves")}
+                        ≈ {gameUi(fullMovesUntilMutation)} {t("full moves")}
                       </p>
                     </div>
                   </div>
@@ -1315,11 +1316,11 @@ export default function MutationChessBoard({
 
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-black text-zinc-200">
-                          {formatMutation(mutationStats.latestMutation, t)}
+                          {gameUi(formatMutation(mutationStats.latestMutation, t))}
                         </p>
 
                         <p className="mt-1 text-[10px] text-zinc-600">
-                          {t("Move")} {mutationStats.latestMutation.moveNumber}
+                          {t("Move")} {gameUi(mutationStats.latestMutation.moveNumber)}
                         </p>
                       </div>
                     </button>
@@ -1344,7 +1345,7 @@ export default function MutationChessBoard({
                   </div>
 
                   <span className="rounded-full border border-violet-400/15 bg-violet-400/[0.07] px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-violet-300">
-                    {mutationStats.totalMutations} ✦
+                    {gameUi(mutationStats.totalMutations)} ✦
                   </span>
                 </div>
 
@@ -1405,14 +1406,14 @@ export default function MutationChessBoard({
                         icon="♔"
                         label={t("White pieces")}
                         value={String(mutationStats.whiteMutations)}
-                        detail={formatSigned(mutationStats.whiteNetValue)}
+                        detail={gameUi(formatSigned(mutationStats.whiteNetValue))}
                       />
 
                       <StatCard
                         icon="♚"
                         label={t("Black pieces")}
                         value={String(mutationStats.blackMutations)}
-                        detail={formatSigned(mutationStats.blackNetValue)}
+                        detail={gameUi(formatSigned(mutationStats.blackNetValue))}
                       />
                     </div>
 
@@ -1446,7 +1447,7 @@ export default function MutationChessBoard({
                             ♔ {t("White")}
                           </p>
                           <p className="mt-1 text-xl font-black text-[#fff3d5]">
-                            {formatSigned(mutationStats.whiteNetValue)}
+                            {gameUi(formatSigned(mutationStats.whiteNetValue))}
                           </p>
                         </div>
 
@@ -1455,7 +1456,7 @@ export default function MutationChessBoard({
                             ♚ {t("Black")}
                           </p>
                           <p className="mt-1 text-xl font-black text-zinc-200">
-                            {formatSigned(mutationStats.blackNetValue)}
+                            {gameUi(formatSigned(mutationStats.blackNetValue))}
                           </p>
                         </div>
                       </div>
@@ -1468,9 +1469,9 @@ export default function MutationChessBoard({
                         </span>
 
                         <span className="text-sm font-black text-violet-200">
-                          {mutationStats.favoriteTarget ? `${
+                          {gameUi(mutationStats.favoriteTarget ? `${
                                 whiteSymbols[mutationStats.favoriteTarget]
-                              } ${t(pieceNames[mutationStats.favoriteTarget])}` : "—"}
+                              } ${t(pieceNames[mutationStats.favoriteTarget])}` : "—")}
                         </span>
                       </div>
                     </div>
@@ -1527,12 +1528,12 @@ export default function MutationChessBoard({
 
                               <div className="min-w-0 flex-1">
                                 <p className="truncate text-xs font-black text-zinc-200">
-                                  {formatMutation(event, t)}
+                                  {gameUi(formatMutation(event, t))}
                                 </p>
 
                                 <p className="mt-1 text-[9px] text-zinc-700">
-                                  {t("Move")} {event.moveNumber} ·{" "}
-                                  {event.square}
+                                  {t("Move")} {gameUi(event.moveNumber)} ·{gameUi(" ")}
+                                  {gameUi(event.square)}
                                 </p>
                               </div>
 
@@ -1550,7 +1551,7 @@ export default function MutationChessBoard({
                                   }
                                 `}
                               >
-                                {formatSigned(event.valueDelta)}
+                                {gameUi(formatSigned(event.valueDelta))}
                               </span>
                             </button>
                           ))}
@@ -1624,11 +1625,11 @@ function formatSigned(value: number): string {
   return String(value);
 }
 
-function Panel({ children }: { children: React.ReactNode }) {
+function Panel({ gameControls = false, children }: { gameControls?: boolean; children: React.ReactNode }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
-      {children}
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+      {gameUi(children)}
     </section>
   );
 }
@@ -1713,7 +1714,7 @@ function CapturedPiecesGrid({
             key={`${color}-${piece}-${index}`}
             className="flex h-7 w-7 items-center justify-center text-2xl leading-none"
           >
-            {color === "w" ? whiteSymbols[piece] : blackSymbols[piece]}
+            {gameUi(color === "w" ? whiteSymbols[piece] : blackSymbols[piece])}
           </span>
         ))
       )}
@@ -1727,7 +1728,7 @@ function CapturedPiecesGrid({
           {t("Black")}
         </p>
 
-        {renderPieces(capturedBlack, "b")}
+        {gameUi(renderPieces(capturedBlack, "b"))}
       </div>
 
       <div className="border-t border-white/5 pt-3">
@@ -1735,7 +1736,7 @@ function CapturedPiecesGrid({
           {t("White")}
         </p>
 
-        {renderPieces(capturedWhite, "w")}
+        {gameUi(renderPieces(capturedWhite, "w"))}
       </div>
     </div>
   );
@@ -1756,16 +1757,16 @@ function StatCard({
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-sm">{icon}</span>
+        <span className="text-sm">{gameUi(icon)}</span>
 
-        <span className="text-xl font-black text-zinc-100">{value}</span>
+        <span className="text-xl font-black text-zinc-100">{gameUi(value)}</span>
       </div>
 
       <p className="mt-2 text-[10px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
       </p>
 
-      <p className="mt-1 text-[10px] text-zinc-700">{detail}</p>
+      <p className="mt-1 text-[10px] text-zinc-700">{gameUi(detail)}</p>
     </div>
   );
 }
@@ -1774,7 +1775,7 @@ function MiniStat({ label, value }: { label: string; value: number }) {
   useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-2 py-3 text-center">
-      <p className="text-lg font-black text-zinc-200">{value}</p>
+      <p className="text-lg font-black text-zinc-200">{gameUi(value)}</p>
 
       <p className="mt-1 text-[9px] font-bold text-zinc-600">{ui(label)}</p>
     </div>
@@ -1785,12 +1786,12 @@ function MutationGlyph({ event }: { event: MutationEvent }) {
   useUiLanguage();
   return (
     <div className="flex shrink-0 items-center gap-1 text-xl">
-      <span>{mutationPieceSymbol(event.color, event.fromType)}</span>
+      <span>{gameUi(mutationPieceSymbol(event.color, event.fromType))}</span>
 
       <span className="text-xs text-violet-400">→</span>
 
       <span className="text-violet-200">
-        {mutationPieceSymbol(event.color, event.toType)}
+        {gameUi(mutationPieceSymbol(event.color, event.toType))}
       </span>
     </div>
   );
@@ -1830,11 +1831,11 @@ function MutationMomentCard({
 
             <div>
               <p className="text-xs font-black text-zinc-200">
-                {formatMutation(event, t)}
+                {gameUi(formatMutation(event, t))}
               </p>
 
               <p className="mt-1 text-[9px] text-zinc-700">
-                {t("Move")} {event.moveNumber}
+                {t("Move")} {gameUi(event.moveNumber)}
               </p>
             </div>
           </div>
@@ -1853,11 +1854,11 @@ function MutationMomentCard({
               }
             `}
           >
-            {formatSigned(event.valueDelta)}
+            {gameUi(formatSigned(event.valueDelta))}
           </span>
         </div>
       ) : (
-        <p className="mt-2 text-xs text-zinc-700">{emptyText}</p>
+        <p className="mt-2 text-xs text-zinc-700">{gameUi(emptyText)}</p>
       )}
     </button>
   );

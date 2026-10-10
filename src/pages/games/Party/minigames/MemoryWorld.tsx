@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { useEffect, useRef, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Line, OrthographicCamera, RoundedBox } from "@react-three/drei";
@@ -26,6 +27,7 @@ function CameraFit({ quadrant }: { quadrant?: number }) {
 }
 
 function Tile({ x, z, state, offset }: { x: number; z: number; state: ArrowMemoryView; offset: RefObject<number | null> }) {
+  useGameLanguage();
   const platform = useRef<Group>(null), icicle = useRef<Group>(null), chips = useRef<Group>(null);
   const ice = state.map === "ice", safe = Object.values(state.safe ?? {}).some((p) => p.x === x && p.z === z);
   const hazard = state.phase === "hazard" || state.phase === "finished", unsafe = hazard && !safe;
@@ -69,6 +71,7 @@ function Tile({ x, z, state, offset }: { x: number; z: number; state: ArrowMemor
 }
 
 function MemoryCharacter({ state, player, yours, offset, motion }: { state: ArrowMemoryView; player: Player; yours: boolean; offset: RefObject<number | null>; motion: boolean }) {
+  useGameLanguage();
   const runner = state.players[player.id], body = useRef<Group>(null), walking = useRef(0), initialized = useRef(false);
   const heading = useRef(Math.PI), ring = useRef<Mesh>(null);
   useFrame((_, dt) => {
@@ -95,6 +98,7 @@ function MemoryCharacter({ state, player, yours, offset, motion }: { state: Arro
 }
 
 function Surroundings({ ice, motion }: { ice: boolean; motion: boolean }) {
+  useGameLanguage();
   return <>
     {[-1, 1].flatMap((side) => [-6, -2, 3, 7].map((z, i) => <group key={`${side}:${i}`} position={[side * (7.5 + i % 2 * 0.5), -0.9, z]}>
       <mesh rotation={[0, i, 0]} scale={[1.35, ice ? 1.4 : 2.2, 1.2]} castShadow><dodecahedronGeometry args={[1, 0]}/><meshStandardMaterial color={ice ? "#458196" : "#35263d"} roughness={0.9}/></mesh>
@@ -115,8 +119,9 @@ function Surroundings({ ice, motion }: { ice: boolean; motion: boolean }) {
 }
 
 export function MemoryWorld({ state, players, playerId, serverNow, focused }: { state: ArrowMemoryView; players: Player[]; playerId: string; serverNow?: number; focused: boolean }) {
+  useGameLanguage();
   const offset = useServerOffset(serverNow), motion = useSceneMotion(), ice = state.map === "ice";
-  return <div className="memory-world" role="img" aria-label={`Animated 3D ${ice ? "ice grid above water" : "hell platforms above lava"}. Four private quadrants with fox, bunny, explorer and ghost characters.`}>
+  return <div className="memory-world" role="img" aria-label={gameUi(`Animated 3D ${ice ? "ice grid above water" : "hell platforms above lava"}. Four private quadrants with fox, bunny, explorer and ghost characters.`)}>
     <Canvas orthographic shadows camera={{ position: [0, 18, 14], zoom: 35, near: 0.1, far: 100 }} dpr={[1, 1.5]} gl={{ antialias: true }} fallback={<p className="memory-webgl-fallback">This 3D world needs WebGL enabled in your browser.</p>}>
       <CameraFit quadrant={focused ? state.players[playerId]?.quadrant : undefined}/>
       <color attach="background" args={[ice ? "#102b46" : "#211325"]}/>
@@ -136,7 +141,7 @@ export function MemoryWorld({ state, players, playerId, serverNow, focused }: { 
       })}
       <AtmosphereParticles kind={ice ? "snow" : "embers"} motion={motion}/>
     </Canvas>
-    <div className="memory-world-compass" aria-hidden="true"><span>↑ UP</span><small>← LEFT · RIGHT →</small></div>
-    <span className="memory-world-caption">{ice ? "FROSTFALL LAGOON" : "THE EMBER VAULT"}</span>
+    <div className="memory-world-compass" aria-hidden="true"><span>{gameUi("↑ UP")}</span><small>{gameUi("← LEFT · RIGHT →")}</small></div>
+    <span className="memory-world-caption">{gameUi(ice ? "FROSTFALL LAGOON" : "THE EMBER VAULT")}</span>
   </div>;
 }

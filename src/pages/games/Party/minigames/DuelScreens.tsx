@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { COLORS, DUEL_FLOW } from "../../../../games/party/config.ts";
 import { describeWager } from "../../../../games/party/duels/wager.ts";
 import type { MinigameDefinition } from "../../../../games/party/minigames/types.ts";
@@ -10,6 +11,7 @@ import type {
 import Portrait from "../PartyPortrait.tsx";
 
 function Duelist({ player, you }: { player: Player; you: boolean }) {
+  useGameLanguage();
   return (
     <div
       className="duel-duelist"
@@ -18,7 +20,7 @@ function Duelist({ player, you }: { player: Player; you: boolean }) {
       <Portrait player={player} />
       <strong>{player.name.toUpperCase()}</strong>
       <small>
-        {you ? "you" : player.isBot ? "bot" : "explorer"} · 🪙 {player.coins} · ✦ {player.goldenPlutos}
+        {gameUi(you ? "you" : player.isBot ? "bot" : "explorer")} · 🪙 {gameUi(player.coins)} · ✦ {gameUi(player.goldenPlutos)}
       </small>
     </div>
   );
@@ -39,6 +41,7 @@ export function DuelIntro({
   playerId: string;
   now: number;
 }) {
+  useGameLanguage();
   const challenger = match.players.find((p) => p.id === duel.challengerPlayerId)!,
     defender = match.players.find((p) => p.id === duel.defenderPlayerId)!;
   const remaining = minigame.startedAt - now,
@@ -49,42 +52,40 @@ export function DuelIntro({
   return (
     <div className="mg-intro duel-intro">
       <span className="pp-eyebrow">
-        {pocket ? "POCKET DUEL · RARE" : "DUEL SABER"} · {challenger.name.toUpperCase()}'S TURN
-      </span>
-      <h2>{pocket ? "POCKET DUEL!" : "DUEL!"}</h2>
+        {gameUi(pocket ? "POCKET DUEL · RARE" : "DUEL SABER")} · {challenger.name.toUpperCase()}{gameUi("'S TURN ")}</span>
+      <h2>{gameUi(pocket ? "POCKET DUEL!" : "DUEL!")}</h2>
       <div className="duel-versus">
         <Duelist player={challenger} you={challenger.id === playerId} />
-        <b aria-label="versus">VS</b>
+        <b aria-label={gameUi("versus")}>{gameUi("VS")}</b>
         <Duelist player={defender} you={defender.id === playerId} />
       </div>
-      {duel.wager ? (
+      {gameUi(duel.wager ? (
         <p className="duel-wager">
-          <small>WAGER</small>
-          {describeWager(duel.wager)}
-          {duel.wager.type === "coins" && <small>Pot {duel.pot} coins · winner takes all</small>}
-          {duel.wager.type === "pluto" && <small>Winner takes 1 Golden Pluto from the loser</small>}
+          <small>{gameUi("WAGER")}</small>
+          {gameUi(describeWager(duel.wager))}
+          {duel.wager.type === "coins" && <small>{gameUi("Pot ")}{gameUi(duel.pot)}{gameUi(" coins · winner takes all")}</small>}
+          {duel.wager.type === "pluto" && <small>{gameUi("Winner takes 1 Golden Pluto from the loser")}</small>}
         </p>
       ) : (
         <p className="duel-wager">
-          <small>PRIZE · NO WAGER</small>✦ +1 NEW GOLDEN PLUTO
-          <small>The loser loses nothing</small>
+          <small>{gameUi("PRIZE · NO WAGER")}</small>{gameUi("✦ +1 NEW GOLDEN PLUTO ")}<small>{gameUi("The loser loses nothing")}</small>
         </p>
-      )}
+      ))}
       <p className="duel-minigame">
-        <small>MINIGAME</small>
-        {definition.name.toUpperCase()}
+        <small>{gameUi("MINIGAME")}</small>
+        {gameUi(definition.name.toUpperCase())}
       </p>
-      <p className="mg-lede">{definition.description}</p>
+      <p className="mg-lede">{gameUi(definition.description)}</p>
       <p className="mg-controls">
-        <b>Controls</b> {definition.controls}
+        <b>{gameUi("Controls")}</b> {gameUi(definition.controls)}
       </p>
-      {!involved && <p className="mg-lede">You are watching this duel.</p>}
+      {!involved && <p className="mg-lede">{gameUi("You are watching this duel.")}</p>}
       <div
         className={`mg-countdown ${counting ? "counting" : ""}`}
         aria-live="assertive"
         key={counting ? count : "ready"}
       >
-        {!counting ? <small>Get ready…</small> : count > 0 ? count : "GO!"}
+        {gameUi(!counting ? <small>{gameUi("Get ready…")}</small> : count > 0 ? count : "GO!")}
       </div>
     </div>
   );
@@ -99,6 +100,7 @@ export function DuelResults({
   duel: DuelState;
   playerId: string;
 }) {
+  useGameLanguage();
   const winner = match.players.find((p) => p.id === duel.winnerPlayerId);
   const duelists = [duel.challengerPlayerId, duel.defenderPlayerId].map(
     (id) => match.players.find((p) => p.id === id)!,
@@ -108,20 +110,19 @@ export function DuelResults({
   const champion = match.players.find((p) => p.id === match.winner);
   return (
     <div className="mg-results duel-results">
-      <span className="pp-eyebrow">DUEL RESULTS</span>
-      <h2>{winner ? `${winner.name.toUpperCase()} WINS!` : "DUEL OVER"}</h2>
+      <span className="pp-eyebrow">{gameUi("DUEL RESULTS")}</span>
+      <h2>{gameUi(winner ? `${winner.name.toUpperCase()} WINS!` : "DUEL OVER")}</h2>
       {duel.kind === "pocket-duel" ? (
         <p className="duel-wager">
-          <small>POCKET DUEL PRIZE</small>
-          {winner ? `✦ +1 NEW GOLDEN PLUTO FOR ${winner.name.toUpperCase()}` : "NO PRIZE"}
-          <small>{loser?.name} loses nothing</small>
+          <small>{gameUi("POCKET DUEL PRIZE")}</small>
+          {gameUi(winner ? `✦ +1 NEW GOLDEN PLUTO FOR ${winner.name.toUpperCase()}` : "NO PRIZE")}
+          <small>{gameUi(loser?.name)}{gameUi(" loses nothing")}</small>
         </p>
       ) : duel.wager?.type === "coins" ? (
         <>
           <p className="duel-wager">
-            <small>WAGER</small>
-            {duel.wager.amount * 2} COINS
-          </p>
+            <small>{gameUi("WAGER")}</small>
+            {gameUi(duel.wager.amount * 2)}{gameUi(" COINS ")}</p>
           <ol className="mg-podium">
             {duelists.map((p) => {
               const payout = duel.payout?.[p.id]?.coins ?? 0;
@@ -131,14 +132,14 @@ export function DuelResults({
                   className={`${p.id === playerId ? "me" : ""} ${p.id === winner?.id ? "place-1" : ""}`}
                   style={{ "--pawn-color": COLORS[p.avatarId] } as React.CSSProperties}
                 >
-                  <b className="mg-place">{p.id === winner?.id ? "WIN" : "—"}</b>
+                  <b className="mg-place">{gameUi(p.id === winner?.id ? "WIN" : "—")}</b>
                   <Portrait player={p} />
                   <span className="mg-name">
                     {p.name}
-                    <small>staked {duel.wager?.type === "coins" ? duel.wager.amount : 0}</small>
+                    <small>{gameUi("staked ")}{gameUi(duel.wager?.type === "coins" ? duel.wager.amount : 0)}</small>
                   </span>
-                  <span className={`mg-reward ${payout ? "" : "none"}`}>+{payout}</span>
-                  <span className="mg-total">🪙 {p.coins}</span>
+                  <span className={`mg-reward ${payout ? "" : "none"}`}>+{gameUi(payout)}</span>
+                  <span className="mg-total">🪙 {gameUi(p.coins)}</span>
                 </li>
               );
             })}
@@ -146,14 +147,13 @@ export function DuelResults({
         </>
       ) : (
         <p className="duel-wager">
-          <small>1 GOLDEN PLUTO</small>
-          TRANSFERRED FROM {loser?.name.toUpperCase()}
+          <small>{gameUi("1 GOLDEN PLUTO")}</small>{gameUi(" TRANSFERRED FROM ")}{gameUi(loser?.name.toUpperCase())}
         </p>
       )}
       <p className="mg-next">
-        {champion
+        {gameUi(champion
           ? `${champion.name} reached the victory goal!`
-          : `Back to ${challenger.name}'s turn — they can still use items and roll.`}
+          : `Back to ${challenger.name}'s turn — they can still use items and roll.`)}
       </p>
     </div>
   );

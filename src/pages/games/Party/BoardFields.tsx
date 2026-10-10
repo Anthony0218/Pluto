@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { createContext, memo, useContext, useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 import { useFrame } from "@react-three/fiber";
@@ -25,16 +26,19 @@ function textureFor(text: string) {
   return texture;
 }
 export function BoardFieldResources({ children }: { children: ReactNode }) {
+  useGameLanguage();
   const textures = useMemo(() => new Map([...new Set([...Object.values(GLYPHS), "!", "◉"])].map((g) => [g, textureFor(g)])), []);
   useEffect(() => () => textures.forEach((t) => t.dispose()), [textures]);
-  return <Textures.Provider value={textures}>{children}</Textures.Provider>;
+  return <Textures.Provider value={textures}>{gameUi(children)}</Textures.Provider>;
 }
 function Mark({ glyph, position = [0, .2, .34], size = .4, facing = true }: { glyph: string; position?: [number, number, number]; size?: number; facing?: boolean }) {
+  useGameLanguage();
   const textures = useContext(Textures);
   const face = <mesh><planeGeometry args={[size, size * .75]}/><meshBasicMaterial map={textures.get(glyph) ?? textures.get("!")} transparent depthWrite={false}/></mesh>;
-  return facing ? <Billboard position={position}>{face}</Billboard> : <group position={position}>{face}</group>;
+  return facing ? <Billboard position={position}>{gameUi(face)}</Billboard> : <group position={position}>{gameUi(face)}</group>;
 }
 function CoinStack() {
+  useGameLanguage();
   return <group position={[-.035, 0, -.09]}>
     {[0, 1, 2].map((i) => <mesh key={i} position={[i === 1 ? .055 : 0, .2 + i * .065, 0]}><cylinderGeometry args={[.18, .18, .057, 16]}/><meshStandardMaterial color={i === 2 ? "#ffe397" : "#edb44b"} metalness={.45} roughness={.3}/></mesh>)}
     <mesh position={[0, .363, 0]} rotation={[-Math.PI / 2, 0, 0]}><torusGeometry args={[.115, .012, 4, 16]}/><meshStandardMaterial color="#ac742c"/></mesh>
@@ -76,6 +80,7 @@ export const BoardField = memo(function BoardField({ node, map, position, select
   node: BoardNode; map: BoardMap; position: [number, number, number]; selected: boolean; reachable: boolean; hot: boolean; amount: number;
   onSelect: (id: string) => void; landing: BoardLanding | null; motion: boolean; eventActive: boolean;
 }) {
+  useGameLanguage();
   const kind = fieldKind(map, node), material = fieldMaterial(map, node), palette = tilePresentationFor(map)[node.type];
   const color = kind === "cleanse" ? "#6be1de" : `#${palette.color.toString(16).padStart(6, "0")}`;
   const artwork = useRef<Group>(null), lid = useRef<Group>(null), door = useRef<Group>(null), sign = useRef<Group>(null), rim = useRef<Mesh>(null), cracks = useRef<Group>(null);
@@ -97,7 +102,7 @@ export const BoardField = memo(function BoardField({ node, map, position, select
     <mesh><cylinderGeometry args={[.46, .49, .2, material.segments]}/><meshStandardMaterial color={material.base} roughness={material.roughness}/></mesh>
     <mesh position={[0, .082, 0]}><cylinderGeometry args={[.43, .43, .06, kind === "rare" ? 6 : 20]}/><meshStandardMaterial color={hot ? "#91c75b" : color} roughness={.65} emissive={reachable ? "#c4ffd5" : selected ? "#ffd391" : "#000"} emissiveIntensity={.35}/></mesh>
     <mesh ref={rim} rotation={[-Math.PI / 2, 0, 0]} position={[0, .122, 0]}><torusGeometry args={[.447, .026, 5, material.segments]}/><meshStandardMaterial color={selected || reachable ? "#fff1a5" : material.trim} roughness={material.roughness}/></mesh>
-    {material.kind === "wood" && [-1, 1].map((i) => <mesh key={i} position={[i * .145, .116, 0]}><boxGeometry args={[.012, .005, .74]}/><meshStandardMaterial color="#85684c" transparent opacity={.35}/></mesh>)}
+    {gameUi(material.kind === "wood" && [-1, 1].map((i) => <mesh key={i} position={[i * .145, .116, 0]}><boxGeometry args={[.012, .005, .74]}/><meshStandardMaterial color="#85684c" transparent opacity={.35}/></mesh>))}
     {material.kind === "stone" && <mesh position={[0, -.005, .485]}><boxGeometry args={[.014, .12, .007]}/><meshStandardMaterial color="#414d5a"/></mesh>}
     <group ref={artwork}>
       {(kind === "coin" || kind === "boost") && <CoinStack/>}
@@ -132,11 +137,12 @@ export const BoardField = memo(function BoardField({ node, map, position, select
     {(kind === "coin" || kind === "boost") && <mesh position={[.26, .118, .12]} rotation={[-Math.PI / 2, 0, 0]}><torusGeometry args={[.063, .012, 4, 12]}/><meshStandardMaterial color="#a78138"/></mesh>}
     <Mark glyph={glyph}/>
     {(reachable || selected || amount > 0) && <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .12, 0]}><ringGeometry args={[.49, .56, 24]}/><meshBasicMaterial color={amount > 0 ? "#ff9273" : "#fff4a7"}/></mesh>}
-    {amount > 0 && <Html position={[0, .8, 0]} center style={{ pointerEvents: "none" }}><span className="pp-world-damage">−{amount}</span></Html>}
+    {amount > 0 && <Html position={[0, .8, 0]} center style={{ pointerEvents: "none" }}><span className="pp-world-damage">−{gameUi(amount)}</span></Html>}
   </group>;
 });
 
 export function LandingEffects({ landing, position, motion, onProject }: { landing: BoardLanding; position: [number, number, number]; motion: boolean; onProject: (x: number, y: number) => void }) {
+  useGameLanguage();
   const particles = useRef<Group>(null), ring = useRef<Mesh>(null);
   const color = landing.kind === "hazard" ? "#ff796c" : landing.kind === "heal" || landing.kind === "cleanse" ? "#92ffce" : landing.kind === "warp" ? "#8ccaff" : "#ffe499";
   const source = useMemo(() => new Vector3(position[0], position[1] + .7, position[2]), [position]);
@@ -149,6 +155,6 @@ export function LandingEffects({ landing, position, motion, onProject }: { landi
   return <group position={position}>
     <mesh ref={ring} position={[0, .17, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[.49, .56, 28]}/><meshBasicMaterial color={color} transparent opacity={.6} depthWrite={false}/></mesh>
     {motion && <group ref={particles}>{Array.from({ length: 8 }, (_, i) => <mesh key={i}><sphereGeometry args={[.045, 6, 4]}/><meshBasicMaterial color={color}/></mesh>)}</group>}
-    <Html position={[0, 1.2, 0]} center zIndexRange={[22, 21]} style={{ pointerEvents: "none" }}><span className={`pp-field-result pp-field-result-${landing.kind}`}><b>{landing.icon} {landing.label}</b>{landing.cleansed && <small className="pp-cleanse-dissolve">☢ → ○ ○ ○</small>}</span></Html>
+    <Html position={[0, 1.2, 0]} center zIndexRange={[22, 21]} style={{ pointerEvents: "none" }}><span className={`pp-field-result pp-field-result-${landing.kind}`}><b>{gameUi(landing.icon)} {gameUi(landing.label)}</b>{landing.cleansed && <small className="pp-cleanse-dissolve">☢ → ○ ○ ○</small>}</span></Html>
   </group>;
 }

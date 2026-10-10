@@ -1,4 +1,5 @@
 import type { Campaign } from "../../../games/MedievalKingdoms/edravane/types.ts";
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { center } from "../../../games/MedievalKingdoms/edravane/world.ts";
 
 export type LabelPlacement = { label: string; x: number; y: number };
@@ -34,7 +35,8 @@ export function createEstateLabelPainter(createCanvas: () => HTMLCanvasElement) 
     let painted = 0;
     for (const { label, x, y } of labels) {
       if (x + 18 < box.minX || x - 18 > box.minX + box.width || y - 4 < box.minY || y - 19 > box.minY + box.height) continue;
-      const key = `${resolution}:${label}`;
+      const caption = gameUi(label);
+      const key = `${resolution}:${caption}`;
       let stamp = stamps.get(key);
       if (!stamp) {
         stamp = createCanvas();
@@ -46,7 +48,7 @@ export function createEstateLabelPainter(createCanvas: () => HTMLCanvasElement) 
         ink.font = '6px "Edravane Fell", Georgia, serif';
         ink.fillStyle = "#14271d";
         ink.textAlign = "center";
-        const lines = splitEstateLabel(label);
+        const lines = splitEstateLabel(caption);
         lines.forEach((text, i) => ink.fillText(text, 18, lines.length === 1 ? 11 : 6 + i * 7, 34));
         if (stamps.size >= 512) stamps.delete(stamps.keys().next().value!);
         stamps.set(key, stamp);

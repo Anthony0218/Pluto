@@ -73,5 +73,5 @@ test('all nine percentage scenarios have audited practice answers and saved prog
   const port = storage(), store = createLearningToolsStore(port);
   store.recordSolvedExercise('alice', percentageActivities[0].id, 'p1'); store.recordSolvedExercise('alice', percentageActivities[0].id, 'fake');
   assert.deepEqual(createLearningToolsStore(port).read('alice').solvedExercises[percentageActivities[0].id], ['p1']); assert.deepEqual(store.read('bob').solvedExercises, {});
-  assert.deepEqual(toolApps.filter(item => item.status === 'available').map(item => item.id), ['calculator', 'percentage-calculator', 'birthday-reminders', 'qr-code-creator', 'number-system-converter', 'unit-converter', 'workout-timer', 'bill-splitter', 'time-zone-planner', 'budget-tracker', 'calorie-tracker', 'day-planner', 'notes']);
+  assert.deepEqual(toolApps.filter(item => item.status === 'available').map(item => item.id), ['calculator', 'percentage-calculator', 'birthday-reminders', 'qr-code-creator', 'todo-list', 'number-system-converter', 'unit-converter', 'workout-timer', 'bill-splitter', 'time-zone-planner', 'budget-tracker', 'calorie-tracker', 'day-planner', 'notes']);
 });

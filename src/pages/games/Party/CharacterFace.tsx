@@ -1,5 +1,7 @@
+import { useGameLanguage } from "../../../i18n/gameUi.ts";
 import { COLORS } from "../../../games/party/config.ts";
 export function CharacterFace({ avatarId, color = COLORS[avatarId % 4] }: { avatarId: number; color?: string }) {
+  useGameLanguage();
   const id = avatarId % 4;
   return <svg viewBox="0 0 64 72" aria-hidden="true" className="pp-character-face">
     {id === 0 && <><path d="M12 33 5 7 26 20M52 33 59 7 38 20" fill="#e89751" stroke="#713e38" strokeWidth="2"/><path d="M12 24 10 13 20 21M52 24 54 13 44 21" fill="#ffe0c1"/></>}

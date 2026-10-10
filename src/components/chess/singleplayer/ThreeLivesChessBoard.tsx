@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -1743,11 +1744,11 @@ export default function ThreeLivesChessBoard({
             >
               <span className="text-[#fff3d5]">♔</span>
               <span className="tracking-wide text-red-300">
-                {"♥".repeat(displayedWhiteHp)}
+                {gameUi("♥".repeat(displayedWhiteHp))}
                 <span className="text-zinc-700">
-                  {"♥".repeat(
+                  {gameUi("♥".repeat(
                     Math.max(0, THREE_LIVES_MAX_HP - displayedWhiteHp),
-                  )}
+                  ))}
                 </span>
               </span>
 
@@ -1755,18 +1756,18 @@ export default function ThreeLivesChessBoard({
 
               <span className="text-zinc-400">♚</span>
               <span className="tracking-wide text-red-300">
-                {"♥".repeat(displayedBlackHp)}
+                {gameUi("♥".repeat(displayedBlackHp))}
                 <span className="text-zinc-700">
-                  {"♥".repeat(
+                  {gameUi("♥".repeat(
                     Math.max(0, THREE_LIVES_MAX_HP - displayedBlackHp),
-                  )}
+                  ))}
                 </span>
               </span>
             </div>
 
             {/* CURRENT TURN */}
 
-            {!gameOver && (
+            {gameUi(!gameOver && (
               <div
                 className="
                   flex
@@ -1793,9 +1794,9 @@ export default function ThreeLivesChessBoard({
                   "
                 />
 
-                {game.turn() === "w" ? t("White to move") : t("Black to move")}
+                {gameUi(game.turn() === "w" ? t("White to move") : t("Black to move"))}
               </div>
-            )}
+            ))}
           </div>
         </ChessPageHeader>
 
@@ -1804,7 +1805,7 @@ export default function ThreeLivesChessBoard({
            ================================================= */}
 
         <main
-          className="
+          className="chess-game-grid
             grid
             gap-6
             xl:grid-cols-[300px_minmax(0,1fr)_300px]
@@ -1820,7 +1821,7 @@ export default function ThreeLivesChessBoard({
                   GAME CONTROLS
                  =========================================== */}
 
-              <section
+              <section data-chess-controls
                 className="
                   rounded-3xl
                   border
@@ -1904,13 +1905,13 @@ export default function ThreeLivesChessBoard({
                       }
                     `}
                   >
-                    {materialDifference > 0 &&
-                      `${t("White")} +${materialDifference}`}
+                    {gameUi(materialDifference > 0 &&
+                      `${t("White")} +${materialDifference}`)}
 
-                    {materialDifference < 0 &&
-                      `${t("Black")} +${Math.abs(materialDifference)}`}
+                    {gameUi(materialDifference < 0 &&
+                      `${t("Black")} +${Math.abs(materialDifference)}`)}
 
-                    {materialDifference === 0 && t("Equal")}
+                    {gameUi(materialDifference === 0 && t("Equal"))}
                   </span>
                 </div>
 
@@ -1967,7 +1968,7 @@ export default function ThreeLivesChessBoard({
                       text-zinc-400
                     "
                   >
-                    {moveHistory.length}
+                    {gameUi(moveHistory.length)}
                   </span>
                 </div>
 
@@ -1981,8 +1982,8 @@ export default function ThreeLivesChessBoard({
                     moveNumber: move.moveNumber,
                     content: (
                       <>
-                        <span className="text-base leading-none">{getHistoryPieceSymbol(move.color, move.piece)}</span>
-                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{move.san}</span>
+                        <span className="text-base leading-none">{gameUi(getHistoryPieceSymbol(move.color, move.piece))}</span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(move.san)}</span>
                       </>
                     ),
                     trailing: move.damagedSide ? (
@@ -2007,13 +2008,13 @@ export default function ThreeLivesChessBoard({
             <div className="mx-auto max-w-[820px]">
               {/* GAME OVER STATUS */}
 
-              {gameOver && (
+              {gameUi(gameOver && (
                 <VisibleGameResult />
-              )}
+              ))}
 
               {/* PROMOTION */}
 
-              {promotionSquare && promotionFrom && (
+              {gameUi(promotionSquare && promotionFrom && (
                 <div
                   className="
                       mb-3
@@ -2027,7 +2028,7 @@ export default function ThreeLivesChessBoard({
                 >
                   <PromotionBar onPromote={promotePawn} />
                 </div>
-              )}
+              ))}
 
               {/* HISTORY PREVIEW STATUS */}
 
@@ -2052,14 +2053,14 @@ export default function ThreeLivesChessBoard({
                       {t("History Preview")}
                     </p>
 
-                    <p className="mt-1 text-sm font-bold text-white">{ui("Move")}{historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
+                    <p className="mt-1 text-sm font-bold text-white">{ui("Move")}{gameUi(historyPreview.moveNumber)}
+                      {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                      {gameUi(historyPreview.san)}
                     </p>
 
                     <p className="mt-1 text-[10px] font-semibold text-zinc-500">
-                      ♔ {historyPreview.whiteHpAfter} ♥ · ♚{" "}
-                      {historyPreview.blackHpAfter} ♥
+                      ♔ {gameUi(historyPreview.whiteHpAfter)} ♥ · ♚{gameUi(" ")}
+                      {gameUi(historyPreview.blackHpAfter)} ♥
                     </p>
                   </div>
 
@@ -2123,13 +2124,13 @@ export default function ThreeLivesChessBoard({
                 <span className="text-sm text-zinc-500">{t("Material")}</span>
 
                 <span className="text-sm font-bold text-zinc-200">
-                  {materialDifference > 0 &&
-                    `${t("White")} +${materialDifference}`}
+                  {gameUi(materialDifference > 0 &&
+                    `${t("White")} +${materialDifference}`)}
 
-                  {materialDifference < 0 &&
-                    `${t("Black")} +${Math.abs(materialDifference)}`}
+                  {gameUi(materialDifference < 0 &&
+                    `${t("Black")} +${Math.abs(materialDifference)}`)}
 
-                  {materialDifference === 0 && t("Equal")}
+                  {gameUi(materialDifference === 0 && t("Equal"))}
                 </span>
               </div>
             </div>
@@ -2184,24 +2185,24 @@ export default function ThreeLivesChessBoard({
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
                         <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
-                          ♔ {whitePlayer.trim() || t("White")}
+                          ♔ {gameUi(whitePlayer.trim() || t("White"))}
                         </p>
 
                         <p className="mt-3 break-words text-3xl leading-none tracking-[0.12em] text-red-300">
-                          {"♥".repeat(displayedWhiteHp)}
+                          {gameUi("♥".repeat(displayedWhiteHp))}
                           <span className="text-zinc-800">
-                            {"♥".repeat(
+                            {gameUi("♥".repeat(
                               Math.max(
                                 0,
                                 THREE_LIVES_MAX_HP - displayedWhiteHp,
                               ),
-                            )}
+                            ))}
                           </span>
                         </p>
                       </div>
 
                       <span className="text-4xl font-black leading-none text-[#fff3d5]">
-                        {displayedWhiteHp}
+                        {gameUi(displayedWhiteHp)}
                       </span>
                     </div>
                   </div>
@@ -2218,24 +2219,24 @@ export default function ThreeLivesChessBoard({
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
                         <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
-                          ♚ {blackPlayer.trim() || t("Black")}
+                          ♚ {gameUi(blackPlayer.trim() || t("Black"))}
                         </p>
 
                         <p className="mt-3 break-words text-3xl leading-none tracking-[0.12em] text-red-300">
-                          {"♥".repeat(displayedBlackHp)}
+                          {gameUi("♥".repeat(displayedBlackHp))}
                           <span className="text-zinc-800">
-                            {"♥".repeat(
+                            {gameUi("♥".repeat(
                               Math.max(
                                 0,
                                 THREE_LIVES_MAX_HP - displayedBlackHp,
                               ),
-                            )}
+                            ))}
                           </span>
                         </p>
                       </div>
 
                       <span className="text-4xl font-black leading-none text-zinc-100">
-                        {displayedBlackHp}
+                        {gameUi(displayedBlackHp)}
                       </span>
                     </div>
                   </div>
@@ -2288,7 +2289,7 @@ export default function ThreeLivesChessBoard({
                       text-red-300
                     "
                   >
-                    {matchStats.totalPlies} {t("plies")}
+                    {gameUi(matchStats.totalPlies)} {t("plies")}
                   </span>
                 </div>
 
@@ -2338,7 +2339,7 @@ export default function ThreeLivesChessBoard({
                   ))}
                 </div>
 
-                {statsTab === "overview" && (
+                {gameUi(statsTab === "overview" && (
                   <div className="mt-4 space-y-3">
                     <div className="grid grid-cols-2 gap-2">
                       <StatCard
@@ -2404,7 +2405,7 @@ export default function ThreeLivesChessBoard({
                         </span>
 
                         <span className="text-sm font-black text-zinc-200">
-                          {matchStats.currentCalmStreak} {t("plies")}
+                          {gameUi(matchStats.currentCalmStreak)} {t("plies")}
                         </span>
                       </div>
 
@@ -2430,14 +2431,14 @@ export default function ThreeLivesChessBoard({
                       <div className="mt-2 flex items-center justify-between text-xs">
                         <span className="text-zinc-500">♔ {t("White")}</span>
                         <span className="font-black text-zinc-200">
-                          {matchStats.whiteLastLifeMoves}
+                          {gameUi(matchStats.whiteLastLifeMoves)}
                         </span>
                       </div>
 
                       <div className="mt-1 flex items-center justify-between text-xs">
                         <span className="text-zinc-500">♚ {t("Black")}</span>
                         <span className="font-black text-zinc-200">
-                          {matchStats.blackLastLifeMoves}
+                          {gameUi(matchStats.blackLastLifeMoves)}
                         </span>
                       </div>
 
@@ -2448,9 +2449,9 @@ export default function ThreeLivesChessBoard({
                       </p>
                     </div>
                   </div>
-                )}
+                ))}
 
-                {statsTab === "pressure" && (
+                {gameUi(statsTab === "pressure" && (
                   <div className="mt-4 space-y-3">
                     <div
                       className="
@@ -2468,7 +2469,7 @@ export default function ThreeLivesChessBoard({
                       <div className="mt-2 flex items-end justify-between gap-3">
                         <div>
                           <p className="text-xl font-black text-white">
-                            {matchStats.pressureLeader === "even" ? t("Dead even") : matchStats.pressureLeader === "white" ? `♔ ${t("White")}` : `♚ ${t("Black")}`}
+                            {gameUi(matchStats.pressureLeader === "even" ? t("Dead even") : matchStats.pressureLeader === "white" ? `♔ ${t("White")}` : `♚ ${t("Black")}`)}
                           </p>
 
                           <p className="mt-1 text-[10px] text-zinc-700">
@@ -2480,10 +2481,10 @@ export default function ThreeLivesChessBoard({
 
                         <div className="text-right text-xs font-black">
                           <p className="text-[#fff3d5]">
-                            {matchStats.whitePressureScore}
+                            {gameUi(matchStats.whitePressureScore)}
                           </p>
                           <p className="text-zinc-400">
-                            {matchStats.blackPressureScore}
+                            {gameUi(matchStats.blackPressureScore)}
                           </p>
                         </div>
                       </div>
@@ -2517,11 +2518,11 @@ export default function ThreeLivesChessBoard({
                         </span>
 
                         <span className="text-sm font-black text-zinc-200">
-                          {matchStats.longestCheckRun.count === 0 ? "—" : `${
+                          {gameUi(matchStats.longestCheckRun.count === 0 ? "—" : `${
                                 matchStats.longestCheckRun.side === "white"
                                   ? "♔"
                                   : "♚"
-                              } ×${matchStats.longestCheckRun.count}`}
+                              } ×${matchStats.longestCheckRun.count}`)}
                         </span>
                       </div>
 
@@ -2530,7 +2531,7 @@ export default function ThreeLivesChessBoard({
                       </p>
                     </div>
                   </div>
-                )}
+                ))}
 
                 {statsTab === "moments" && (
                   <div className="mt-4 space-y-3">
@@ -2582,7 +2583,7 @@ export default function ThreeLivesChessBoard({
                       </div>
 
                       <span className="text-xl font-black text-zinc-200">
-                        {matchStats.longestCalmStreak}
+                        {gameUi(matchStats.longestCalmStreak)}
                       </span>
                     </div>
 
@@ -2639,19 +2640,19 @@ export default function ThreeLivesChessBoard({
                               >
                                 <div className="min-w-0">
                                   <p className="truncate font-mono text-xs font-black text-zinc-200">
-                                    {moment.san}
+                                    {gameUi(moment.san)}
                                   </p>
 
                                   <p className="mt-0.5 text-[9px] text-zinc-700">
-                                    {t("Move")} {moment.moveNumber} ·{" "}
-                                    {moment.attacker === "white" ? t("White") : t("Black")}{" "}
+                                    {t("Move")} {gameUi(moment.moveNumber)} ·{gameUi(" ")}
+                                    {gameUi(moment.attacker === "white" ? t("White") : t("Black"))}{gameUi(" ")}
                                     {t("hit")}
                                   </p>
                                 </div>
 
                                 <span className="shrink-0 text-[10px] font-black text-red-300">
-                                  ♔ {moment.whiteHpAfter}♥ · ♚{" "}
-                                  {moment.blackHpAfter}♥
+                                  ♔ {gameUi(moment.whiteHpAfter)}♥ · ♚{gameUi(" ")}
+                                  {gameUi(moment.blackHpAfter)}♥
                                 </span>
                               </button>
                             ))}
@@ -2710,12 +2711,12 @@ export default function ThreeLivesChessBoard({
                               >
                                 <div>
                                   <p className="font-mono text-xs font-black text-zinc-200">
-                                    {pickup.san}
+                                    {gameUi(pickup.san)}
                                   </p>
 
                                   <p className="mt-0.5 text-[9px] text-zinc-700">
-                                    {pickup.side === "white" ? t("White") : t("Black")}{" "}
-                                    · {pickup.square}
+                                    {gameUi(pickup.side === "white" ? t("White") : t("Black"))}{gameUi(" ")}
+                                    · {gameUi(pickup.square)}
                                   </p>
                                 </div>
 
@@ -2828,15 +2829,15 @@ function StatCard({
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-sm">{icon}</span>
-        <span className="text-xl font-black text-zinc-100">{value}</span>
+        <span className="text-sm">{gameUi(icon)}</span>
+        <span className="text-xl font-black text-zinc-100">{gameUi(value)}</span>
       </div>
 
       <p className="mt-2 text-[10px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
       </p>
 
-      <p className="mt-1 text-[10px] text-zinc-700">{detail}</p>
+      <p className="mt-1 text-[10px] text-zinc-700">{gameUi(detail)}</p>
     </div>
   );
 }
@@ -2875,22 +2876,22 @@ function DangerPieceCard({
     <div className="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <div className="flex items-center gap-3">
         <span className="text-2xl">
-          {dangerousPiece ? statsPieceSymbols[side][dangerousPiece.piece] : side === "white" ? "♔" : "♚"}
+          {gameUi(dangerousPiece ? statsPieceSymbols[side][dangerousPiece.piece] : side === "white" ? "♔" : "♚")}
         </span>
 
         <div>
           <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-            {side === "white" ? t("White danger piece") : t("Black danger piece")}
+            {gameUi(side === "white" ? t("White danger piece") : t("Black danger piece"))}
           </p>
 
           <p className="mt-1 text-xs font-bold text-zinc-300">
-            {dangerousPiece ? t(statsPieceNames[dangerousPiece.piece]) : t("No checks yet")}
+            {gameUi(dangerousPiece ? t(statsPieceNames[dangerousPiece.piece]) : t("No checks yet"))}
           </p>
         </div>
       </div>
 
       <span className="text-lg font-black text-red-300">
-        {dangerousPiece ? `×${dangerousPiece.checks}` : "—"}
+        {gameUi(dangerousPiece ? `×${dangerousPiece.checks}` : "—")}
       </span>
     </div>
   );
@@ -2940,12 +2941,12 @@ function MomentCard({
         <div className="mt-2 flex items-center justify-between gap-3">
           <div>
             <p className="font-mono text-sm font-black text-zinc-200">
-              {moment.san}
+              {gameUi(moment.san)}
             </p>
 
             <p className="mt-1 text-[10px] text-zinc-700">
-              {moment.attacker === "white" ? t("White") : t("Black")} ·{" "}
-              {t("Move")} {moment.moveNumber}
+              {gameUi(moment.attacker === "white" ? t("White") : t("Black"))} ·{gameUi(" ")}
+              {t("Move")} {gameUi(moment.moveNumber)}
             </p>
           </div>
 
@@ -2953,12 +2954,12 @@ function MomentCard({
             <p className="text-xs font-black text-red-300">−1 ♥</p>
 
             <p className="mt-1 text-[9px] text-zinc-700">
-              ♔ {moment.whiteHpAfter} · ♚ {moment.blackHpAfter}
+              ♔ {gameUi(moment.whiteHpAfter)} · ♚ {gameUi(moment.blackHpAfter)}
             </p>
           </div>
         </div>
       ) : (
-        <p className="mt-2 text-xs text-zinc-700">{emptyText}</p>
+        <p className="mt-2 text-xs text-zinc-700">{gameUi(emptyText)}</p>
       )}
     </button>
   );
@@ -3032,10 +3033,11 @@ function CapturedPiecesGrid({
     color: "white" | "black";
     pieces: PieceType[];
   }) {
+  useGameLanguage();
     return (
       <div className="grid grid-cols-[52px_minmax(0,1fr)] items-start gap-2">
         <div className="pt-2 text-[10px] font-black uppercase tracking-wider text-zinc-600">
-          {color === "white" ? t("White") : t("Black")}
+          {gameUi(color === "white" ? t("White") : t("Black"))}
         </div>
 
         <div
@@ -3052,7 +3054,7 @@ function CapturedPiecesGrid({
             p-1.5
           "
         >
-          {pieces.length === 0 ? (
+          {gameUi(pieces.length === 0 ? (
             <span className="px-1 py-1 text-xs text-zinc-700">—</span>
           ) : (
             pieces.map((piece, index) => (
@@ -3073,10 +3075,10 @@ function CapturedPiecesGrid({
                   leading-none
                 "
               >
-                {symbols[color][piece]}
+                {gameUi(symbols[color][piece])}
               </span>
             ))
-          )}
+          ))}
         </div>
       </div>
     );

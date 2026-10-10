@@ -1,3 +1,5 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
+import GameXpReward from "@/components/games/GameXpReward";
 import { useEffect, useRef, useState } from "react";
 
 type Platform = {
@@ -59,6 +61,7 @@ export default function DoodleJumpTowerGame({
 }: {
   onComplete: () => void;
 }) {
+  useGameLanguage();
   const [player, setPlayer] = useState({
     x: 48,
     y: 82,
@@ -267,20 +270,15 @@ export default function DoodleJumpTowerGame({
 
   return (
     <div className="rounded-3xl border-2 border-[#84613b] bg-[#241a18] p-5 shadow-2xl">
+      {(reachedTop) && <GameXpReward />}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-black text-[#ffe6aa]">
-            Moon Tower Climb
-          </h2>
+          <h2 className="text-xl font-black text-[#ffe6aa]">{gameUi(" Moon Tower Climb ")}</h2>
 
-          <p className="mt-1 text-xs text-[#baa17c]">
-            Use A/D or ←/→. Your hero jumps automatically.
-          </p>
+          <p className="mt-1 text-xs text-[#baa17c]">{gameUi(" Use A/D or ←/→. Your hero jumps automatically. ")}</p>
         </div>
 
-        <div className="rounded-lg border border-[#6a533b] bg-[#31251b] px-3 py-2 text-xs font-black text-[#d8c08f]">
-          Reach the glowing roof
-        </div>
+        <div className="rounded-lg border border-[#6a533b] bg-[#31251b] px-3 py-2 text-xs font-black text-[#d8c08f]">{gameUi(" Reach the glowing roof ")}</div>
       </div>
 
       <div className="relative mx-auto aspect-[4/5] max-h-[650px] overflow-hidden rounded-2xl border-2 border-[#64523f] bg-gradient-to-b from-[#182039] via-[#34263b] to-[#241610]">
@@ -334,13 +332,13 @@ export default function DoodleJumpTowerGame({
 
         {/* Small debug info */}
         <div className="pointer-events-none absolute left-2 top-2 z-40 rounded bg-black/70 px-2 py-1 font-mono text-[10px] text-white">
-          <div>x: {player.x.toFixed(1)}</div>
+          <div>x: {gameUi(player.x.toFixed(1))}</div>
 
-          <div>y: {player.y.toFixed(1)}</div>
+          <div>y: {gameUi(player.y.toFixed(1))}</div>
 
-          <div>vy: {velocityRef.current.y.toFixed(2)}</div>
+          <div>{gameUi("vy: ")}{gameUi(velocityRef.current.y.toFixed(2))}</div>
 
-          <div>platform: {landedPlatform ?? "-"}</div>
+          <div>{gameUi("platform: ")}{gameUi(landedPlatform ?? "-")}</div>
         </div>
 
         {/* Victory */}
@@ -349,9 +347,7 @@ export default function DoodleJumpTowerGame({
             <div className="rounded-2xl border-2 border-yellow-300 bg-[#49351d] p-6 text-center">
               <div className="text-4xl">🌙</div>
 
-              <div className="mt-2 text-xl font-black text-[#ffe7a4]">
-                Tower conquered!
-              </div>
+              <div className="mt-2 text-xl font-black text-[#ffe7a4]">{gameUi(" Tower conquered! ")}</div>
             </div>
           </div>
         )}

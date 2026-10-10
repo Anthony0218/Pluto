@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { memo, useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { RoundedBox, Sky } from "@react-three/drei";
@@ -7,6 +8,9 @@ import { AtmosphereParticles } from "./WorldEffects.tsx";
 import { useSceneMotion } from "./useSceneMotion.ts";
 
 function SceneSign({ text, subtext, color, width, height }: { text: string; subtext: string; color: string; width: number; height: number }) {
+  useGameLanguage();
+  text = gameUi(text);
+  subtext = gameUi(subtext);
   const texture = useMemo(() => {
     const canvas = document.createElement("canvas"); canvas.width = 768; canvas.height = 192;
     const ctx = canvas.getContext("2d")!;
@@ -38,6 +42,7 @@ function ArcadeDisplay({ seed, motion, width, height }: { seed: number; motion: 
 }
 
 function ArcadeCabinet({ box, motion }: { box: ArenaBox; motion: boolean }) {
+  useGameLanguage();
   const accent = box.y < 4 ? "#54eadc" : box.y < 8 ? "#f68ace" : "#fac77c";
   return <group position={[box.x, box.y, box.z]}>
     <RoundedBox args={[box.w, box.h, box.d]} radius={0.08} smoothness={2} castShadow receiveShadow><meshStandardMaterial color={box.color} roughness={0.48} metalness={0.2}/></RoundedBox>
@@ -54,6 +59,7 @@ function ArcadeCabinet({ box, motion }: { box: ArenaBox; motion: boolean }) {
 }
 
 function AirHockeyTable({ box, motion }: { box: ArenaBox; motion: boolean }) {
+  useGameLanguage();
   const puck = useRef<Group>(null);
   useFrame(({ clock }) => { if (puck.current) puck.current.position.x = motion ? Math.sin(clock.elapsedTime * 1.7 + box.x) * 0.8 : 0; });
   return <group position={[box.x, box.y, box.z]}>
@@ -86,6 +92,7 @@ function BuildingWindows({ depth, index }: { depth: number; index: number }) {
     <instancedMesh ref={ledges} args={[undefined, undefined, 36]}><boxGeometry args={[1.6, .08, .25]}/><meshStandardMaterial color="#a8b7bd"/></instancedMesh></>;
 }
 function Building({ box, index, motion }: { box: ArenaBox; index: number; motion: boolean }) {
+  useGameLanguage();
   const signColors = ["#f7b89b", "#83d7d2", "#c2b0ef", "#f1d68d"], accent = signColors[index % 4];
   const fan = useRef<Group>(null), flag = useRef<Group>(null);
   useFrame(({ clock }) => {
@@ -116,6 +123,7 @@ function Building({ box, index, motion }: { box: ArenaBox; index: number; motion
 }
 
 function Car({ box }: { box: ArenaBox }) {
+  useGameLanguage();
   return <group position={[box.x, 0, box.z]}>
     <RoundedBox args={[box.w, 0.7, box.d]} position={[0, 0.75, 0]} radius={0.18} smoothness={3} castShadow><meshStandardMaterial color={box.color} metalness={0.3} roughness={0.24}/></RoundedBox>
     <RoundedBox args={[box.w * 0.48, 0.55, box.d * 0.83]} position={[0, 1.3, 0]} radius={0.12} smoothness={2} castShadow><meshStandardMaterial color="#2a465e" metalness={0.45} roughness={0.22}/></RoundedBox>
@@ -129,6 +137,7 @@ function Car({ box }: { box: ArenaBox }) {
 }
 
 function CityCover({ box }: { box: ArenaBox }) {
+  useGameLanguage();
   if (box.w > 3) return <Car box={box}/>;
   return <group position={[box.x, box.y, box.z]}>
     <RoundedBox args={[box.w, box.h, box.d]} radius={0.055} smoothness={2} castShadow receiveShadow><meshStandardMaterial color={box.color} roughness={0.85}/></RoundedBox>
@@ -138,6 +147,7 @@ function CityCover({ box }: { box: ArenaBox }) {
 }
 
 export const ArenaWorld = memo(function ArenaWorld({ map }: { map: ArenaMap }) {
+  useGameLanguage();
   const motion = useSceneMotion(), arcade = map.id === "arcade";
   return <>
     <color attach="background" args={[arcade ? "#14152c" : "#c0c9d2"]}/>
@@ -158,8 +168,8 @@ export const ArenaWorld = memo(function ArenaWorld({ map }: { map: ArenaMap }) {
       <group position={[stair.x, stair.base + 1.8, stair.z - stair.length / 2 - 0.65]} rotation={[0, Math.PI, 0]}><SceneSign text={`LEVEL ${stair.base / 4 + 2} ↑`} subtext="TAKE THE STAIRS" color="#a2f4da" width={stair.w} height={0.55}/></group>
       <mesh position={[stair.x, stair.base + 0.03, stair.z - stair.length / 2 - 0.7]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[stair.w, 1]}/><meshStandardMaterial color="#73d3b7" emissive="#22a878" emissiveIntensity={0.3}/></mesh>
     </group>)}
-    {arcade ? [0, 4, 8].map((y, floor) => <group key={y}>
-      {floor < 2 && floorPieces(map, floor + 1).map((p, i) => <mesh key={`ceiling:${i}`} position={[p.x, y + 3.745, p.z]} rotation={[Math.PI / 2, 0, 0]}><planeGeometry args={[p.w, p.d]}/><meshStandardMaterial color="#343549" emissive="#1c2237" emissiveIntensity={0.5} roughness={0.9}/></mesh>)}
+    {gameUi(arcade ? [0, 4, 8].map((y, floor) => <group key={y}>
+      {gameUi(floor < 2 && floorPieces(map, floor + 1).map((p, i) => <mesh key={`ceiling:${i}`} position={[p.x, y + 3.745, p.z]} rotation={[Math.PI / 2, 0, 0]}><planeGeometry args={[p.w, p.d]}/><meshStandardMaterial color="#343549" emissive="#1c2237" emissiveIntensity={0.5} roughness={0.9}/></mesh>))}
       {[-6, 6].flatMap((x) => [-9, 0, 9].map((z) => <mesh key={`light:${x}:${z}`} position={[x, y + 3.72, z]}><boxGeometry args={[1.2, 0.035, 0.55]}/><meshStandardMaterial color="#b4edff" emissive="#8ec1dc" emissiveIntensity={1.8}/></mesh>))}
       {[-1, 1].map((side) => <group key={side}>
         <mesh position={[0, y + 3.5, side * 15.65]}><boxGeometry args={[30, 0.08, 0.08]}/><meshStandardMaterial color={side < 0 ? "#fa83da" : "#78ecec"} emissive={side < 0 ? "#ed4da5" : "#39b8c7"} emissiveIntensity={2.3}/></mesh>
@@ -180,7 +190,7 @@ export const ArenaWorld = memo(function ArenaWorld({ map }: { map: ArenaMap }) {
           <mesh position={[8 * side, 9, 0]}><boxGeometry args={[6, 18, 7]}/><meshStandardMaterial color="#94a2b4"/></mesh>
         </group>)}
       </group>)}
-    </>}
+    </>)}
     {arcade && <AtmosphereParticles kind="dust" motion={motion} area={29}/>}
   </>;
 });

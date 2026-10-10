@@ -1,8 +1,10 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useState, type RefObject } from "react";
 import type { Player } from "../../../games/party/types.ts";
 
 // "Reconnecting… 42s" for a disconnected human, counting down to the server's bot-takeover deadline.
 function ReconnectCountdown({ deadline, serverOffset }: { deadline: number; serverOffset: RefObject<number | null> }) {
+  useGameLanguage();
   const [left, setLeft] = useState<number | null>(null);
   useEffect(() => {
     const update = () =>
@@ -11,7 +13,7 @@ function ReconnectCountdown({ deadline, serverOffset }: { deadline: number; serv
     const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
   }, [deadline, serverOffset]);
-  return <>Reconnecting…{left !== null && left > 0 ? ` ${left}s` : ""}</>;
+  return <>{gameUi("Reconnecting…")}{gameUi(left !== null && left > 0 ? ` ${left}s` : "")}</>;
 }
 // One wording for a seat's controller everywhere (lobby slots, scoreboard). Text, not colour alone.
 export default function PlayerStatus({
@@ -23,13 +25,14 @@ export default function PlayerStatus({
   serverOffset: RefObject<number | null>;
   human?: string;
 }) {
-  if (player.botTakeover) return <>Bot (player left)</>;
-  if (player.isBot) return <>Bot</>;
+  useGameLanguage();
+  if (player.botTakeover) return <>{gameUi("Bot (player left)")}</>;
+  if (player.isBot) return <>{gameUi("Bot")}</>;
   if (!player.connected)
     return player.reconnectDeadline ? (
       <ReconnectCountdown deadline={player.reconnectDeadline} serverOffset={serverOffset} />
     ) : (
-      <>Disconnected</>
+      <>{gameUi("Disconnected")}</>
     );
-  return <>{human}</>;
+  return <>{gameUi(human)}</>;
 }

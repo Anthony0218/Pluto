@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -141,10 +142,10 @@ export default function VariantRoomSetup({ roomId, variantName, lobbyPath, onSta
         >
           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500">{ui("Room Code")}</p>
           <p className="mt-2 break-all font-mono text-4xl font-black tracking-[0.16em] text-amber-200 sm:text-5xl">
-            {room?.code ?? "······"}
+            {gameUi(room?.code ?? "······")}
           </p>
           <p className="mt-4 text-xs font-bold text-zinc-400" aria-live="polite">
-            {copied ? `✓ ${ui("Copied")}` : ui("Click this box to copy the code")}
+            {gameUi(copied ? `✓ ${ui("Copied")}` : ui("Click this box to copy the code"))}
           </p>
         </button>
 
@@ -162,24 +163,24 @@ export default function VariantRoomSetup({ roomId, variantName, lobbyPath, onSta
                 >
                   <div className="flex items-center gap-4">
                     <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl border text-3xl ${player ? "border-amber-300/30 bg-amber-300/10 text-amber-100" : "border-white/10 bg-black/20 text-zinc-600"}`} aria-hidden="true">
-                      {color === "black" ? "♚" : color === "white" ? "♔" : "♙"}
+                      {gameUi(color === "black" ? "♚" : color === "white" ? "♔" : "♙")}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-300/70">
-                        {player ? `${ui(role)}${isMe ? ` · ${ui("You")}` : ""}` : ui("Open seat")}
+                        {gameUi(player ? `${ui(role)}${isMe ? ` · ${ui("You")}` : ""}` : ui("Open seat"))}
                       </p>
-                      <p className="mt-1 truncate text-lg font-black text-zinc-100">{player?.display_name ?? ui("Waiting for player")}</p>
-                      {player && (
+                      <p className="mt-1 truncate text-lg font-black text-zinc-100">{gameUi(player?.display_name ?? ui("Waiting for player"))}</p>
+                      {gameUi(player && (
                         <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-bold">
                           <span className={`rounded-full border px-2 py-0.5 ${color ? "border-white/15 bg-white/5 text-zinc-200" : "border-dashed border-white/15 text-zinc-500"}`}>
-                            {color === "white" ? ui("White") : color === "black" ? ui("Black") : ui("No color")}
+                            {gameUi(color === "white" ? ui("White") : color === "black" ? ui("Black") : ui("No color"))}
                           </span>
                           <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 ${player.ready ? "border-emerald-400/30 bg-emerald-400/[0.08] text-emerald-200" : "border-white/10 text-zinc-500"}`}>
                             <span className={`h-1.5 w-1.5 rounded-full ${player.ready ? "bg-emerald-400" : "bg-zinc-600"}`} />
-                            {player.ready ? ui("Ready") : ui("Not ready")}
+                            {gameUi(player.ready ? ui("Ready") : ui("Not ready"))}
                           </span>
                         </div>
-                      )}
+                      ))}
                     </div>
                     {!player && <InviteFriendButton />}
                   </div>
@@ -189,7 +190,7 @@ export default function VariantRoomSetup({ roomId, variantName, lobbyPath, onSta
           </section>
 
           <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-5 shadow-xl shadow-black/20 backdrop-blur-md">
-            {me && (
+            {gameUi(me && (
               <>
                 <div className="flex items-baseline justify-between gap-3">
                   <h2 className="text-sm font-black text-zinc-100">{ui("Your color")}</h2>
@@ -209,39 +210,39 @@ export default function VariantRoomSetup({ roomId, variantName, lobbyPath, onSta
                   onToggle={() => void run("ready", "set_variant_room_ready", { p_ready: !myReady })}
                 />
               </>
-            )}
+            ))}
 
             <div className="mt-5 border-t border-white/5 pt-5">
               <p className="text-sm font-black text-zinc-100">
-                {players.length < 2 ? ui("Waiting for another player") : bothReady ? ui("Both players are ready") : ui("Waiting for both players to be ready")}
+                {gameUi(players.length < 2 ? ui("Waiting for another player") : bothReady ? ui("Both players are ready") : ui("Waiting for both players to be ready"))}
               </p>
               <p className="mt-1 text-xs leading-5 text-zinc-500">
-                {players.length < 2
+                {gameUi(players.length < 2
                   ? ui("Share the room code. The second player card fills automatically.")
-                  : ui("Each player picks a different color and presses Ready. Then the host can start.")}
+                  : ui("Each player picks a different color and presses Ready. Then the host can start."))}
               </p>
 
-              {isHost ? (
+              {gameUi(isHost ? (
                 <button
                   type="button"
                   disabled={saving !== null || !bothReady}
                   onClick={() => void run("start", "start_variant_room", {})}
                   className="mt-4 w-full rounded-xl bg-amber-300 px-5 py-3 font-black text-zinc-950 transition hover:bg-amber-200 disabled:cursor-not-allowed disabled:bg-white/5 disabled:text-zinc-600"
                 >
-                  {saving === "start" ? ui("Starting...") : ui("Start Game")}
+                  {gameUi(saving === "start" ? ui("Starting...") : ui("Start Game"))}
                 </button>
               ) : (
                 players.length === 2 && (
                   <div className="mt-4 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-zinc-500">
-                    {bothReady ? ui("Waiting for host...") : ui("The host can start once both players are ready.")}
+                    {gameUi(bothReady ? ui("Waiting for host...") : ui("The host can start once both players are ready."))}
                   </div>
                 )
-              )}
+              ))}
             </div>
 
-            {error && (
+            {gameUi(error && (
               <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">{ui(error)}</div>
-            )}
+            ))}
           </section>
         </div>
       </div>

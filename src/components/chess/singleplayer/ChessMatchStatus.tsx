@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import type { ReactNode } from "react";
 
@@ -162,11 +163,11 @@ export default function ChessMatchStatus({
             ${style.iconBox}
           `}
         >
-          {style.icon}
+          {gameUi(style.icon)}
         </div>
 
         <div className="min-w-0">
-          {label && (
+          {gameUi(label && (
             <p
               className={`
                 text-[9px]
@@ -178,21 +179,21 @@ export default function ChessMatchStatus({
             >
               {ui(label)}
             </p>
-          )}
+          ))}
 
           <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
             <p className="min-w-0 text-sm font-semibold text-[#f5e8cf]">
-              {message}
+              {gameUi(message)}
             </p>
 
-            {detail && <p className="text-[11px] text-zinc-500">{detail}</p>}
+            {detail && <p className="text-[11px] text-zinc-500">{gameUi(detail)}</p>}
           </div>
         </div>
       </div>
 
-      {(effects.length > 0 || actions) && (
+      {gameUi((effects.length > 0 || actions) && (
         <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
-          {effects.length > 0 && (
+          {gameUi(effects.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5 sm:justify-end">
               {effects.map((effect, index) => {
                 const tone = effect.tone ?? "zinc";
@@ -213,26 +214,26 @@ export default function ChessMatchStatus({
                       ${effectStyles[tone]}
                     `}
                   >
-                    {effect.icon && (
-                      <span aria-hidden="true">{effect.icon}</span>
-                    )}
+                    {gameUi(effect.icon && (
+                      <span aria-hidden="true">{gameUi(effect.icon)}</span>
+                    ))}
                     <span>{ui(effect.label)}</span>
-                    {effect.value !== undefined && (
+                    {gameUi(effect.value !== undefined && (
                       <span className="font-black text-current">
-                        {effect.value}
+                        {gameUi(effect.value)}
                       </span>
-                    )}
+                    ))}
                   </span>
                 );
               })}
             </div>
-          )}
+          ))}
 
-          {actions && (
-            <div className="flex flex-wrap items-center gap-1.5">{actions}</div>
-          )}
+          {gameUi(actions && (
+            <div className="flex flex-wrap items-center gap-1.5">{gameUi(actions)}</div>
+          ))}
         </div>
-      )}
+      ))}
     </section>
   );
 }

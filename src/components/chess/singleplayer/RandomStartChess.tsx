@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -545,19 +546,19 @@ export default function RandomStartChess({
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2">
-              {!gameOver && (
+              {gameUi(!gameOver && (
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-black text-zinc-300">
-                  {game.turn() === "w" ? t("White to move") : t("Black to move")}
+                  {gameUi(game.turn() === "w" ? t("White to move") : t("Black to move"))}
                 </span>
-              )}
+              ))}
             </div>
           </div>
         </ChessPageHeader>
 
-        <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <main className="chess-game-grid grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel
+              <Panel gameControls
                 title={t("Game Controls")}
                 subtitle={t("Players and actions")}
               >
@@ -604,7 +605,7 @@ export default function RandomStartChess({
 
               <Panel
                 title={t("Move History")}
-                subtitle={`${records.length} ${t("plies")}`}
+                subtitle={gameUi(`${records.length} ${t("plies")}`)}
               >
                 <ChessMoveHistoryList
                   listClassName="max-h-72 rounded-xl border border-white/5 bg-black/20"
@@ -614,7 +615,7 @@ export default function RandomStartChess({
                     ply: record.ply,
                     side: record.color,
                     moveNumber: record.moveNumber,
-                    content: <span className="truncate text-xs font-black text-zinc-200">{record.san}</span>,
+                    content: <span className="truncate text-xs font-black text-zinc-200">{gameUi(record.san)}</span>,
                   }))}
                   onSelect={(ply) => {
                     setHistoryPreviewPly(ply);
@@ -634,9 +635,9 @@ export default function RandomStartChess({
                     {t("History Preview")}
                   </p>
                   <p className="mt-1 text-sm font-bold text-white">
-                    {historyPreview.moveNumber}
-                    {historyPreview.color === "w" ? "." : "..."}{" "}
-                    {historyPreview.san}
+                    {gameUi(historyPreview.moveNumber)}
+                    {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                    {gameUi(historyPreview.san)}
                   </p>
                 </div>
 
@@ -650,7 +651,7 @@ export default function RandomStartChess({
               </div>
             )}
 
-            {promotionFrom && promotionSquare && !historyPreview && (
+            {gameUi(promotionFrom && promotionSquare && !historyPreview && (
               <div className="mb-3">
                 <PromotionBar
                   onPromote={(piece) =>
@@ -658,9 +659,9 @@ export default function RandomStartChess({
                   }
                 />
               </div>
-            )}
+            ))}
 
-            {gameOver && !historyPreview && (
+            {gameUi(gameOver && !historyPreview && (
               <VisibleGameResult
                 actions={
                   <button
@@ -672,7 +673,7 @@ export default function RandomStartChess({
                   </button>
                 }
               />
-            )}
+            ))}
 
             <div className="relative">
               <Board
@@ -729,20 +730,22 @@ export default function RandomStartChess({
 }
 
 function Panel({
+  gameControls = false,
   title,
   subtitle,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   subtitle: string;
   children: ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       <h2 className="font-black text-zinc-100">{ui(title)}</h2>
       <p className="mt-1 mb-4 text-xs text-zinc-600">{ui(subtitle)}</p>
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -755,7 +758,7 @@ function Lineup({ title, value }: { title: string; value: string }) {
         {ui(title)}
       </p>
       <p className="mt-2 font-mono text-sm font-black tracking-widest text-zinc-200">
-        {value}
+        {gameUi(value)}
       </p>
     </div>
   );

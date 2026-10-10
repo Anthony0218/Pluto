@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useSyncExternalStore, type ReactNode } from "react";
 import { AI_KINDS, type AiKind } from "@/games/chess/custom/engine/ai";
 import { boardLayers } from "@/games/chess/custom/engine/board";
@@ -33,6 +34,7 @@ export interface SimulationSettings {
 }
 
 function DrawerShell({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+  useGameLanguage();
   return (
     <div role="dialog" aria-label={ui(title)} className="flex max-h-full w-[310px] max-w-[calc(100vw-1.5rem)] flex-col rounded-2xl border border-amber-300/20 bg-[#0b0d10]/95 shadow-[0_24px_60px_rgba(0,0,0,.6)] backdrop-blur-xl">
       <header className="flex items-center justify-between border-b border-white/[0.07] px-4 py-3">
@@ -41,12 +43,13 @@ function DrawerShell({ title, onClose, children }: { title: string; onClose: () 
           <CloseIcon size={16} />
         </button>
       </header>
-      <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4 text-sm">{children}</div>
+      <div className="min-h-0 flex-1 space-y-5 overflow-y-auto p-4 text-sm">{gameUi(children)}</div>
     </div>
   );
 }
 
 function RulesAtAGlance({ variant }: { variant: GameVariant }) {
+  useGameLanguage();
   const { goToStep } = useEditor();
   const behavior = KING_BEHAVIORS.find((entry) => entry.id === matchKingBehavior(variant.settings));
   const events = variant.events.filter((event) => event.enabled);
@@ -63,7 +66,7 @@ function RulesAtAGlance({ variant }: { variant: GameVariant }) {
         </div>
         <div>
           <p className={heading}>
-            {ui("Victory")} ({variant.settings.victoryMode === "all" ? ui("all of") : ui("any of")})
+            {ui("Victory")} ({gameUi(variant.settings.victoryMode === "all" ? ui("all of") : ui("any of"))})
           </p>
           <ul className="space-y-0.5 text-zinc-300">
             {variant.victoryConditions
@@ -83,10 +86,10 @@ function RulesAtAGlance({ variant }: { variant: GameVariant }) {
               <li key={event.id}>
                 <span className="flex items-center gap-1.5 font-semibold">
                   <EventsIcon size={13} className="text-sky-300" />
-                  {event.name}
+                  {gameUi(event.name)}
                 </span>
                 <span className="block pl-5 text-zinc-500">
-                  {ui(TRIGGER_LABELS[event.trigger.type])} → {event.actions.map((action) => ui(ACTION_LABELS[action.type])).join(", ")}
+                  {ui(TRIGGER_LABELS[event.trigger.type])} → {gameUi(event.actions.map((action) => ui(ACTION_LABELS[action.type])).join(", "))}
                 </span>
               </li>
             ))}
@@ -95,7 +98,7 @@ function RulesAtAGlance({ variant }: { variant: GameVariant }) {
         </div>
         <div>
           <p className={heading}>{ui("Switches")}</p>
-          <p className="text-zinc-300">{variant.rules.filter((rule) => rule.enabled).map((rule) => ui(RULE_NAMES[rule.type])).join(", ") || ui("None")}</p>
+          <p className="text-zinc-300">{gameUi(variant.rules.filter((rule) => rule.enabled).map((rule) => ui(RULE_NAMES[rule.type])).join(", ") || ui("None"))}</p>
         </div>
         <Button size="sm" className="w-full" onClick={() => goToStep("rules")}>
           {ui("Edit rules in Create")}
@@ -129,9 +132,10 @@ export function PlayDrawer({
   canStart: boolean;
   onClose: () => void;
 }) {
+  useGameLanguage();
   const { simulationSource, setSimulationSource } = useEditor();
   return (
-    <DrawerShell title="Play" onClose={onClose}>
+    <DrawerShell title={gameUi("Play")} onClose={onClose}>
       <fieldset>
         <legend className={heading}>{ui("Mode")}</legend>
         <div className="grid gap-1.5">
@@ -155,7 +159,7 @@ export function PlayDrawer({
           ))}
         </div>
       </fieldset>
-      {mode !== "hvh" && (
+      {gameUi(mode !== "hvh" && (
         <label className="block">
           <span className={heading}>{ui("AI strength")}</span>
           <select value={aiLevel} onChange={(event) => onMode(mode, event.target.value as AiKind)} className="w-full rounded-lg border border-white/10 bg-black/60 px-2 py-1.5 text-sm text-zinc-100">
@@ -166,7 +170,7 @@ export function PlayDrawer({
             ))}
           </select>
         </label>
-      )}
+      ))}
       <details className="rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2">
         <summary className="cursor-pointer text-xs font-semibold text-zinc-300 marker:text-zinc-600">{ui("Players per side")}</summary>
         <div className="mt-3 space-y-2">
@@ -174,13 +178,12 @@ export function PlayDrawer({
             <label key={team.id} className="flex items-center justify-between gap-3 text-xs text-zinc-400">
               <span className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-full ring-1 ring-white/30" style={{ background: team.color }} />
-                {team.name}{team.alliance ? ` · ${team.alliance}` : ""}
+                {gameUi(team.name)}{gameUi(team.alliance ? ` · ${team.alliance}` : "")}
               </span>
               <select value={players[team.id] ?? "human"} onChange={(event) => onPlayers({ ...players, [team.id]: event.target.value as PlayerKind })} className="rounded-lg border border-white/10 bg-black/60 px-2 py-1 text-xs text-zinc-100">
                 <option value="human">{ui("Human")}</option>
                 {AI_KINDS.map((kind) => (
-                  <option key={kind.id} value={kind.id}>
-                    AI · {ui(kind.label)}
+                  <option key={kind.id} value={kind.id}>{gameUi(" AI · ")}{ui(kind.label)}
                   </option>
                 ))}
               </select>
@@ -192,7 +195,7 @@ export function PlayDrawer({
         <p className={heading}>{ui("Start from")}</p>
         <Segmented
           size="sm"
-          label="Start from"
+          label={gameUi("Start from")}
           value={simulationSource}
           onChange={setSimulationSource}
           options={[
@@ -202,13 +205,13 @@ export function PlayDrawer({
         />
       </div>
       <div className="grid gap-2">
-        {mode === "ava" && (
+        {gameUi(mode === "ava" && (
           <Button tone="primary" className="w-full" onClick={onStart} disabled={!canStart}>
             {ui("Start Simulation")}
           </Button>
-        )}
+        ))}
         <Button tone={mode === "ava" ? "ghost" : "primary"} className="w-full" onClick={onRestart}>
-          {mode === "ava" ? ui("Restart Simulation") : ui("New game")}
+          {gameUi(mode === "ava" ? ui("Restart Simulation") : ui("New game"))}
         </Button>
       </div>
       <RulesAtAGlance variant={variant} />
@@ -244,27 +247,28 @@ export function BoardDrawer({
   onFlip: (flipped: boolean) => void;
   onClose: () => void;
 }) {
+  useGameLanguage();
   const { dispatch } = useEditor();
   const layers = boardLayers(variant.board);
   return (
-    <DrawerShell title="Board" onClose={onClose}>
+    <DrawerShell title={gameUi("Board")} onClose={onClose}>
       <div>
         <p className={heading}>{ui("View")}</p>
-        <Segmented size="sm" label="View" value={view} onChange={onView} options={[{ id: "2d", label: "2D" }, { id: "3d", label: "3D" }]} />
+        <Segmented size="sm" label={gameUi("View")} value={view} onChange={onView} options={[{ id: "2d", label: "2D" }, { id: "3d", label: "3D" }]} />
       </div>
-      {layers.length > 1 && (
+      {gameUi(layers.length > 1 && (
         <>
           <label className="block">
             <span className={heading}>{ui("Layer")}</span>
             <select aria-label={ui("Active layer")} value={activeLayer} onChange={(event) => onLayer(Number(event.target.value))} className="w-full rounded-lg border border-white/10 bg-black/60 px-2 py-1.5 text-sm text-zinc-100">
               {layers.map((layer) => (
                 <option key={layer.z} value={layer.z} className="bg-zinc-900">
-                  {layer.name} · {layer.width}×{layer.height}
+                  {gameUi(layer.name)} · {gameUi(layer.width)}×{gameUi(layer.height)}
                 </option>
               ))}
             </select>
           </label>
-          {view === "3d" && (
+          {gameUi(view === "3d" && (
             <div>
               <p className={heading}>{ui("Stack")}</p>
               <div className="grid grid-cols-2 gap-1.5">
@@ -289,9 +293,9 @@ export function BoardDrawer({
                 ))}
               </div>
             </div>
-          )}
+          ))}
         </>
-      )}
+      ))}
       <div>
         <p className={heading}>{ui("Board theme")}</p>
         <ThemeSelector compact value={variant.theme.boardTheme} onChange={(boardTheme) => dispatch({ type: "update", recipe: (current) => ({ ...current, theme: { ...current.theme, boardTheme } }) })} />
@@ -299,12 +303,12 @@ export function BoardDrawer({
       <div className="space-y-3">
         <Toggle checked={settings.showMoves} onChange={(showMoves) => onSettings({ ...settings, showMoves })} label={ui("Legal move highlights")} description={ui("Mark where a selected piece can move and capture.")} />
         <Toggle checked={settings.showIllegal} onChange={(showIllegal) => onSettings({ ...settings, showIllegal })} label={ui("Show blocked squares")} description={ui("Grey dots mark squares a piece’s rules reach but cannot legally use.")} />
-        {view === "2d" && (
+        {gameUi(view === "2d" && (
           <>
             <Toggle checked={settings.showCoords} onChange={(showCoords) => onSettings({ ...settings, showCoords })} label={ui("Coordinates")} />
             <Toggle checked={flipped} onChange={onFlip} label={ui("Flip board")} />
           </>
-        )}
+        ))}
       </div>
     </DrawerShell>
   );
@@ -328,11 +332,12 @@ export function SettingsDrawer({
   onAutoOrbit: (value: boolean) => void;
   onClose: () => void;
 }) {
+  useGameLanguage();
   const { variant, dispatch } = useEditor();
   const audio = useSyncExternalStore(subscribeAudioSettings, getAudioSettings, getAudioSettings);
   const skin = isChess3DPieceSkin(variant.theme.pieceSkin) ? variant.theme.pieceSkin : "classic";
   return (
-    <DrawerShell title="Settings" onClose={onClose}>
+    <DrawerShell title={gameUi("Settings")} onClose={onClose}>
       <div className="space-y-3">
         <Toggle checked={autoOrbit} onChange={onAutoOrbit} label={ui("Orbit camera")} description={ui("Slowly circle the board while watching.")} />
         <Toggle
@@ -347,7 +352,7 @@ export function SettingsDrawer({
         <select value={speed} onChange={(event) => onSpeed(Number(event.target.value))} className="w-full rounded-lg border border-white/10 bg-black/60 px-2 py-1.5 text-sm text-zinc-100">
           {PLAYBACK_SPEEDS.map((value) => (
             <option key={value} value={value} className="bg-zinc-900">
-              {value}×
+              {gameUi(value)}×
             </option>
           ))}
         </select>
@@ -374,7 +379,7 @@ export function SettingsDrawer({
         <p className={heading}>{ui("Effects")}</p>
         <Segmented
           size="sm"
-          label="Effects"
+          label={gameUi("Effects")}
           value={settings.motion}
           onChange={(motion) => onChange({ ...settings, motion })}
           options={[
@@ -386,7 +391,7 @@ export function SettingsDrawer({
       </div>
       <div>
         <p className={heading}>{ui("Performance")}</p>
-        <Segmented size="sm" label="Render quality" value={settings.quality} onChange={(quality) => onChange({ ...settings, quality })} options={[{ id: "high", label: "High quality" }, { id: "low", label: "Performance" }]} />
+        <Segmented size="sm" label={gameUi("Render quality")} value={settings.quality} onChange={(quality) => onChange({ ...settings, quality })} options={[{ id: "high", label: "High quality" }, { id: "low", label: "Performance" }]} />
       </div>
     </DrawerShell>
   );

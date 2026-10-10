@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Link2, MousePointer2, SquareDashed } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
@@ -30,6 +31,7 @@ type Tool = { kind: "select" } | { kind: "toggle" } | { kind: "tile"; tile: Tile
 const SIZE_PRESETS: [number, number][] = [[8, 8], [10, 8], [10, 10], [12, 12]];
 
 export default function BoardSection() {
+  useGameLanguage();
   const { variant, dispatch, focusTarget } = useEditor();
   const [activeLayer, setActiveLayer] = useState(0);
   const layers = boardLayers(variant.board);
@@ -125,7 +127,7 @@ export default function BoardSection() {
       onClick={onClick}
       className={`flex items-center gap-2 rounded-xl border px-2.5 py-2 text-left text-xs font-semibold transition ${active ? "border-sky-400/60 bg-sky-400/15 text-sky-50" : "border-white/[0.08] bg-white/[0.03] text-zinc-300 hover:border-white/20"}`}
     >
-      {swatch}
+      {gameUi(swatch)}
       <span className="truncate">{ui(label)}</span>
     </button>
   );
@@ -146,20 +148,20 @@ export default function BoardSection() {
       <SectionHeading
         step="board"
         eyebrow="Board"
-        title="Shape the battlefield"
+        title={gameUi("Shape the battlefield")}
         description={ui("Resize the board, carve out any shape, stack layers and paint special tiles. Pieces standing on removed cells are ignored when the game starts. Board colours and piece finishes live in Simulation → Settings.")}
       />
-      <Panel title="Board layers" eyebrow={`${layers.length} layer${layers.length === 1 ? "" : "s"}`}>
+      <Panel title={gameUi("Board layers")} eyebrow={`${layers.length} layer${layers.length === 1 ? "" : "s"}`}>
         <div className="flex flex-wrap gap-2">
-          {layers.map((layer) => <button key={layer.id} type="button" aria-pressed={activeLayer === layer.z} onClick={() => { setActiveLayer(layer.z); setSelected(null); }} className={`rounded-xl border px-3 py-2 text-left text-xs ${activeLayer === layer.z ? "border-sky-400 bg-sky-400/15 text-white" : "border-white/10 text-zinc-400"}`}><span className="block font-semibold">{layer.name}</span><span>{layer.width}×{layer.height} · z={layer.z}</span></button>)}
+          {layers.map((layer) => <button key={layer.id} type="button" aria-pressed={activeLayer === layer.z} onClick={() => { setActiveLayer(layer.z); setSelected(null); }} className={`rounded-xl border px-3 py-2 text-left text-xs ${activeLayer === layer.z ? "border-sky-400 bg-sky-400/15 text-white" : "border-white/10 text-zinc-400"}`}><span className="block font-semibold">{gameUi(layer.name)}</span><span>{gameUi(layer.width)}×{gameUi(layer.height)} · z={gameUi(layer.z)}</span></button>)}
           {layers.length < 8 && <Button size="sm" onClick={() => {
             const z = Math.max(...layers.map((layer) => layer.z)) + 1;
             updateLayers((current) => ({ ...current, layers: [...(current.layers ?? []), { ...createRectangularBoard(current.width, current.height), id: `layer-${Date.now()}`, name: `Layer ${z + 1}`, z }] }));
             setActiveLayer(z);
-          }}>+ Add Layer</Button>}
+          }}>{gameUi("+ Add Layer")}</Button>}
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <label className="text-xs text-zinc-400">Name <input value={layers.find((layer) => layer.z === activeLayer)?.name ?? "Ground"} onChange={(event) => {
+          <label className="text-xs text-zinc-400">{gameUi("Name ")}<input value={layers.find((layer) => layer.z === activeLayer)?.name ?? "Ground"} onChange={(event) => {
             const name = event.target.value;
             updateLayers((current) => activeLayer === 0 ? { ...current, name } : { ...current, layers: current.layers?.map((layer) => layer.z === activeLayer ? { ...layer, name } : layer) });
           }} className="ml-1 rounded-lg border border-white/10 bg-zinc-900 px-2 py-1 text-white" /></label>
@@ -168,27 +170,27 @@ export default function BoardSection() {
             if (layers.length >= 8) return;
             updateLayers((current) => ({ ...current, layers: [...(current.layers ?? []), { width: board.width, height: board.height, id: `layer-${Date.now()}`, name: `${layers.find((layer) => layer.z === activeLayer)?.name ?? "Ground"} Copy`, z, cells: board.cells.map((cell) => ({ ...cell, portalTarget: undefined, tile: cell.tile === "portal" ? "normal" : cell.tile })) }] }));
             setActiveLayer(z);
-          }}>Duplicate</Button>
-          <Button size="sm" onClick={() => updateBoard({ ...board, cells: board.cells.map((cell) => ({ ...cell, x: board.width - 1 - cell.x, portalTarget: cell.portalTarget && (cell.portalTarget.z ?? activeLayer) === activeLayer ? { ...cell.portalTarget, x: board.width - 1 - cell.portalTarget.x } : cell.portalTarget })).sort((a, b) => a.y - b.y || a.x - b.x) })}>Mirror</Button>
-          <Button size="sm" onClick={() => updateBoard(createRectangularBoard(board.width, board.height))}>Clear Layer</Button>
+          }}>{gameUi("Duplicate")}</Button>
+          <Button size="sm" onClick={() => updateBoard({ ...board, cells: board.cells.map((cell) => ({ ...cell, x: board.width - 1 - cell.x, portalTarget: cell.portalTarget && (cell.portalTarget.z ?? activeLayer) === activeLayer ? { ...cell.portalTarget, x: board.width - 1 - cell.portalTarget.x } : cell.portalTarget })).sort((a, b) => a.y - b.y || a.x - b.x) })}>{gameUi("Mirror")}</Button>
+          <Button size="sm" onClick={() => updateBoard(createRectangularBoard(board.width, board.height))}>{gameUi("Clear Layer")}</Button>
           {activeLayer > 0 && <>
             <Button size="sm" disabled={layers.findIndex((layer) => layer.z === activeLayer) <= 1} onClick={() => {
               const index = layers.findIndex((layer) => layer.z === activeLayer);
               const nextZ = layers[index - 1].z;
               dispatch({ type: "swapLayers", a: activeLayer, b: nextZ });
               setActiveLayer(nextZ);
-            }}>Move Down</Button>
+            }}>{gameUi("Move Down")}</Button>
             <Button size="sm" disabled={layers.findIndex((layer) => layer.z === activeLayer) >= layers.length - 1} onClick={() => {
               const index = layers.findIndex((layer) => layer.z === activeLayer);
               const nextZ = layers[index + 1].z;
               dispatch({ type: "swapLayers", a: activeLayer, b: nextZ });
               setActiveLayer(nextZ);
-            }}>Move Up</Button>
+            }}>{gameUi("Move Up")}</Button>
           </>}
           {activeLayer > 0 && <Button size="sm" tone="danger" onClick={() => {
             dispatch({ type: "deleteLayer", z: activeLayer });
             setActiveLayer(0);
-          }}>Delete Layer</Button>}
+          }}>{gameUi("Delete Layer")}</Button>}
         </div>
       </Panel>
       <div className="grid gap-5 2xl:grid-cols-[260px_minmax(0,1fr)_300px] xl:grid-cols-[240px_minmax(0,1fr)]">
@@ -197,21 +199,21 @@ export default function BoardSection() {
             <div className="grid grid-cols-2 gap-2">
               {SIZE_PRESETS.map(([width, height]) => (
                 <Button key={`${width}x${height}`} size="sm" tone={board.width === width && board.height === height ? "blue" : "ghost"} onClick={() => resizeLayer(width, height)}>
-                  {width}×{height}
+                  {gameUi(width)}×{gameUi(height)}
                 </Button>
               ))}
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <div>
                 <p className={labelClass}>{ui("Width")}</p>
-                <NumberField label="Width" value={board.width} min={MIN_BOARD_SIZE} max={MAX_BOARD_SIZE} onChange={(width) => resizeLayer(width, board.height)} />
+                <NumberField label={gameUi("Width")} value={board.width} min={MIN_BOARD_SIZE} max={MAX_BOARD_SIZE} onChange={(width) => resizeLayer(width, board.height)} />
               </div>
               <div>
                 <p className={labelClass}>{ui("Height")}</p>
-                <NumberField label="Height" value={board.height} min={MIN_BOARD_SIZE} max={MAX_BOARD_SIZE} onChange={(height) => resizeLayer(board.width, height)} />
+                <NumberField label={gameUi("Height")} value={board.height} min={MIN_BOARD_SIZE} max={MAX_BOARD_SIZE} onChange={(height) => resizeLayer(board.width, height)} />
               </div>
             </div>
-            <p className="mt-2 text-xs text-zinc-500">{ui("Maximum size, to keep the 3D simulation smooth:")} {MAX_BOARD_SIZE}×{MAX_BOARD_SIZE}</p>
+            <p className="mt-2 text-xs text-zinc-500">{ui("Maximum size, to keep the 3D simulation smooth:")} {gameUi(MAX_BOARD_SIZE)}×{gameUi(MAX_BOARD_SIZE)}</p>
           </Panel>
 
           <Panel title={ui("Shape templates")}>
@@ -229,8 +231,8 @@ export default function BoardSection() {
         <div className="min-w-0 space-y-4">
           <Panel padded={false}>
             <div className="flex flex-wrap gap-1.5 border-b border-white/[0.06] p-3">
-              {toolButton(tool.kind === "select", "Inspect", () => setTool({ kind: "select" }), <MousePointer2 size={14} />)}
-              {toolButton(tool.kind === "toggle", "Add / remove cells", () => setTool({ kind: "toggle" }), <SquareDashed size={14} />)}
+              {gameUi(toolButton(tool.kind === "select", "Inspect", () => setTool({ kind: "select" }), <MousePointer2 size={14} />))}
+              {gameUi(toolButton(tool.kind === "toggle", "Add / remove cells", () => setTool({ kind: "toggle" }), <SquareDashed size={14} />))}
               {TILE_TYPES.map((tile) =>
                 toolButton(
                   tool.kind === "tile" && tool.tile === tile,
@@ -240,20 +242,20 @@ export default function BoardSection() {
                     setLinkFrom(null);
                   },
                   <span className="flex h-4 w-4 items-center justify-center rounded text-[10px]" style={{ background: tile === "normal" ? theme.light : `${TILE_STYLES[tile].color}40`, boxShadow: `inset 0 0 0 1.5px ${tile === "normal" ? theme.dark : TILE_STYLES[tile].color}`, color: TILE_STYLES[tile].color }}>
-                    {TILE_STYLES[tile].glyph}
+                    {gameUi(TILE_STYLES[tile].glyph)}
                   </span>,
                   TILE_STYLES[tile].description,
                 ),
               )}
             </div>
             <div className="flex items-center justify-between gap-3 px-4 py-2 text-xs text-zinc-400">
-              <p aria-live="polite">{hint}</p>
-              {tool.kind === "tile" && tool.tile === "portal" && (
+              <p aria-live="polite">{gameUi(hint)}</p>
+              {gameUi(tool.kind === "tile" && tool.tile === "portal" && (
                 <label className="flex shrink-0 items-center gap-2">
                   <input type="checkbox" checked={twoWay} onChange={(event) => setTwoWay(event.target.checked)} className="accent-amber-300" />
                   {ui("Two-way")}
                 </label>
-              )}
+              ))}
             </div>
             <div className="mx-auto max-w-[min(100%,calc(var(--app-height)-300px))] p-4 pt-1" onPointerLeave={() => (painting.current = null)}>
               <Board2D
@@ -275,7 +277,7 @@ export default function BoardSection() {
                 }}
                 cellBadge={(cell) =>
                   cell.tile === "portal" && cell.portalTarget ? (
-                    <span className="pointer-events-none absolute bottom-[4%] left-1/2 z-10 -translate-x-1/2 rounded bg-black/70 px-1 text-[min(1.5vw,9px)] font-bold text-violet-200">→{squareName(cell.portalTarget)}</span>
+                    <span className="pointer-events-none absolute bottom-[4%] left-1/2 z-10 -translate-x-1/2 rounded bg-black/70 px-1 text-[min(1.5vw,9px)] font-bold text-violet-200">→{gameUi(squareName(cell.portalTarget))}</span>
                   ) : null
                 }
               />
@@ -284,8 +286,8 @@ export default function BoardSection() {
         </div>
 
         <div className="space-y-4 xl:col-span-2 2xl:col-span-1">
-          <Panel title={selectedCell ? `${ui("Cell")} ${squareName(selectedCell)}` : ui("Cell inspector")}>
-            {!selectedCell ? (
+          <Panel title={gameUi(selectedCell ? `${ui("Cell")} ${squareName(selectedCell)}` : ui("Cell inspector"))}>
+            {gameUi(!selectedCell ? (
               <p className="text-sm text-zinc-500">{ui("Select a cell (Inspect tool) to edit its properties.")}</p>
             ) : (
               <div className="space-y-4">
@@ -298,7 +300,7 @@ export default function BoardSection() {
                 <div>
                   <p className={labelClass}>{ui("Tile type")}</p>
                   <Select
-                    label="Tile type"
+                    label={gameUi("Tile type")}
                     value={selectedCell.tile}
                     onChange={(tile) => updateBoard(setTile(board, selectedCell, tile))}
                     options={TILE_TYPES.map((tile) => ({ id: tile, label: TILE_STYLES[tile].label }))}
@@ -306,19 +308,19 @@ export default function BoardSection() {
                   />
                   <p className="mt-1.5 text-xs leading-5 text-zinc-500">{ui(TILE_STYLES[selectedCell.tile].description)}</p>
                 </div>
-                {["promotion", "goal", "spawn"].includes(selectedCell.tile) && (
+                {gameUi(["promotion", "goal", "spawn"].includes(selectedCell.tile) && (
                   <div>
                     <p className={labelClass}>{ui("Belongs to")}</p>
                     <Select
-                      label="Tile team"
+                      label={gameUi("Tile team")}
                       value={selectedCell.team ?? "any"}
                       onChange={(team) => updateBoard(updateCell(board, selectedCell, { team: team === "any" ? undefined : team }))}
                       options={[{ id: "any", label: "Every team" }, ...variant.teams.map((team) => ({ id: team.id, label: team.name }))]}
                       className="mt-1.5"
                     />
                   </div>
-                )}
-                {selectedCell.tile === "oneWay" && (
+                ))}
+                {gameUi(selectedCell.tile === "oneWay" && (
                   <div>
                     <p className={labelClass}>{ui("Allowed direction")}</p>
                     <div className="mt-1.5 flex gap-1.5">
@@ -331,7 +333,7 @@ export default function BoardSection() {
                         <button
                           key={label}
                           type="button"
-                          title={label}
+                          title={gameUi(label)}
                           aria-pressed={sameCoord(selectedCell.direction, direction)}
                           onClick={() => updateBoard(updateCell(board, selectedCell, { direction }))}
                           className={`flex h-9 w-9 items-center justify-center rounded-lg border ${sameCoord(selectedCell.direction, direction) ? "border-sky-400/60 bg-sky-400/15 text-sky-100" : "border-white/10 text-zinc-400 hover:text-white"}`}
@@ -341,11 +343,11 @@ export default function BoardSection() {
                       ))}
                     </div>
                   </div>
-                )}
-                {selectedCell.tile === "portal" && (
+                ))}
+                {gameUi(selectedCell.tile === "portal" && (
                   <div>
                     <p className={labelClass}>{ui("Destination")}</p>
-                    <p className="mt-1.5 text-sm text-zinc-200">{selectedCell.portalTarget ? squareName(selectedCell.portalTarget) : <span className="text-red-300">{ui("Not linked yet")}</span>}</p>
+                    <p className="mt-1.5 text-sm text-zinc-200">{gameUi(selectedCell.portalTarget ? squareName(selectedCell.portalTarget) : <span className="text-red-300">{ui("Not linked yet")}</span>)}</p>
                     <Button
                       size="sm"
                       className="mt-2"
@@ -358,9 +360,9 @@ export default function BoardSection() {
                       {ui("Pick destination on board")}
                     </Button>
                   </div>
-                )}
+                ))}
               </div>
-            )}
+            ))}
           </Panel>
 
         </div>

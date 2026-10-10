@@ -1,7 +1,9 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useEffect, useRef, type ReactNode } from 'react';
 
 /** Native dialog supplies inert background, focus containment and opener restoration. */
 export default function FieldDialog({ title, close, className = '', restoreFocus = true, afterClose, children }: { title: string; close: () => void; className?: string; restoreFocus?: boolean; afterClose?: () => void; children: ReactNode }) {
+  useGameLanguage();
   const ref = useRef<HTMLDialogElement>(null);
   const onClose = useRef(close);
   const onDismiss = useRef(afterClose);
@@ -14,7 +16,7 @@ export default function FieldDialog({ title, close, className = '', restoreFocus
     dialog.showModal();
     return () => { dialog.close(); if (shouldRestore.current) opener?.focus(); onDismiss.current?.(); };
   }, []);
-  return <dialog ref={ref} className={`nf-dialog ${className}`} aria-label={title} onCancel={e => { e.preventDefault(); onClose.current(); }}>
-    {children}
+  return <dialog ref={ref} className={`nf-dialog ${className}`} aria-label={gameUi(title)} onCancel={e => { e.preventDefault(); onClose.current(); }}>
+    {gameUi(children)}
   </dialog>;
 }

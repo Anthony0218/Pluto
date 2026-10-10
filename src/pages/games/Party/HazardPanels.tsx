@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { animalRegistry } from "../../../games/party/animals/registry.ts";
 import { statusRegistry } from "../../../games/party/status/effects.ts";
 import type {
@@ -8,6 +9,7 @@ import type {
 
 // Always-visible status and summoned-animal details for one player card (no hover needed).
 export function StatusChips({ match, player }: { match: Match; player: Player }) {
+  useGameLanguage();
   const animals = match.animals.filter((a) => a.ownerPlayerId === player.id);
   if (!player.statusEffects.length && !animals.length) return null;
   return (
@@ -17,14 +19,14 @@ export function StatusChips({ match, player }: { match: Match; player: Player })
         return (
           <li key={effect.id} className={`pp-status pp-status-${effect.id}`}>
             <b>
-              {definition.icon} {definition.name.toUpperCase()}
+              {gameUi(definition.icon)} {gameUi(definition.name.toUpperCase())}
             </b>
             <span>
-              {effect.remainingTurns > 0
+              {gameUi(effect.remainingTurns > 0
                 ? `${effect.remainingTurns} turn${effect.remainingTurns === 1 ? "" : "s"}`
-                : "final turn"}
+                : "final turn")}
             </span>
-            <small>{definition.summary}</small>
+            <small>{gameUi(definition.summary)}</small>
           </li>
         );
       })}
@@ -33,12 +35,11 @@ export function StatusChips({ match, player }: { match: Match; player: Player })
         return (
           <li key={animal.id} className="pp-status pp-status-animal">
             <b>
-              {definition.icon} {definition.name.toUpperCase()}
+              {gameUi(definition.icon)} {gameUi(definition.name.toUpperCase())}
             </b>
-            <span>{animal.remainingRounds} rounds</span>
+            <span>{gameUi(animal.remainingRounds)}{gameUi(" rounds")}</span>
             <small>
-              {animal.movementPerPhase} spaces · {animal.damage} dmg · hunts others
-            </small>
+              {gameUi(animal.movementPerPhase)}{gameUi(" spaces · ")}{gameUi(animal.damage)}{gameUi(" dmg · hunts others ")}</small>
           </li>
         );
       })}
@@ -54,33 +55,32 @@ export function AnimalPhasePanel({
   match: Match;
   phase: AnimalPhaseState;
 }) {
+  useGameLanguage();
   const name = (id: string | null) => match.players.find((p) => p.id === id)?.name ?? "—";
   return (
     <section className="pp-animal-phase" aria-live="polite">
-      <span className="pp-eyebrow">ANIMAL PHASE</span>
-      <h2>The wild things move.</h2>
-      <p>Summoned animals hunt the nearest opponent. The minigame starts right after.</p>
+      <span className="pp-eyebrow">{gameUi("ANIMAL PHASE")}</span>
+      <h2>{gameUi("The wild things move.")}</h2>
+      <p>{gameUi("Summoned animals hunt the nearest opponent. The minigame starts right after.")}</p>
       <ol>
         {phase.steps.map((step) => {
           const definition = animalRegistry.get(step.type);
           return (
             <li key={step.animalId}>
               <strong>
-                {definition.icon} {name(step.ownerPlayerId)}’s {definition.name}
+                {gameUi(definition.icon)} {gameUi(name(step.ownerPlayerId))}’s {gameUi(definition.name)}
               </strong>
               <small>
-                {step.path.length
+                {gameUi(step.path.length
                   ? `Moved ${step.path.length} space${step.path.length === 1 ? "" : "s"}`
-                  : "Stayed put"}
-                {step.targetPlayerId ? ` toward ${name(step.targetPlayerId)}` : ""}
+                  : "Stayed put")}
+                {gameUi(step.targetPlayerId ? ` toward ${name(step.targetPlayerId)}` : "")}
               </small>
               {step.hits.map((hit) => (
-                <small key={hit.playerId} className="pp-animal-hit">
-                  💥 Hit {name(hit.playerId)} for {hit.damage} HP
-                  {hit.knockedOut ? " · KO!" : ""}
+                <small key={hit.playerId} className="pp-animal-hit">{gameUi(" 💥 Hit ")}{gameUi(name(hit.playerId))}{gameUi(" for ")}{gameUi(hit.damage)}{gameUi(" HP ")}{gameUi(hit.knockedOut ? " · KO!" : "")}
                 </small>
               ))}
-              {step.despawned && <small>💨 Despawned — its time is up.</small>}
+              {step.despawned && <small>{gameUi("💨 Despawned — its time is up.")}</small>}
             </li>
           );
         })}

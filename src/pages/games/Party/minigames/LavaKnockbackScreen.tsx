@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { useCallback, useEffect, useRef, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Html, OrthographicCamera } from "@react-three/drei";
@@ -32,6 +33,7 @@ function ArenaCamera() {
   return <OrthographicCamera makeDefault position={[0, 34, 22]} zoom={Math.min(size.width / 34, size.height / 28)} near={.1} far={110} onUpdate={(camera) => camera.lookAt(0, 0, 0)}/>;
 }
 function Lava() {
+  useGameLanguage();
   const material = useRef<ShaderMaterial>(null), motion = useSceneMotion();
   useFrame(({ clock }) => { if (material.current) material.current.uniforms.uTime.value = motion ? clock.elapsedTime : 0; });
   return <group>
@@ -43,6 +45,7 @@ function Lava() {
   </group>;
 }
 function Fighter({ p, color, name, mine, hitAt, offset }: { p: KnockbackPlayer; color: string; name: string; mine: boolean; hitAt?: number; offset: RefObject<number | null> }) {
+  useGameLanguage();
   const root = useRef<Group>(null), fist = useRef<Group>(null), motion = useRef(0), initialized = useRef(false);
   useFrame((_, dt) => {
     if (!root.current) return;
@@ -63,11 +66,12 @@ function Fighter({ p, color, name, mine, hitAt, offset }: { p: KnockbackPlayer; 
     <group ref={fist} position={[.4, .85, -.4]}><mesh><sphereGeometry args={[.18, 12, 8]}/><meshStandardMaterial color="#e7b89c"/></mesh><mesh position={[0, 0, .15]}><capsuleGeometry args={[.085, .17, 4, 8]}/><meshStandardMaterial color={color}/></mesh></group>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .025, 0]}><ringGeometry args={[mine ? .55 : .45, mine ? .64 : .5, 32]}/><meshBasicMaterial color={color}/></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .035, -.95]}><coneGeometry args={[.16, .36, 3]}/><meshBasicMaterial color={color}/></mesh>
-    <Html position={[0, 3.5, 0]} center style={{ pointerEvents: "none" }}><div className="knockback-name" style={{ borderColor: color }}><b>{name}{mine ? " · YOU" : ""}</b><span><i style={{ width: `${p.hp / KNOCKBACK_HP * 100}%`, background: color }}/></span></div></Html>
+    <Html position={[0, 3.5, 0]} center style={{ pointerEvents: "none" }}><div className="knockback-name" style={{ borderColor: color }}><b>{name}{gameUi(mine ? " · YOU" : "")}</b><span><i style={{ width: `${p.hp / KNOCKBACK_HP * 100}%`, background: color }}/></span></div></Html>
   </group>;
 }
 const neutral = (): KnockbackInput => ({ type: "KNOCKBACK_CONTROL", x: 0, z: 0, yaw: 0, punch: false, jump: false, guard: false });
 export default function LavaKnockbackScreen({ minigame, match, playerId, online, sendInput }: MinigameViewProps) {
+  useGameLanguage();
   const state = minigame.state as KnockbackView, me = state.players[playerId];
   const offset = useServerOffset(minigame.serverNow), time = useServerClock(minigame.serverNow, 100);
   const live = useRef(state), held = useRef(neutral()), keys = useRef(new Set<string>()), touch = useRef(new Set<string>()), send = useRef(sendInput);
@@ -98,13 +102,13 @@ export default function LavaKnockbackScreen({ minigame, match, playerId, online,
       const direction: Record<string, number> = { KeyW: 0, KeyS: Math.PI, KeyA: -Math.PI / 2, KeyD: Math.PI / 2 };
       if (direction[code] !== undefined) held.current.yaw = direction[code]; publish(); }}
     onPointerUp={() => { touch.current.delete(code); publish(); }} onPointerCancel={() => { touch.current.delete(code); publish(); }}
-    onLostPointerCapture={() => { touch.current.delete(code); publish(); }} aria-label={label}>{label}</button>;
+    onLostPointerCapture={() => { touch.current.delete(code); publish(); }} aria-label={gameUi(label)}>{gameUi(label)}</button>;
   const elapsed = time - state.startedAt;
   const nextCollapse = [25000, 50000, 65000].find((at) => elapsed < at);
   const alive = Object.values(state.players).filter((p) => p.eliminatedAt === null).length;
   return <div className="knockback-game new-minigame">
-    <header className="new-game-header"><div><span className="pp-eyebrow">FISTS ONLY · LAST SURVIVOR WINS</span><h2>Hell Knockout</h2></div><strong>{alive} alive · {Math.max(0, Math.ceil((state.endsAt - time) / 1000))}s</strong></header>
-    <div className="knockback-collapse">{nextCollapse && nextCollapse - elapsed <= 5000 ? `⚠ Glowing islands collapse in ${Math.ceil((nextCollapse - elapsed) / 1000)}s · move to the center!` : "Glowing edges warn you before islands collapse · G to guard"}</div><div className="knockback-world">
+    <header className="new-game-header"><div><span className="pp-eyebrow">{gameUi("FISTS ONLY · LAST SURVIVOR WINS")}</span><h2>{gameUi("Hell Knockout")}</h2></div><strong>{gameUi(alive)}{gameUi(" alive · ")}{gameUi(Math.max(0, Math.ceil((state.endsAt - time) / 1000)))}s</strong></header>
+    <div className="knockback-collapse">{gameUi(nextCollapse && nextCollapse - elapsed <= 5000 ? `⚠ Glowing islands collapse in ${Math.ceil((nextCollapse - elapsed) / 1000)}s · move to the center!` : "Glowing edges warn you before islands collapse · G to guard")}</div><div className="knockback-world">
       <Canvas orthographic camera={{ position: [0, 34, 22], zoom: 20, near: .1, far: 110 }} dpr={[1, 1.5]}>
         <color attach="background" args={["#210b20"]}/><fog attach="fog" args={["#210b20", 48, 85]}/>
         <ArenaCamera/><hemisphereLight args={["#e5c9ff", "#a9320f", 2.2]}/><directionalLight position={[-8, 20, 8]} intensity={2.6} color="#ffe0ba"/>
@@ -117,17 +121,17 @@ export default function LavaKnockbackScreen({ minigame, match, playerId, online,
         </group>)}
         {[-1, 1].flatMap((x) => [-1, 1].map((z) => <group key={`${x}:${z}`} position={[x * 19, LAVA_Y, z * 18]}><mesh><coneGeometry args={[3.8, 9, 7]}/><meshStandardMaterial color="#271f30" flatShading/></mesh><mesh position={[0, 3.6, 0]}><coneGeometry args={[1.1, 1.8, 7]}/><meshStandardMaterial color="#e75429" emissive="#ff4f13" emissiveIntensity={1}/></mesh></group>))}
         {match.players.filter((p) => state.players[p.id]).map((p) => <Fighter key={p.id} p={state.players[p.id]} name={p.name} mine={p.id === playerId} color={COLORS[p.avatarId % COLORS.length]} offset={offset} hitAt={state.hits.filter((h) => h.victim === p.id).at(-1)?.at}/>)}
-        {state.hits.map((h) => <Html key={h.id} position={[h.x, h.y + .8, h.z]} center style={{ pointerEvents: "none" }}><span className="knockback-damage">−{h.damage}</span></Html>)}
+        {state.hits.map((h) => <Html key={h.id} position={[h.x, h.y + .8, h.z]} center style={{ pointerEvents: "none" }}><span className="knockback-damage">−{gameUi(h.damage)}</span></Html>)}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .02, 0]}
           onPointerMove={(e) => { const p = live.current.players[playerId]; if (p) held.current.yaw = Math.atan2(e.point.x - p.x, p.z - e.point.z); }}
           onPointerDown={(e) => { if (e.pointerType === "mouse" && e.button === 0) { touch.current.add("Fire"); publish(); } }}>
           <planeGeometry args={[70, 70]}/><meshBasicMaterial transparent opacity={0} depthWrite={false}/>
         </mesh>
       </Canvas>
-      <div className="knockback-hud"><b>{me && me.eliminatedAt !== null ? "ELIMINATED" : `${me?.hp ?? 0} / 200 HP`}</b><span>{me && me.eliminatedAt !== null ? (me.reason === "lava" ? "You fell into lava. Watch the survivors." : "You ran out of HP. Watch the survivors.") : me?.guarding ? "GUARDING · reduced damage and knockback" : "Punch: −10 HP · G: guard"}</span><small>{time - (me?.lastPunchAt ?? 0) >= PUNCH_COOLDOWN ? "FIST READY" : "Fist recovering…"} · mouse aim · Space jump</small><span className="knockback-punch-meter"><i style={{ width: `${Math.max(0, Math.min(100, (time - (me?.lastPunchAt ?? 0)) / PUNCH_COOLDOWN * 100))}%` }}/></span></div>
+      <div className="knockback-hud"><b>{gameUi(me && me.eliminatedAt !== null ? "ELIMINATED" : `${me?.hp ?? 0} / 200 HP`)}</b><span>{gameUi(me && me.eliminatedAt !== null ? (me.reason === "lava" ? "You fell into lava. Watch the survivors." : "You ran out of HP. Watch the survivors.") : me?.guarding ? "GUARDING · reduced damage and knockback" : "Punch: −10 HP · G: guard")}</span><small>{gameUi(time - (me?.lastPunchAt ?? 0) >= PUNCH_COOLDOWN ? "FIST READY" : "Fist recovering…")}{gameUi(" · mouse aim · Space jump")}</small><span className="knockback-punch-meter"><i style={{ width: `${Math.max(0, Math.min(100, (time - (me?.lastPunchAt ?? 0)) / PUNCH_COOLDOWN * 100))}%` }}/></span></div>
     </div>
-    <div className="knockback-controls"><div className="knockback-dpad">{button("KeyW", "↑")}{button("KeyA", "←")}{button("KeyS", "↓")}{button("KeyD", "→")}</div><div>{button("Space", "Jump")}{button("KeyF", "Punch")}{button("KeyG", "Guard")}</div></div>
-    <div className="new-game-scores">{match.players.filter((p) => state.players[p.id]).map((p) => <div key={p.id}><i style={{ background: COLORS[p.avatarId % COLORS.length] }}/><span>{p.name}</span><b>{state.players[p.id].eliminatedAt === null ? `${state.players[p.id].hp} HP` : "OUT"}</b></div>)}</div>
-    <p className="new-game-tip">WASD / arrows · mouse to aim · click / F to punch · Space to jump · touch arrows also aim</p>
+    <div className="knockback-controls"><div className="knockback-dpad">{gameUi(button("KeyW", "↑"))}{gameUi(button("KeyA", "←"))}{gameUi(button("KeyS", "↓"))}{gameUi(button("KeyD", "→"))}</div><div>{gameUi(button("Space", "Jump"))}{gameUi(button("KeyF", "Punch"))}{gameUi(button("KeyG", "Guard"))}</div></div>
+    <div className="new-game-scores">{match.players.filter((p) => state.players[p.id]).map((p) => <div key={p.id}><i style={{ background: COLORS[p.avatarId % COLORS.length] }}/><span>{p.name}</span><b>{gameUi(state.players[p.id].eliminatedAt === null ? `${state.players[p.id].hp} HP` : "OUT")}</b></div>)}</div>
+    <p className="new-game-tip">{gameUi("WASD / arrows · mouse to aim · click / F to punch · Space to jump · touch arrows also aim")}</p>
   </div>;
 }

@@ -1,3 +1,5 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
+import GameXpReward from "@/components/games/GameXpReward";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
@@ -13,6 +15,7 @@ type SuggestedMove = { coordinate: string; move: GoMove };
 type BestMoves = { position: GoState; status: "loading" | "ready" | "error"; moves: SuggestedMove[]; selected: number; error?: string };
 
 export default function GoGamePage({ mode }: { mode: "ai" | "hotseat" }) {
+  useGameLanguage();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [params] = useSearchParams();
@@ -130,38 +133,38 @@ export default function GoGamePage({ mode }: { mode: "ai" | "hotseat" }) {
   }
   return <main className="go-page">
     <header className="go-page-header">
-      <Link to="/games/go"><ArrowLeft size={16} /> Go</Link>
-      <h1>Go · {mode === "ai" ? "Singleplayer" : "Hotseat"}</h1>
-      <div className="go-header-links"><Link to="/games/go/rules"><BookOpen size={16} /> Rules</Link><Link to="/games/go/analysis"><ScanSearch size={16} /> Analysis</Link></div>
+      <Link to="/games/go"><ArrowLeft size={16} />{gameUi(" Go")}</Link>
+      <h1>{gameUi("Go · ")}{gameUi(mode === "ai" ? "Singleplayer" : "Hotseat")}</h1>
+      <div className="go-header-links"><Link to="/games/go/rules"><BookOpen size={16} />{gameUi(" Rules")}</Link><Link to="/games/go/analysis"><ScanSearch size={16} />{gameUi(" Analysis")}</Link></div>
     </header>
     <div className="go-game-toolbar">
-      <label>Board <select value={boardSize} onChange={event => { const size = Number(event.target.value) as GoState["boardSize"]; restart(size); }}><option value={9}>9 × 9</option><option value={13}>13 × 13</option><option value={19}>19 × 19</option></select></label>
-      {mode === "ai" && <label>Difficulty <select value={difficulty} onChange={event => setDifficulty(event.target.value as BotDifficulty)}><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></label>}
+      <label>{gameUi("Board ")}<select value={boardSize} onChange={event => { const size = Number(event.target.value) as GoState["boardSize"]; restart(size); }}><option value={9}>9 × 9</option><option value={13}>13 × 13</option><option value={19}>19 × 19</option></select></label>
+      {mode === "ai" && <label>{gameUi("Difficulty ")}<select value={difficulty} onChange={event => setDifficulty(event.target.value as BotDifficulty)}><option value="easy">{gameUi("Easy")}</option><option value="medium">{gameUi("Medium")}</option><option value="hard">{gameUi("Hard")}</option></select></label>}
     </div>
     <div className="go-play-layout">
       <section><GoBoard state={state} onMove={play} disabled={disabled} scoring={scoring && !scoreConfirmed} onAttempt={scoring && !scoreConfirmed ? move => { if (move.type === "place") setState(current => toggleDeadGoGroup(current, move.row * current.boardSize + move.col)); } : undefined} help={helpMode && !scoring} suggestions={visibleBestMoves?.moves.map(candidate => candidate.move)} selectedSuggestion={visibleBestMoves?.selected} /></section>
       <aside>
-        <h2 className="capitalize" role="status">{scoring && !scoreConfirmed ? "Review dead stones" : state.result ?? (thinking && disabled ? "White is thinking..." : state.currentPlayer + " to move")}</h2>
-        <p className="go-muted">Move {state.moveHistory.length + 1} · Komi {state.komi}{mode === "ai" ? " · " + botName : ""}</p>
-        <div className="go-score-grid"><div>Black<strong>{state.captures.black}</strong><span>captured stones</span></div><div>White<strong>{state.captures.white}</strong><span>captured stones</span></div></div>
+        <h2 className="capitalize" role="status">{gameUi(scoring && !scoreConfirmed ? "Review dead stones" : state.result ?? (thinking && disabled ? "White is thinking..." : state.currentPlayer + " to move"))}</h2>
+        <p className="go-muted">{gameUi("Move ")}{gameUi(state.moveHistory.length + 1)}{gameUi(" · Komi ")}{gameUi(state.komi)}{gameUi(mode === "ai" ? " · " + botName : "")}</p>
+        <div className="go-score-grid"><div>{gameUi("Black")}<strong>{gameUi(state.captures.black)}</strong><span>{gameUi("captured stones")}</span></div><div>{gameUi("White")}<strong>{gameUi(state.captures.white)}</strong><span>{gameUi("captured stones")}</span></div></div>
         <div className="go-help-panel">
-          <button type="button" className="go-action" aria-pressed={helpMode} onClick={toggleHelp}><Lightbulb size={16} /> Help mode {helpMode ? "on" : "off"}</button>
+          <button type="button" className="go-action" aria-pressed={helpMode} onClick={toggleHelp}><Lightbulb size={16} />{gameUi(" Help mode ")}{gameUi(helpMode ? "on" : "off")}</button>
           {helpMode && <>
-            <p className="go-muted">Liberties and atari appear on the board. The engine recommends a move automatically.</p>
-            {visibleBestMoves?.status === "loading" && <p role="status" className="go-muted">Finding the best moves…</p>}
-            {visibleBestMoves?.status === "error" && <p role="alert" className="go-engine-error">{visibleBestMoves.error}</p>}
+            <p className="go-muted">{gameUi("Liberties and atari appear on the board. The engine recommends a move automatically.")}</p>
+            {visibleBestMoves?.status === "loading" && <p role="status" className="go-muted">{gameUi("Finding the best moves…")}</p>}
+            {visibleBestMoves?.status === "error" && <p role="alert" className="go-engine-error">{gameUi(visibleBestMoves.error)}</p>}
             {visibleBestMoves?.status === "ready" && (visibleBestMoves.moves.length ? <>
-              <p className="go-muted">{visibleBestMoves.moves[visibleBestMoves.selected].move.type === "pass" ? "The engine recommends passing." : "The ring marks the recommended move. Select another candidate to inspect it."}</p>
-              <div className="go-best-moves" aria-label="Best moves">{visibleBestMoves.moves.map((candidate, index) => <button key={candidate.coordinate} type="button" aria-pressed={visibleBestMoves.selected === index} onClick={() => setBestMoves(current => current?.position === state ? { ...current, selected: index } : current)}><span className="go-best-rank">{index + 1}</span><span>{candidate.coordinate}</span></button>)}</div>
-              <button type="button" className="go-action" disabled={disabled} onClick={() => play(visibleBestMoves.moves[visibleBestMoves.selected].move)}>Play selected move</button>
-            </> : <p className="go-muted">No legal suggestions are available for this position.</p>)}
+              <p className="go-muted">{gameUi(visibleBestMoves.moves[visibleBestMoves.selected].move.type === "pass" ? "The engine recommends passing." : "The ring marks the recommended move. Select another candidate to inspect it.")}</p>
+              <div className="go-best-moves" aria-label={gameUi("Best moves")}>{visibleBestMoves.moves.map((candidate, index) => <button key={gameUi(candidate.coordinate)} type="button" aria-pressed={visibleBestMoves.selected === index} onClick={() => setBestMoves(current => current?.position === state ? { ...current, selected: index } : current)}><span className="go-best-rank">{gameUi(index + 1)}</span><span>{gameUi(candidate.coordinate)}</span></button>)}</div>
+              <button type="button" className="go-action" disabled={disabled} onClick={() => play(visibleBestMoves.moves[visibleBestMoves.selected].move)}>{gameUi("Play selected move")}</button>
+            </> : <p className="go-muted">{gameUi("No legal suggestions are available for this position.")}</p>)}
           </>}
         </div>
-        {state.status === "finished" && <div className="go-result"><strong>{scoring && !scoreConfirmed ? "Scoring review" : "Game over"} · {state.result}</strong><p>Chinese area · komi {state.komi} · captures B {state.captures.black}, W {state.captures.white}</p>{scoring && <p>{scoreConfirmed ? `${state.deadStones?.length ?? 0} stones marked dead.` : "Tap each dead group to remove it from area scoring, then confirm the result."}</p>}{!state.result?.includes("resignation") && <p>Area score: Black {score.black} · White {score.white}</p>}{scoring && <button className="go-action" onClick={() => setScoreConfirmed(!scoreConfirmed)}>{scoreConfirmed ? "Edit dead groups" : "Confirm score"}</button>}<div className="go-result-actions"><button className="go-action" disabled={scoring && !scoreConfirmed} onClick={saveCurrent}><Save size={16} /> Save Game</button><button className="go-action" disabled={scoring && !scoreConfirmed} onClick={analyzeCurrent}><ScanSearch size={16} /> Analyze Game</button></div></div>}
-        <div className="go-controls go-game-controls"><button disabled={disabled} onClick={() => play({ type: "pass" })}>Pass</button><button disabled={disabled} onClick={() => play({ type: "resign" })}>Resign</button><button onClick={() => restart()}><RotateCcw size={16} /> New Game</button></div>
-        {state.status === "playing" && state.moveHistory.length > 0 && <button className="go-action" onClick={saveCurrent}><Save size={16} /> Save Game</button>}
-        {saveMessage && <p role="status" className="go-muted">{saveMessage}</p>}
-        <h3>Moves</h3><ol className="go-game-history">{state.moveHistory.map((entry, index) => <li key={index}><span>{index + 1}. {entry.player === "black" ? "B" : "W"} {goCoordinate(entry, state.boardSize)}</span>{!!entry.captured && <span>+{entry.captured}</span>}</li>)}</ol>
+        {state.status === "finished" && <div className="go-result"><GameXpReward /><strong>{gameUi(scoring && !scoreConfirmed ? "Scoring review" : "Game over")} · {gameUi(state.result)}</strong><p>{gameUi("Chinese area · komi ")}{gameUi(state.komi)}{gameUi(" · captures B ")}{gameUi(state.captures.black)}, W {gameUi(state.captures.white)}</p>{scoring && <p>{gameUi(scoreConfirmed ? `${state.deadStones?.length ?? 0} stones marked dead.` : "Tap each dead group to remove it from area scoring, then confirm the result.")}</p>}{!state.result?.includes("resignation") && <p>{gameUi("Area score: Black ")}{gameUi(score.black)}{gameUi(" · White ")}{gameUi(score.white)}</p>}{scoring && <button className="go-action" onClick={() => setScoreConfirmed(!scoreConfirmed)}>{gameUi(scoreConfirmed ? "Edit dead groups" : "Confirm score")}</button>}<div className="go-result-actions"><button className="go-action" disabled={scoring && !scoreConfirmed} onClick={saveCurrent}><Save size={16} />{gameUi(" Save Game")}</button><button className="go-action" disabled={scoring && !scoreConfirmed} onClick={analyzeCurrent}><ScanSearch size={16} />{gameUi(" Analyze Game")}</button></div></div>}
+        <div className="go-controls go-game-controls"><button disabled={disabled} onClick={() => play({ type: "pass" })}>{gameUi("Pass")}</button><button disabled={disabled} onClick={() => play({ type: "resign" })}>{gameUi("Resign")}</button><button onClick={() => restart()}><RotateCcw size={16} />{gameUi(" New Game")}</button></div>
+        {state.status === "playing" && state.moveHistory.length > 0 && <button className="go-action" onClick={saveCurrent}><Save size={16} />{gameUi(" Save Game")}</button>}
+        {saveMessage && <p role="status" className="go-muted">{gameUi(saveMessage)}</p>}
+        <h3>{gameUi("Moves")}</h3><ol className="go-game-history">{state.moveHistory.map((entry, index) => <li key={index}><span>{gameUi(index + 1)}. {gameUi(entry.player === "black" ? "B" : "W")} {gameUi(goCoordinate(entry, state.boardSize))}</span>{!!entry.captured && <span>+{gameUi(entry.captured)}</span>}</li>)}</ol>
       </aside>
     </div>
   </main>;

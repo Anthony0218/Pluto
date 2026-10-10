@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import type { MoveQuality } from "@/utils/chessAnalysis";
 import { ReviewQualityIcon } from "./ReviewQualityBadge";
@@ -40,7 +41,7 @@ export function AlternativeMoveButton({
           className="flex h-7 w-7 items-center justify-center rounded-lg text-xs font-black"
           style={active ? { background: color, color: "#09090b" } : { background: `${color}1a`, color }}
         >
-          {index + 1}
+          {gameUi(index + 1)}
         </span>
 
         <div>
@@ -50,26 +51,26 @@ export function AlternativeMoveButton({
               <ReviewQualityIcon quality={quality} size={12} />
               {ui(quality)}
             </span>
-            {played && (
+            {gameUi(played && (
               <span className="rounded-md border border-amber-200/25 bg-amber-200/10 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-amber-100">
                 {ui("Played")}
               </span>
-            )}
+            ))}
           </p>
 
           <p className="mt-0.5 text-[10px] text-zinc-600">
-            {played
+            {gameUi(played
               ? active
                 ? ui("Currently played · on the board")
                 : ui("Currently played · click to show")
               : active
                 ? ui("Highlighted on board")
-                : ui("Click to highlight")}
+                : ui("Click to highlight"))}
           </p>
         </div>
       </div>
 
-      <span className="text-xs text-zinc-500">{evaluation}</span>
+      <span className="text-xs text-zinc-500">{gameUi(evaluation)}</span>
     </button>
   );
 }

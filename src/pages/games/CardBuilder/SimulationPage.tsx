@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Play } from "lucide-react";
@@ -21,6 +22,7 @@ interface Choice {
 
 /** `/games/card-builder/simulation` — watch bots play any game, or play against them. */
 export default function SimulationPage() {
+  useGameLanguage();
   const [params, setParams] = useSearchParams();
   const { repository, local } = useCardGameRepository();
   const [saved, setSaved] = useState<GameRecord[]>([]);
@@ -51,9 +53,9 @@ export default function SimulationPage() {
   return (
     <CardBuilderLayout crumbs={[{ label: "Simulation" }]}>
       <header className="mb-5 max-w-3xl">
-        <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-300">Card Builder</p>
-        <h1 className="mt-2 text-4xl font-black">Simulation</h1>
-        <p className="mt-2 text-sm text-zinc-400">Let bots play each other, or take a seat yourself. The number of seats comes from the player count you choose; bots fill every seat that isn't yours.</p>
+        <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-300">{gameUi("Card Builder")}</p>
+        <h1 className="mt-2 text-4xl font-black">{gameUi("Simulation")}</h1>
+        <p className="mt-2 text-sm text-zinc-400">{gameUi("Let bots play each other, or take a seat yourself. The number of seats comes from the player count you choose; bots fill every seat that isn't yours.")}</p>
       </header>
       <CardBuilderTabs active="simulation" />
       {/* Remount the setup when the game changes so its players and settings start from that game's defaults. */}
@@ -72,6 +74,7 @@ export default function SimulationPage() {
 }
 
 function SimulationSetup({ def, choices, choiceId, onChoose }: { def: GameDefinition; choices: Choice[]; choiceId: string; onChoose: (id: string) => void }) {
+  useGameLanguage();
   const [players, setPlayers] = useState(def.players.min);
   const [mode, setMode] = useState<SimulationMode>("ai");
   const [settings, setSettings] = useState<Record<string, SettingValue>>(() => resolveSettings(def));
@@ -85,40 +88,40 @@ function SimulationSetup({ def, choices, choiceId, onChoose }: { def: GameDefini
 
   return (
     <div className="space-y-5">
-      <Panel title="Setup" eyebrow="Game, players and mode">
+      <Panel title={gameUi("Setup")} eyebrow="Game, players and mode">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className="space-y-4">
-            <Field label="Game">
+            <Field label={gameUi("Game")}>
               <select className={inputClass} value={choiceId} onChange={(event) => onChoose(event.target.value)}>
-                <optgroup label="Templates" className="bg-zinc-900">
+                <optgroup label={gameUi("Templates")} className="bg-zinc-900">
                   {choices
                     .filter((entry) => entry.id.startsWith("template:"))
                     .map((entry) => (
                       <option key={entry.id} value={entry.id}>
-                        {entry.label}
+                        {gameUi(entry.label)}
                       </option>
                     ))}
                 </optgroup>
-                {choices.some((entry) => entry.id.startsWith("game:")) && (
-                  <optgroup label="My games" className="bg-zinc-900">
+                {gameUi(choices.some((entry) => entry.id.startsWith("game:")) && (
+                  <optgroup label={gameUi("My games")} className="bg-zinc-900">
                     {choices
                       .filter((entry) => entry.id.startsWith("game:"))
                       .map((entry) => (
                         <option key={entry.id} value={entry.id}>
-                          {entry.label}
+                          {gameUi(entry.label)}
                         </option>
                       ))}
                   </optgroup>
-                )}
+                ))}
               </select>
             </Field>
             <div className="flex flex-wrap items-end gap-6">
-              <Field label="Players" hint={def.players.min === def.players.max ? `${def.name} is for exactly ${def.players.min}.` : `${def.players.min}–${def.players.max} allowed.`}>
-                <NumberField value={players} min={def.players.min} max={def.players.max} label="Players" onChange={(value) => (setPlayers(value), setRun((current) => current + 1))} />
+              <Field label={gameUi("Players")} hint={def.players.min === def.players.max ? `${def.name} is for exactly ${def.players.min}.` : `${def.players.min}–${def.players.max} allowed.`}>
+                <NumberField value={players} min={def.players.min} max={def.players.max} label={gameUi("Players")} onChange={(value) => (setPlayers(value), setRun((current) => current + 1))} />
               </Field>
-              <Field label="Mode">
+              <Field label={gameUi("Mode")}>
                 <Segmented
-                  label="Mode"
+                  label={gameUi("Mode")}
                   value={mode}
                   onChange={(value) => (setMode(value), setRun((current) => current + 1))}
                   options={[
@@ -130,10 +133,9 @@ function SimulationSetup({ def, choices, choiceId, onChoose }: { def: GameDefini
             </div>
           </div>
           <div className="space-y-3">
-            {def.settings?.length ? <SettingsForm def={def} values={settings} onChange={setSettings} /> : <p className="text-sm text-zinc-500">This game has no lobby settings.</p>}
+            {def.settings?.length ? <SettingsForm def={def} values={settings} onChange={setSettings} /> : <p className="text-sm text-zinc-500">{gameUi("This game has no lobby settings.")}</p>}
             <Button tone="primary" onClick={restart}>
-              <Play size={16} /> Start with these settings
-            </Button>
+              <Play size={16} />{gameUi(" Start with these settings ")}</Button>
           </div>
         </div>
       </Panel>

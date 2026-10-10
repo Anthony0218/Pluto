@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -230,22 +231,24 @@ function playLatestMoveSound(initialFen: string, moves: string[]) {
 
 
 function Panel({
+  gameControls = false,
   title,
   subtitle,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   subtitle?: string;
   children: ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       <div className="mb-4">
         <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
         {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}
       </div>
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -254,7 +257,7 @@ function ErrorBox({ children }: { children: ReactNode }) {
   useUiLanguage();
   return (
     <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/[0.07] px-4 py-3 text-sm font-semibold text-red-200">
-      {children}
+      {gameUi(children)}
     </div>
   );
 }
@@ -281,10 +284,10 @@ function PlayerCard({
     >
       <div className="flex items-center justify-between gap-3">
         <span className="font-black text-zinc-200">{name}</span>
-        <span className="text-xl">{color === "black" ? "♚" : "♔"}</span>
+        <span className="text-xl">{gameUi(color === "black" ? "♚" : "♔")}</span>
       </div>
       <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-        {you ? ui("You") : ui("Opponent")} · {color ?? "waiting"}
+        {gameUi(you ? ui("You") : ui("Opponent"))} · {gameUi(color ?? "waiting")}
       </p>
     </div>
   );
@@ -358,7 +361,7 @@ export function MirrorMultiplayerLobby() {
 
         </ChessPageHeader>
 
-        {!user ? (
+        {gameUi(!user ? (
           <Panel title={ui("Sign in required")}>
             <p className="text-sm text-zinc-400">{ui("Multiplayer rooms use your existing Supabase account.")}</p>
           </Panel>
@@ -371,7 +374,7 @@ export function MirrorMultiplayerLobby() {
                 onClick={() => void createRoom()}
                 className="mt-5 w-full rounded-xl bg-violet-300 px-5 py-3 font-black text-zinc-950 transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "create" ? ui("Creating...") : ui("Create Mirror Room")}
+                {gameUi(loading === "create" ? ui("Creating...") : ui("Create Mirror Room"))}
               </button>
             </Panel>
 
@@ -391,11 +394,11 @@ export function MirrorMultiplayerLobby() {
                 onClick={() => void joinRoom()}
                 className="mt-3 w-full rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-5 py-3 font-black text-violet-200 transition hover:bg-violet-400/10 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {loading === "join" ? ui("Joining...") : ui("Join Mirror Room")}
+                {gameUi(loading === "join" ? ui("Joining...") : ui("Join Mirror Room"))}
               </button>
             </Panel>
           </div>
-        )}
+        ))}
 
         {error && <ErrorBox>{ui(error)}</ErrorBox>}
       </div>
@@ -1116,14 +1119,14 @@ export function MirrorMultiplayerGame() {
   return (
     <div className="chess-variant-page min-h-[var(--app-height)] bg-transparent px-4 py-6 text-zinc-100 sm:px-6">
       <div className="mx-auto max-w-[1500px]">
-        <ChessPageHeader className="mb-6 flex flex-col gap-4 rounded-3xl border border-violet-400/10 bg-zinc-900/55 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between" description={<> {phase === "setup" ? `${setupTurnColor === "white" ? "White" : "Black"} places the next seeded piece` : `${liveGame?.turn() === "w" ? "White" : "Black"} to move`} </>}>
+        <ChessPageHeader className="mb-6 flex flex-col gap-4 rounded-3xl border border-violet-400/10 bg-zinc-900/55 px-5 py-4 shadow-xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between" description={<> {gameUi(phase === "setup" ? `${setupTurnColor === "white" ? "White" : "Black"} places the next seeded piece` : `${liveGame?.turn() === "w" ? "White" : "Black"} to move`)} </>}>
 
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => void copyRoomCode()}
               className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs font-black text-zinc-300"
-            >{ui("Room")}{room.code} {copied ? "✓" : ""}
+            >{ui("Room")}{room.code} {gameUi(copied ? "✓" : "")}
             </button>
             <Link
               to="/games/chess/variants/mirror/multiplayer"
@@ -1132,7 +1135,7 @@ export function MirrorMultiplayerGame() {
           </div>
         </ChessPageHeader>
 
-        {phase === "setup" && (
+        {gameUi(phase === "setup" && (
           <section className="mb-6 grid gap-3 rounded-3xl border border-violet-400/10 bg-violet-400/[0.03] px-5 py-4 md:grid-cols-3">
             <div className="rounded-2xl border border-white/5 bg-black/20 p-3 text-xs text-zinc-400">
               <b className="text-violet-200">{ui("🎲 Seeded piece")}</b>
@@ -1144,7 +1147,7 @@ export function MirrorMultiplayerGame() {
               <b className="text-violet-200">{ui("↔ Alternating setup")}</b>
               <br />{ui("White and Black take turns choosing a square.")}</div>
           </section>
-        )}
+        ))}
 
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
@@ -1152,7 +1155,7 @@ export function MirrorMultiplayerGame() {
               <Panel
                 title={ui("Players")}
                 subtitle={
-                  players.length < 2 ? "Waiting for opponent..." : "Connected"
+                  gameUi(players.length < 2 ? "Waiting for opponent..." : "Connected")
                 }
               >
                 <div className="space-y-2">
@@ -1173,44 +1176,44 @@ export function MirrorMultiplayerGame() {
                 </div>
               </Panel>
 
-              {phase === "setup" ? (
+              {gameUi(phase === "setup" ? (
                 <Panel
                   title={ui("Mirror Setup")}
                   subtitle={ui("Alternating random construction")}
                 >
                   <div className="rounded-2xl border border-violet-400/15 bg-violet-400/[0.06] p-4 text-center">
                     <p className="text-[10px] font-black uppercase tracking-[0.18em] text-violet-300">{ui("Next piece")}</p>
-                    {currentPiece ? (
+                    {gameUi(currentPiece ? (
                       <>
                         <div className="mt-3 text-6xl leading-none">
-                          {setupState.turn === "w" ? whiteSymbols[currentPiece] : blackSymbols[currentPiece]}
+                          {gameUi(setupState.turn === "w" ? whiteSymbols[currentPiece] : blackSymbols[currentPiece])}
                         </div>
                         <p className="mt-3 font-black text-white">
-                          {pieceNames[currentPiece]}
+                          {gameUi(pieceNames[currentPiece])}
                         </p>
                         <p className="mt-1 text-xs text-zinc-500">
-                          {mySetupTurn ? ui("Your placement turn") : ui("Opponent is placing")}
+                          {gameUi(mySetupTurn ? ui("Your placement turn") : ui("Opponent is placing"))}
                         </p>
                       </>
                     ) : (
                       <p className="mt-3 font-black text-emerald-200">{ui("Formation complete")}</p>
-                    )}
+                    ))}
                   </div>
 
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
                       <p className="text-[9px] uppercase tracking-wider text-zinc-600">{ui("Placed")}</p>
                       <p className="mt-1 text-xl font-black">
-                        {placementCount}
+                        {gameUi(placementCount)}
                       </p>
                     </div>
                     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
                       <p className="text-[9px] uppercase tracking-wider text-zinc-600">{ui("Pairs left")}</p>
-                      <p className="mt-1 text-xl font-black">{pairsLeft}</p>
+                      <p className="mt-1 text-xl font-black">{gameUi(pairsLeft)}</p>
                     </div>
                   </div>
 
-                  {setupState.complete && !gameState.initial_fen && (
+                  {gameUi(setupState.complete && !gameState.initial_fen && (
                     <button
                       type="button"
                       disabled={actionLoading !== null}
@@ -1219,10 +1222,10 @@ export function MirrorMultiplayerGame() {
                       }
                       className="mt-3 w-full rounded-xl bg-violet-300 px-3 py-3 text-sm font-black text-zinc-950 hover:bg-violet-200 disabled:opacity-40"
                     >{ui("▶ Start Match")}</button>
-                  )}
+                  ))}
                 </Panel>
               ) : (
-                <Panel title={ui("Game Controls")} subtitle={ui("Online Mirror match")}>
+                <Panel gameControls title={ui("Game Controls")} subtitle={ui("Online Mirror match")}>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
@@ -1242,18 +1245,18 @@ export function MirrorMultiplayerGame() {
                     >{ui("Resign")}</button>
                   </div>
                 </Panel>
-              )}
+              ))}
 
-              {gameState.undo_requested_by && phase === "playing" && (
+              {gameUi(gameState.undo_requested_by && phase === "playing" && (
                 <Panel
                   title={ui("Undo request")}
                   subtitle={
-                    myUndoRequest
+                    gameUi(myUndoRequest
                       ? "Waiting for opponent"
-                      : "Opponent wants to undo the latest move"
+                      : "Opponent wants to undo the latest move")
                   }
                 >
-                  {opponentUndoRequest ? (
+                  {gameUi(opponentUndoRequest ? (
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         onClick={() => void respondUndo(true)}
@@ -1266,15 +1269,15 @@ export function MirrorMultiplayerGame() {
                     </div>
                   ) : (
                     <p className="text-sm text-zinc-400">{ui("Request sent.")}</p>
-                  )}
+                  ))}
                 </Panel>
-              )}
+              ))}
             </div>
           </aside>
 
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
-              {gameState.status === "finished" && (
+              {gameUi(gameState.status === "finished" && (
                 <VisibleGameResult
                   winner={gameState.winner}
                   playerColor={myColor}
@@ -1286,18 +1289,18 @@ export function MirrorMultiplayerGame() {
                       onClick={() => void requestRematch()}
                       className="rounded-xl bg-violet-300 px-4 py-2.5 text-sm font-black text-zinc-950 disabled:opacity-40"
                     >
-                      {myRematchReady ? ui("Rematch requested") : ui("Play Again")}
+                      {gameUi(myRematchReady ? ui("Rematch requested") : ui("Play Again"))}
                     </button>
                   }
                 />
-              )}
+              ))}
 
               {historyPreviewPly !== null && phase === "playing" && (
                 <div className="mb-3 flex items-center justify-between rounded-xl border border-violet-400/20 bg-violet-400/[0.06] px-4 py-3">
                   <div>
                     <p className="text-[9px] font-black uppercase tracking-widest text-violet-300">{ui("History Preview")}</p>
                     <p className="mt-1 text-sm font-bold text-white">
-                      {historyPreviewPly === 0 ? ui("Initial mirrored position") : `${historyRows[historyPreviewPly - 1]?.moveNumber}${historyRows[historyPreviewPly - 1]?.color === "w" ? "." : "..."} ${historyRows[historyPreviewPly - 1]?.san ?? ""}`}
+                      {gameUi(historyPreviewPly === 0 ? ui("Initial mirrored position") : `${historyRows[historyPreviewPly - 1]?.moveNumber}${historyRows[historyPreviewPly - 1]?.color === "w" ? "." : "..."} ${historyRows[historyPreviewPly - 1]?.san ?? ""}`)}
                     </p>
                   </div>
                   <button
@@ -1349,7 +1352,7 @@ export function MirrorMultiplayerGame() {
                       <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                       <h2 className="mt-2 text-2xl font-black text-white">
-                        {players.length}{ui("/2 players connected")}</h2>
+                        {gameUi(players.length)}{ui("/2 players connected")}</h2>
 
                       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
@@ -1362,21 +1365,21 @@ export function MirrorMultiplayerGame() {
                       </div>
 
                       <p className="mt-4 text-xs font-bold text-zinc-400">
-                        {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
+                        {gameUi(copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code"))}
                       </p>
                     </button>
                     <RoomSlots total={2} names={players.map((player) => player.display_name)} overlay />
                   </div>
                 )}
 
-                {pendingPromotion && historyPreviewPly === null && (
+                {gameUi(pendingPromotion && historyPreviewPly === null && (
                   <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/45 p-4 backdrop-blur-[4px]">
                     <div className="w-full max-w-sm rounded-3xl border border-violet-400/20 bg-zinc-900/95 p-4 shadow-2xl">
                       <p className="mb-3 text-center text-sm font-black text-violet-200">{ui("Choose promotion")}</p>
                       <PromotionBar onPromote={promotePawn} />
                     </div>
                   </div>
-                )}
+                ))}
               </div>
             </div>
           </section>
@@ -1384,11 +1387,11 @@ export function MirrorMultiplayerGame() {
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
               <Panel
-                title={phase === "setup" ? "Shared Piece Bag" : "Move History"}
+                title={gameUi(phase === "setup" ? "Shared Piece Bag" : "Move History")}
                 subtitle={
-                  phase === "setup"
+                  gameUi(phase === "setup"
                     ? `Seed ${setupState.seed}`
-                    : `${historyRows.length} plies · click to preview`
+                    : `${historyRows.length} plies · click to preview`)
                 }
               >
                 {phase === "setup" ? (
@@ -1404,7 +1407,7 @@ export function MirrorMultiplayerGame() {
                               : "border-white/5 bg-white/[0.03] text-zinc-400"
                         }`}
                       >
-                        {whiteSymbols[piece]}
+                        {gameUi(whiteSymbols[piece])}
                       </div>
                     ))}
                   </div>
@@ -1424,7 +1427,7 @@ export function MirrorMultiplayerGame() {
                       ply: row.ply,
                       side: row.color,
                       moveNumber: row.moveNumber,
-                      content: <span className="truncate font-mono text-xs font-black text-zinc-200">{row.san}</span>,
+                      content: <span className="truncate font-mono text-xs font-black text-zinc-200">{gameUi(row.san)}</span>,
                     }))}
                     onSelect={setHistoryPreviewPly}
                   />
@@ -1434,20 +1437,20 @@ export function MirrorMultiplayerGame() {
               <Panel
                 title={ui("Mirror Status")}
                 subtitle={
-                  phase === "setup"
+                  gameUi(phase === "setup"
                     ? "One placement creates two pieces"
-                    : "Symmetric origin · normal chess play"
+                    : "Symmetric origin · normal chess play")
                 }
               >
                 <div className="grid grid-cols-2 gap-2">
                   <div className="rounded-xl border border-white/5 bg-black/20 p-3">
                     <p className="text-[9px] uppercase tracking-wider text-zinc-600">{ui("Placed pairs")}</p>
-                    <p className="mt-1 text-xl font-black">{placementCount}</p>
+                    <p className="mt-1 text-xl font-black">{gameUi(placementCount)}</p>
                   </div>
                   <div className="rounded-xl border border-white/5 bg-black/20 p-3">
                     <p className="text-[9px] uppercase tracking-wider text-zinc-600">{ui("Seed")}</p>
                     <p className="mt-1 truncate font-mono text-xs font-black">
-                      {setupState.seed}
+                      {gameUi(setupState.seed)}
                     </p>
                   </div>
                 </div>
@@ -1458,7 +1461,7 @@ export function MirrorMultiplayerGame() {
         </main>
 
         {players.length < 2 && (
-          <div className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm font-semibold text-amber-100">{ui("Waiting for a second player. Share room code")}{" "}
+          <div className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3 text-sm font-semibold text-amber-100">{ui("Waiting for a second player. Share room code")}{gameUi(" ")}
             <span className="font-mono font-black">{room.code}</span>.
           </div>
         )}

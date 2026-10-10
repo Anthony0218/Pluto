@@ -9,3 +9,6 @@ They were resized with `sips`; nothing else was changed.
 | `schafkopf-bavarian.png` | `../schafkopf/avatars/bavarian.png` (400 px high) |
 | `schafkopf-dirndl.png` | `../schafkopf/avatars/dirndl.png` (400 px high) |
 | `schafkopf-plaid.png` | `../schafkopf/avatars/plaid.png` (400 px high) |
+| `watten-herz-king.png` | `../bavarian/herz-king.png` (340 px high) |
+| `watten-schellen-7.png` | `../bavarian/schellen-7.png` (340 px high) |
+| `watten-eichel-7.png` | `../bavarian/eichel-7.png` (340 px high) |

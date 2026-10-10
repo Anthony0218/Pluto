@@ -14,6 +14,15 @@
 .chess-game-grid > aside section { border-color: #fbbf2426; background-color: #091019e6; border-radius: 20px; }
 .chess-game-grid > aside { min-width: 0; scrollbar-width: thin; }
 .chess-variant-result-actions > * { width: auto !important; max-width: 100%; margin: 0 !important; }
+.chess-board-frame { max-width: var(--board-size, 820px); margin-inline: auto; }
+/* Result and actual XP share one compact row instead of pushing down the board. */
+.chess-status-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(130px, .65fr); gap: 8px; margin-bottom: 8px; }
+.chess-status-row > section { min-width: 0; margin: 0 !important; padding: 8px 10px; }
+.chess-status-row > [role="status"] { gap: 8px; }
+.chess-status-row > [role="status"] > svg { display: none; }
+.chess-status-row > [role="status"] > strong { font-size: 16px; }
+.chess-status-row > [role="status"] p { font-size: 10px; line-height: 1.4; }
+.chess-status-row > section:first-child { flex-wrap: wrap; }
 .chess-sidebar-toggle { display: none; }
 body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
 @media (min-width:1280px) {
@@ -47,9 +56,30 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
   .chess-menu-page header .mt-12 { margin-top: 20px; }
 }
 @media (max-width:1279px) {
+  /* Sidebar visibility stays available without covering the bottom rank. */
+  body:has(.chess-game-grid) .chess-sidebar-toggle { position: static; margin: 12px 16px; }
+  /* Long rule summaries and legends follow gameplay on smaller screens. */
+  :has(> .chess-game-grid) { display: flex; flex-direction: column; }
+  :has(> .chess-game-grid) > * { order: 2; }
+  :has(> .chess-game-grid) > header { order: 0; }
+  :has(> .chess-game-grid) > .chess-game-grid { order: 1; }
   .chess-game-grid { display: flex; flex-direction: column; align-items: center; }
   .chess-game-grid > :not(aside) { order: 0; width: min(100%,800px); }
   .chess-game-grid > aside { order: 1; width: min(100%,800px); }
+  /* Flatten only layout wrappers; controls keep their panel and React state. */
+  .chess-game-grid > aside,
+  .chess-game-grid > aside :has([data-chess-controls]) { display: contents; }
+  .chess-game-grid > aside > *,
+  .chess-game-grid > aside :has([data-chess-controls]) > * { order: 2; width: min(100%,800px); margin: 0; }
+  .chess-game-grid > aside [data-chess-controls] { order: 1; width: min(100%,800px); margin: 0; }
+  .chess-game-grid > aside > div:not(:has([data-chess-controls])) { display: flex; flex-direction: column; gap: 16px; }
+  .chess-game-grid > :not(aside):has(.chess-board-frame),
+  .chess-game-grid > :not(aside) :has(.chess-board-frame):not(.relative):not(.shrink-0) { display: contents; }
+  .chess-game-grid > :not(aside):has(.chess-board-frame) > *,
+  .chess-game-grid > :not(aside) :has(.chess-board-frame):not(.relative):not(.shrink-0) > * { order: -1; width: min(100%,800px); }
+  .chess-game-grid > :not(aside) :is(.chess-board-frame, .relative:has(.chess-board-frame), .shrink-0:has(.chess-board-frame)) { order: 0 !important; width: min(100%,var(--board-size)); margin-inline: auto; }
+  .chess-game-grid > :not(aside):has(.chess-board-frame) > :has(.chess-board-frame) ~ *,
+  .chess-game-grid > :not(aside) :has(.chess-board-frame) > :is(.chess-board-frame, :has(.chess-board-frame)) ~ * { order: 2 !important; }
   .four-player-game-grid > :not(aside), .four-player-game-grid > aside { width: 100%; }
 }
 @media (max-width:639px) {
@@ -88,7 +118,7 @@ body:has(.chess-game-grid) .chess-sidebar-toggle { display: block; }
 .chess-header-brand { display: flex; align-items: center; gap: 12px; min-width: 0; margin-right: auto; flex: 1 1 320px; }
 /* Description sits right after the name; when it does not fit it wraps to its own second line under the name. */
 .chess-header-text { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; row-gap: 1px; min-width: 0; flex: 1 1 0; }
-.chess-header-logo { display: flex; align-items: baseline; gap: 6px; flex-shrink: 0; }
+.chess-header-logo { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .chess-header-colon { color: color-mix(in srgb,var(--chess-header-accent) 80%,#fff); font: 700 18px/1 Georgia,serif; }
 .chess-header-name { font: 600 16px Georgia,serif; color: #f4f4f5; overflow-wrap: anywhere; }
 .chess-header-details { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-width: 0; }

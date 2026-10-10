@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { useEffect, useRef } from "react";
 import { COLORS } from "../../../../games/party/config.ts";
 import { PADDLE_PANIC_CONFIG as CONFIG } from "../../../../games/party/minigames/paddlePanic/config.ts";
@@ -34,6 +35,7 @@ export default function PaddlePanicScreen({
   online,
   sendInput,
 }: MinigameViewProps) {
+  useGameLanguage();
   const view = minigame.state as PaddlePanicView;
   const canvas = useRef<HTMLCanvasElement>(null);
   const offset = useServerOffset(minigame.serverNow);
@@ -163,24 +165,24 @@ export default function PaddlePanicScreen({
     <div className="duel-game">
       <div className="duel-hud">
         <span className="duel-side" style={{ "--pawn-color": leftColor } as React.CSSProperties}>
-          <i /> {left.name}
-          {left.id === playerId ? " · you" : ""}
-          <b>{view.scores[left.id]}</b>
+          <i /> {gameUi(left.name)}
+          {gameUi(left.id === playerId ? " · you" : "")}
+          <b>{gameUi(view.scores[left.id])}</b>
         </span>
         <span className={`tp-timer ${secondsLeft <= 10 ? "urgent" : ""}`} role="timer">
-          {secondsLeft}
+          {gameUi(secondsLeft)}
           <small>s</small>
         </span>
         <span className="duel-side right" style={{ "--pawn-color": rightColor } as React.CSSProperties}>
-          <b>{view.scores[right.id]}</b>
-          {right.name}
-          {right.id === playerId ? " · you" : ""} <i />
+          <b>{gameUi(view.scores[right.id])}</b>
+          {gameUi(right.name)}
+          {gameUi(right.id === playerId ? " · you" : "")} <i />
         </span>
       </div>
       <canvas
         ref={canvas}
         className="pp-paddle-court"
-        aria-label={`Paddle Panic court. ${left.name} ${view.scores[left.id]}, ${right.name} ${view.scores[right.id]}. First to ${CONFIG.pointsToWin}.`}
+        aria-label={gameUi(`Paddle Panic court. ${left.name} ${view.scores[left.id]}, ${right.name} ${view.scores[right.id]}. First to ${CONFIG.pointsToWin}.`)}
         onPointerDown={(e) => {
           e.currentTarget.setPointerCapture(e.pointerId);
           aimAt(e.clientY);
@@ -190,13 +192,12 @@ export default function PaddlePanicScreen({
         }}
       />
       <p className="duel-help">
-        {mine
+        {gameUi(mine
           ? `You are ${mine.side.toUpperCase()}. Drag up and down anywhere on the court. First to ${CONFIG.pointsToWin}.`
-          : "Spectating the duel."}
+          : "Spectating the duel.")}
       </p>
       {scorer && (
-        <div className="tp-banner duel-point" key={view.lastPoint!.at}>
-          POINT {match.players.find((p) => p.id === scorer)?.name.toUpperCase()}
+        <div className="tp-banner duel-point" key={view.lastPoint!.at}>{gameUi(" POINT ")}{gameUi(match.players.find((p) => p.id === scorer)?.name.toUpperCase())}
         </div>
       )}
     </div>

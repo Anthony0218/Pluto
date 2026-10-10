@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { useAppLanguage } from "@/i18n/languageStore";
 import "./wattenMenus.css";
 import { useCallback, useState } from "react";
@@ -89,7 +90,7 @@ export default function Watten() {
     <div className="watten-menu__layout">
       <div className="watten-menu__panel">
         <div className="watten-pub-bar">
-          <div className="watten-pub-brand"><span className="watten-menu__seal">W</span><span><strong>WATTEN</strong><small>{t("Bavarian Watten")}</small></span></div>
+          <div className="watten-pub-brand"><span className="watten-menu__seal">W</span><span><strong>{gameUi("WATTEN")}</strong><small>{t("Bavarian Watten")}</small></span></div>
         </div>
 
         <div className="watten-pub-grid">
@@ -106,11 +107,11 @@ export default function Watten() {
                 <img src="/images/bavarian/schellen-7.png" alt="" />
                 <img src="/images/bavarian/eichel-7.png" alt="" />
               </div>
-              <span className="watten-pub-table__stamp">EST. AT THE TABLE</span>
+              <span className="watten-pub-table__stamp">{gameUi("EST. AT THE TABLE")}</span>
             </div>
             <button type="button" className="watten-pub-talk" onClick={() => setTip(current => (current + 1) % tableTalk.length)} aria-label={t("Next table note")}>
               <span className="watten-pub-talk__icon" aria-hidden="true">✦</span>
-              <span><small>{t("TABLE TALK")} · {tip + 1} / {tableTalk.length}</small><strong>{t(tableTalk[tip])}</strong></span>
+              <span><small>{t("TABLE TALK")} · {gameUi(tip + 1)} / {gameUi(tableTalk.length)}</small><strong>{t(tableTalk[tip])}</strong></span>
               <ChevronRight size={18} aria-hidden="true" />
             </button>
           </section>
@@ -124,7 +125,7 @@ export default function Watten() {
             </Link>
             <Link to="/games/watten/hotseat" className="watten-pub-choice watten-pub-choice--local">
               <span className="watten-pub-choice__icon"><Gamepad2 size={24} aria-hidden="true" /></span>
-              <span className="watten-pub-choice__text"><small>{t("ONE DEVICE · 3 OR 4 PLAYERS")}</small><strong>Hotseat</strong><span>{t("Pass the device around the table and play together.")}</span></span>
+              <span className="watten-pub-choice__text"><small>{t("ONE DEVICE · 3 OR 4 PLAYERS")}</small><strong>{gameUi("Hotseat")}</strong><span>{t("Pass the device around the table and play together.")}</span></span>
               <span className="watten-pub-choice__arrow"><ArrowRight size={21} aria-hidden="true" /></span>
             </Link>
             <Link to="/games/watten/multiplayer" className="watten-pub-choice watten-pub-choice--online">

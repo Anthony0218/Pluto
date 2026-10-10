@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { isMissedWin, REVIEW_SPEEDS, playbackDelay } from "./reviewPlayback.ts";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -1448,7 +1449,7 @@ export default function ChessGameReview({
 
             <div className="flex items-center gap-1.5">
               <span className="rounded-full bg-white/5 px-2 py-0.5 text-[9px] font-bold text-zinc-500">
-                {filteredReviews.length}/{reviewRows.length}
+                {gameUi(filteredReviews.length)}/{gameUi(reviewRows.length)}
               </span>
             </div>
           </div>
@@ -1468,12 +1469,12 @@ export default function ChessGameReview({
                     : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
                 }`}
               >
-                {option.key !== "all" && (
+                {gameUi(option.key !== "all" && (
                   <span
                     aria-hidden="true"
                     className={`h-2 w-2 rounded-full border ${option.key === "w" ? "border-white/60 bg-zinc-100" : "border-zinc-500 bg-zinc-900"}`}
                   />
-                )}
+                ))}
                 {ui(option.label)}
               </button>
             ))}
@@ -1608,7 +1609,7 @@ export default function ChessGameReview({
               </thead>
 
               <tbody>
-                {pairedReviews.length === 0 ? (
+                {gameUi(pairedReviews.length === 0 ? (
                   <tr>
                     <td colSpan={3} className="px-4 py-8 text-center">
                       <div className="text-2xl text-zinc-700">♟</div>
@@ -1623,10 +1624,10 @@ export default function ChessGameReview({
                 ) : (
                   pairedReviews.map((pair) => (
                     <tr key={pair.moveNumber} className="border-b border-white/5 last:border-0">
-                      <td className="px-2 py-1.5 text-[10px] text-zinc-600">{pair.moveNumber}.</td>
+                      <td className="px-2 py-1.5 text-[10px] text-zinc-600">{gameUi(pair.moveNumber)}.</td>
                       {[pair.white, pair.black].map((row, index) => (
                         <td key={index} className="px-1 py-1">
-                          {row && (
+                          {gameUi(row && (
                             <PairedReviewCell
                               row={row}
                               quality={displayQuality(row)}
@@ -1634,12 +1635,12 @@ export default function ChessGameReview({
                               showLoss={showLoss}
                               onSelect={() => selectReviewMove(row.review.ply)}
                             />
-                          )}
+                          ))}
                         </td>
                       ))}
                     </tr>
                   ))
-                )}
+                ))}
               </tbody>
             </table>
           ) : (
@@ -1670,14 +1671,14 @@ export default function ChessGameReview({
                     onClick={() => changeSort("quality")}
                   />
 
-                  {showLoss && (
+                  {gameUi(showLoss && (
                     <SortableHeader
                       label={ui("Loss")}
                       active={sortKey === "loss"}
                       direction={sortDirection}
                       onClick={() => changeSort("loss")}
                     />
-                  )}
+                  ))}
                 </tr>
               </thead>
 
@@ -1714,34 +1715,34 @@ export default function ChessGameReview({
                         }`}
                       >
                         <td className="px-2 py-2 text-[10px] text-zinc-600">
-                          {review.moveNumber}
-                          {review.color === "w" ? "." : "..."}
+                          {gameUi(review.moveNumber)}
+                          {gameUi(review.color === "w" ? "." : "...")}
                         </td>
 
                         <td className="px-1.5 py-2">
-                          {pieceType ? (
+                          {gameUi(pieceType ? (
                             <div className="flex items-center gap-1">
                               <span className="w-5 text-center text-lg leading-none">
-                                {pieceSymbols[review.color][pieceType]}
+                                {gameUi(pieceSymbols[review.color][pieceType])}
                               </span>
 
                               <span className="hidden text-[8px] text-zinc-600 2xl:inline">
-                                {pieceNames[pieceType]}
+                                {gameUi(pieceNames[pieceType])}
                               </span>
                             </div>
                           ) : (
                             <span className="text-zinc-700">·</span>
-                          )}
+                          ))}
                         </td>
 
                         <td className="px-1.5 py-2">
                           <p className="font-mono text-xs font-bold text-zinc-200">
-                            {review.san}
+                            {gameUi(review.san)}
                           </p>
 
                           <div className="mt-0.5 flex flex-wrap gap-1">
                             <span className="text-[7px] text-zinc-600">
-                              {row.phase}
+                              {gameUi(row.phase)}
                             </span>
 
                             {row.moveTags.slice(0, 2).map((tag) => (
@@ -1749,7 +1750,7 @@ export default function ChessGameReview({
                                 key={tag}
                                 className="text-[7px] text-zinc-700"
                               >
-                                · {formatMoveTag(tag)}
+                                · {gameUi(formatMoveTag(tag))}
                               </span>
                             ))}
                           </div>
@@ -1759,11 +1760,11 @@ export default function ChessGameReview({
                           <QualityBadge quality={displayQuality(row)} />
                         </td>
 
-                        {showLoss && (
+                        {gameUi(showLoss && (
                           <td className="px-1.5 py-2 text-[9px] font-bold text-zinc-500">
-                            {(review.centipawnLoss / 100).toFixed(2)}
+                            {gameUi((review.centipawnLoss / 100).toFixed(2))}
                           </td>
-                        )}
+                        ))}
                       </tr>
                     );
                   })
@@ -1836,11 +1837,11 @@ export default function ChessGameReview({
         {/* HEADER */}
 
         {/* z-20: the Audio / Appearance menus drop down over the review body. */}
-        <ChessPageHeader className="relative z-20 flex shrink-0 items-center justify-between border-b border-amber-100/[0.08] bg-[#08111b]/88 px-3 py-2.5 sm:px-5 sm:py-3.5" title="Game Review">
+        <ChessPageHeader className="relative z-20 flex shrink-0 items-center justify-between border-b border-amber-100/[0.08] bg-[#08111b]/88 px-3 py-2.5 sm:px-5 sm:py-3.5" title={gameUi("Game Review")}>
 
 
           <div className="flex items-center gap-2">
-            {reviews.length > 0 && (
+            {gameUi(reviews.length > 0 && (
               <button
                 type="button"
                 onClick={() => {
@@ -1856,9 +1857,9 @@ export default function ChessGameReview({
                     : "border-white/[0.08] bg-white/[0.035] text-zinc-400 hover:border-amber-200/15 hover:bg-amber-200/[0.05] hover:text-[#f3e7cf]"
                 }`}
               >
-                {detailsOpen ? ui("← Simple") : ui("Details")}
+                {gameUi(detailsOpen ? ui("← Simple") : ui("Details"))}
               </button>
-            )}
+            ))}
 
             <button
               type="button"
@@ -1870,16 +1871,16 @@ export default function ChessGameReview({
           </div>
         </ChessPageHeader>
 
-        {(trainingPuzzleStatus || reviews.length > 0) && (
+        {gameUi((trainingPuzzleStatus || reviews.length > 0) && (
           <div className="mx-3 mt-3 flex shrink-0 flex-col gap-2 sm:mx-4 lg:flex-row lg:items-stretch">
-            {trainingPuzzleStatus && (
+            {gameUi(trainingPuzzleStatus && (
               <div className="flex items-center rounded-2xl border border-amber-300/15 bg-[linear-gradient(135deg,rgba(111,76,32,.14),rgba(7,14,22,.68))] px-4 py-2 text-xs leading-5 text-amber-100/80 shadow-inner shadow-black/20 lg:w-[34%] lg:max-w-[520px] lg:shrink-0">
                 <span className="mr-2 shrink-0 text-amber-300">✦</span>
-                <span className="min-w-0">{trainingPuzzleStatus}</span>
+                <span className="min-w-0">{gameUi(trainingPuzzleStatus)}</span>
               </div>
-            )}
+            ))}
 
-            {reviews.length > 0 && (
+            {gameUi(reviews.length > 0 && (
               <ReviewPlaybackBar
                 rows={reviewRows}
                 ply={selectedPly}
@@ -1889,9 +1890,9 @@ export default function ChessGameReview({
                 onTogglePlay={togglePlayback}
                 onSeek={(ply) => selectReviewMove(Math.max(0, Math.min(reviews.length, ply)))}
               />
-            )}
+            ))}
           </div>
-        )}
+        ))}
 
         {/* BEFORE ANALYSIS */}
 
@@ -1914,7 +1915,7 @@ export default function ChessGameReview({
                   <div className="rounded-2xl border border-white/[0.06] bg-black/20 p-3.5">
                     <p className="text-[8px] font-black uppercase tracking-wider text-zinc-700">{ui("Moves")}</p>
                     <p className="mt-1 font-serif text-2xl font-semibold text-[#eadbbc]">
-                      {moves.length}
+                      {gameUi(moves.length)}
                     </p>
                   </div>
 
@@ -1938,11 +1939,11 @@ export default function ChessGameReview({
                     <div className="min-w-0">
                       <p className="text-[9px] font-black uppercase tracking-[0.24em] text-amber-300/75">{ui("Did you know?")}</p>
 
-                      {puzzleSource ? (
+                      {gameUi(puzzleSource ? (
                         <>
                           <h4 className="mt-1 font-serif text-lg font-semibold text-[#f2e4c9]">{ui("You have to press “Analyse Game” to create your personal puzzle.")}</h4>
 
-                          <p className="mt-2 max-w-4xl text-xs leading-5 text-zinc-400">{ui("Let the analysis finish. Afterwards, your biggest meaningful missed opportunity is turned into one private training position under")}{" "}
+                          <p className="mt-2 max-w-4xl text-xs leading-5 text-zinc-400">{ui("Let the analysis finish. Afterwards, your biggest meaningful missed opportunity is turned into one private training position under")}{gameUi(" ")}
                             <strong className="text-violet-200">{ui("Puzzles → My Games")}</strong>
                             .
                           </p>
@@ -1957,7 +1958,7 @@ export default function ChessGameReview({
                             />
 
                             <span className="rounded-full border border-white/[0.07] bg-black/20 px-2.5 py-1 text-[9px] font-black text-zinc-300">
-                              {puzzleSource === "singleplayer" ? ui("From your Singleplayer game") : ui("From your Multiplayer game")}
+                              {gameUi(puzzleSource === "singleplayer" ? ui("From your Singleplayer game") : ui("From your Multiplayer game"))}
                             </span>
 
                             <span className="text-[9px] text-zinc-600">{ui("No puzzle is created before the analysis finishes.")}</span>
@@ -1972,33 +1973,33 @@ export default function ChessGameReview({
                               onChange={(event) =>
                                 setPuzzleName(event.target.value)
                               }
-                              placeholder={defaultPersonalPuzzleName(
+                              placeholder={gameUi(defaultPersonalPuzzleName(
                                 puzzleSource,
-                              )}
+                              ))}
                               className="mt-1.5 w-full rounded-xl border border-white/[0.08] bg-black/25 px-3 py-2.5 text-sm font-semibold text-[#f1e4ca] outline-none transition placeholder:text-zinc-700 focus:border-amber-300/35 focus:bg-black/35"
                             />
                             <span className="mt-1.5 block text-[9px] leading-4 text-zinc-700">{ui("Suggested convention: mode · date · time. You can replace it with any memorable name before analysis.")}</span>
                           </label>
 
-                          {!user && (
+                          {gameUi(!user && (
                             <p className="mt-3 rounded-xl border border-rose-400/15 bg-rose-400/[0.05] px-3 py-2 text-xs text-rose-200/80">{ui("Sign in before analysing if you want the personal puzzle saved to your account.")}</p>
-                          )}
+                          ))}
                         </>
                       ) : (
                         <>
                           <h4 className="mt-1 font-serif text-lg font-semibold text-[#f2e4c9]">{ui("Personal puzzles are available for Singleplayer and Multiplayer games.")}</h4>
                           <p className="mt-2 text-xs leading-5 text-zinc-500">{ui("Hotseat Game Review can still analyse the game, but it never creates a personal training puzzle.")}</p>
                         </>
-                      )}
+                      ))}
                     </div>
                   </div>
                 </div>
 
-                {error && (
+                {gameUi(error && (
                   <p className="mt-4 rounded-xl border border-red-400/20 bg-red-400/[0.06] px-3 py-2 text-sm text-red-200">
                     {ui(error)}
                   </p>
-                )}
+                ))}
 
                 <div className="mt-7 flex flex-wrap items-center gap-4">
                   <button
@@ -2009,14 +2010,14 @@ export default function ChessGameReview({
                     onClick={runReview}
                     className="inline-flex min-w-52 items-center justify-center gap-2 rounded-2xl border border-amber-200/25 bg-[linear-gradient(180deg,rgba(245,190,92,.98),rgba(207,145,53,.96))] px-8 py-4 text-sm font-black text-[#161007] shadow-[0_12px_30px_rgba(190,126,40,.18)] transition hover:-translate-y-0.5 hover:brightness-105 disabled:translate-y-0 disabled:cursor-wait disabled:opacity-40"
                   >
-                    {reviewing ? (
+                    {gameUi(reviewing ? (
                       <>
-                        <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#161007]/25 border-t-[#161007]" />{ui("Analyzing")}{progress}/{moves.length}
+                        <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#161007]/25 border-t-[#161007]" />{ui("Analyzing")}{gameUi(progress)}/{gameUi(moves.length)}
                       </>
                     ) : (
                       <>
                         <span>✦</span>{ui("Analyse Game")}</>
-                    )}
+                    ))}
                   </button>
 
                   <p className="text-[10px] leading-4 text-zinc-700">{ui("Keep this window open until the analysis has finished.")}</p>
@@ -2045,7 +2046,7 @@ export default function ChessGameReview({
                       active={showingPlayedMove}
                       onClick={showPlayedMove}
                     />
-                    {selected.openingName && <p className="mt-2 text-xs font-semibold text-purple-300">{selected.openingName}</p>}
+                    {selected.openingName && <p className="mt-2 text-xs font-semibold text-purple-300">{gameUi(selected.openingName)}</p>}
 
                     {winningMove && (
                       <CorrectMoveButton
@@ -2068,20 +2069,20 @@ export default function ChessGameReview({
                         <span className="text-xs text-zinc-500">{ui("Evaluation loss")}</span>
 
                         <strong className="text-sm text-zinc-200">
-                          {(selected.centipawnLoss / 100).toFixed(2)}</strong>
+                          {gameUi((selected.centipawnLoss / 100).toFixed(2))}</strong>
                       </div>
 
-                      {selectedRow.criticalLabel && (
+                      {gameUi(selectedRow.criticalLabel && (
                         <div className="mt-2 rounded-lg border border-orange-400/20 bg-orange-400/[0.07] px-2.5 py-2 text-xs font-bold text-orange-300">
-                          ⚠ {selectedRow.criticalLabel}
+                          ⚠ {gameUi(selectedRow.criticalLabel)}
                         </div>
-                      )}
+                      ))}
 
-                      {selectedRow.missedOpportunity && (
+                      {gameUi(selectedRow.missedOpportunity && (
                         <p className="mt-2 text-xs leading-5 text-zinc-400">
-                          {selectedRow.missedOpportunity}
+                          {gameUi(selectedRow.missedOpportunity)}
                         </p>
-                      )}
+                      ))}
                     </div>
 
                     {/* EDUCATIONAL EXPLANATION */}
@@ -2097,7 +2098,7 @@ export default function ChessGameReview({
                               className="flex gap-2 text-xs leading-5"
                             >
                               <span className="mt-0.5 text-amber-400">•</span>
-                              <span className="text-zinc-400">{bullet}</span>
+                              <span className="text-zinc-400">{gameUi(bullet)}</span>
                             </div>
                           ),
                         )}
@@ -2106,23 +2107,23 @@ export default function ChessGameReview({
 
                     {/* MATERIAL */}
 
-                    {(selectedRow.capturedPiece ||
+                    {gameUi((selectedRow.capturedPiece ||
                       selectedRow.promotionGain > 0) && (
                       <div className="mt-4 rounded-xl border border-white/5 bg-black/20 p-3">
                         <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">{ui("Material Change")}</p>
 
-                        {selectedRow.capturedPiece && (
-                          <p className="mt-2 text-xs text-zinc-300">{ui("Captured")}{pieceNames[selectedRow.capturedPiece]} (+
-                            {selectedRow.materialGain})
+                        {gameUi(selectedRow.capturedPiece && (
+                          <p className="mt-2 text-xs text-zinc-300">{ui("Captured")}{gameUi(pieceNames[selectedRow.capturedPiece])} (+
+                            {gameUi(selectedRow.materialGain)})
                           </p>
-                        )}
+                        ))}
 
-                        {selectedRow.promotionGain > 0 && (
-                          <p className="mt-1 text-xs text-zinc-300">{ui("Promotion gain +")}{selectedRow.promotionGain}
+                        {gameUi(selectedRow.promotionGain > 0 && (
+                          <p className="mt-1 text-xs text-zinc-300">{ui("Promotion gain +")}{gameUi(selectedRow.promotionGain)}
                           </p>
-                        )}
+                        ))}
                       </div>
-                    )}
+                    ))}
 
                     {/* TOP 3 */}
 
@@ -2154,7 +2155,7 @@ export default function ChessGameReview({
                           <p className="mt-1 text-[10px] text-zinc-600">{ui("Click a continuation move to preview it on the board")}</p>
                         </div>
 
-                        {!continuation && (
+                        {gameUi(!continuation && (
                           <button
                             type="button"
                             disabled={
@@ -2166,17 +2167,17 @@ export default function ChessGameReview({
                             onClick={() => void loadContinuation()}
                             className="rounded-lg border border-amber-400/20 bg-amber-400/10 px-2.5 py-1.5 text-[10px] font-bold text-amber-300 disabled:opacity-40"
                           >
-                            {continuationLoading ? ui("Analyzing...") : ui("Show")}
+                            {gameUi(continuationLoading ? ui("Analyzing...") : ui("Show"))}
                           </button>
-                        )}
+                        ))}
                       </div>
 
-                      {continuation && (
+                      {gameUi(continuation && (
                         <div className="mt-3">
                           <div className="flex items-center justify-between">
                             <span className="text-[10px] text-zinc-600">{ui("Engine eval")}</span>
                             <span className="text-xs font-bold text-zinc-300">
-                              {continuation.evaluation}
+                              {gameUi(continuation.evaluation)}
                             </span>
                           </div>
 
@@ -2200,11 +2201,11 @@ export default function ChessGameReview({
                                     key={`${move}-${index}`}
                                     className="flex items-center gap-1.5"
                                   >
-                                    {index > 0 && (
+                                    {gameUi(index > 0 && (
                                       <span className="text-[10px] font-black text-zinc-700">
                                         →
                                       </span>
-                                    )}
+                                    ))}
 
                                     <button
                                       type="button"
@@ -2218,15 +2219,15 @@ export default function ChessGameReview({
                                       }`}
                                     >
                                       <span className="text-[10px]">
-                                        {moveColor === "w" ? "♔" : "♚"}
+                                        {gameUi(moveColor === "w" ? "♔" : "♚")}
                                       </span>
 
                                       <span className="text-[8px] font-black uppercase tracking-wide">
-                                        {moveColor === "w" ? ui("White") : ui("Black")}
+                                        {gameUi(moveColor === "w" ? ui("White") : ui("Black"))}
                                       </span>
 
                                       <span className="font-mono text-[11px] font-bold text-zinc-200">
-                                        {move}
+                                        {gameUi(move)}
                                       </span>
                                     </button>
                                   </div>
@@ -2235,20 +2236,20 @@ export default function ChessGameReview({
                             </div>
                           </div>
                         </div>
-                      )}
+                      ))}
 
-                      {continuationError && (
+                      {gameUi(continuationError && (
                         <p className="mt-2 text-xs text-red-300">
-                          {continuationError}
+                          {gameUi(continuationError)}
                         </p>
-                      )}
+                      ))}
                     </div>
 
                     {/* PIECE PERFORMANCE */}
 
                     <div className="mt-5">
                       <p className="text-[9px] font-black uppercase tracking-[0.18em] text-amber-200/45">
-                        {selected.color === "w" ? ui("White") : ui("Black")}{ui("Piece Performance")}</p>
+                        {gameUi(selected.color === "w" ? ui("White") : ui("Black"))}{ui("Piece Performance")}</p>
 
                       <div className="mt-2 space-y-1.5">
                         {selectedSidePiecePerformance.map((performance) => (
@@ -2257,19 +2258,19 @@ export default function ChessGameReview({
                             className="grid grid-cols-[32px_1fr_auto] items-center gap-2 rounded-lg bg-black/20 px-2.5 py-2"
                           >
                             <span className="text-center text-xl">
-                              {pieceSymbols[selected.color][performance.piece]}
+                              {gameUi(pieceSymbols[selected.color][performance.piece])}
                             </span>
 
                             <div>
                               <p className="text-xs font-bold text-zinc-300">
-                                {pieceNames[performance.piece]}
+                                {gameUi(pieceNames[performance.piece])}
                               </p>
                               <p className="text-[9px] text-zinc-600">
-                                {performance.moves}{ui(" moves · ")}{performance.best}{" "}{ui("best ·")}{performance.mistakes}{ui("errors")}</p>
+                                {gameUi(performance.moves)}{ui(" moves · ")}{gameUi(performance.best)}{gameUi(" ")}{ui("best ·")}{gameUi(performance.mistakes)}{ui("errors")}</p>
                             </div>
 
                             <span className="text-[10px] font-bold text-zinc-500">
-                              {performance.acpl}{ui("ACPL")}</span>
+                              {gameUi(performance.acpl)}{ui("ACPL")}</span>
                           </div>
                         ))}
                       </div>
@@ -2288,17 +2289,17 @@ export default function ChessGameReview({
                           >
                             <div className="flex items-center justify-between gap-2">
                               <span className="text-xs font-bold text-zinc-300">
-                                {performance.phase}
+                                {gameUi(performance.phase)}
                               </span>
 
                               <span className="text-[10px] text-zinc-500">
-                                {performance.acpl}{ui("ACPL")}</span>
+                                {gameUi(performance.acpl)}{ui("ACPL")}</span>
                             </div>
 
                             <div className="mt-1 flex items-center justify-between text-[9px] text-zinc-600">
-                              <span>{performance.moves}{ui(" moves")}</span>
+                              <span>{gameUi(performance.moves)}{ui(" moves")}</span>
                               <span>
-                                {performance.goodOrBetterPercent}{ui("% good-or-better")}</span>
+                                {gameUi(performance.goodOrBetterPercent)}{ui("% good-or-better")}</span>
                             </div>
                           </div>
                         ))}
@@ -2331,7 +2332,7 @@ export default function ChessGameReview({
                     moveAnimation={moveAnimation}
                   />
 
-                  {continuationMove && selected && (
+                  {gameUi(continuationMove && selected && (
                     <div className="mt-2 flex flex-col items-center gap-2 rounded-xl border border-yellow-300/20 bg-yellow-300/[0.07] px-3 py-2 text-center text-xs text-yellow-100/85 sm:flex-row sm:justify-between sm:text-left">
                       <span>{ui("Continuation preview · the yellow squares show the move you clicked")}</span>
                       <button
@@ -2343,11 +2344,11 @@ export default function ChessGameReview({
                         {ui("Play from here")}
                       </button>
                     </div>
-                  )}
+                  ))}
 
-                  {!continuationMove && alternativeMove && selected && (
+                  {gameUi(!continuationMove && alternativeMove && selected && (
                     <div className="mt-2 rounded-xl border border-amber-400/20 bg-amber-400/[0.07] px-3 py-2 text-center text-xs text-amber-200">{ui("Showing Stockfish alternative instead of the played move")}</div>
-                  )}
+                  ))}
                 </div>
               </main>
             </div>
@@ -2356,7 +2357,7 @@ export default function ChessGameReview({
                 RIGHT — WHITE MOVE REVIEW
                =============================================== */}
 
-            <div className="min-h-0">{renderMoveReviewPanel(true)}</div>
+            <div className="min-h-0">{gameUi(renderMoveReviewPanel(true))}</div>
           </div>
         ) : (
           <div className="grid min-h-0 flex-auto auto-rows-max gap-2 bg-[radial-gradient(circle_at_50%_12%,rgba(176,126,61,.035),transparent_28%)] p-3 sm:p-4 xl:flex-1 xl:auto-rows-auto xl:grid-cols-[290px_minmax(0,1fr)_450px] xl:overflow-hidden">
@@ -2382,9 +2383,9 @@ export default function ChessGameReview({
                     />
                   )}
 
-                  <div className="mt-4 rounded-xl bg-black/20 p-3 text-xs text-zinc-500">{ui("Evaluation loss")}{" "}
+                  <div className="mt-4 rounded-xl bg-black/20 p-3 text-xs text-zinc-500">{ui("Evaluation loss")}{gameUi(" ")}
                     <strong className="text-zinc-200">
-                      {(selected.centipawnLoss / 100).toFixed(2)}</strong>
+                      {gameUi((selected.centipawnLoss / 100).toFixed(2))}</strong>
                   </div>
 
                   <div className="mt-5">
@@ -2415,7 +2416,7 @@ export default function ChessGameReview({
                         <p className="mt-1 text-[10px] text-zinc-600">{ui("Click a move to preview that position on the board")}</p>
                       </div>
 
-                      {!continuation && (
+                      {gameUi(!continuation && (
                         <button
                           type="button"
                           disabled={
@@ -2427,17 +2428,17 @@ export default function ChessGameReview({
                           onClick={() => void loadContinuation()}
                           className="rounded-xl border border-amber-300/20 bg-amber-300/[0.08] px-3 py-1.5 text-[10px] font-black text-amber-200 transition hover:bg-amber-300/[0.13] disabled:opacity-40"
                         >
-                          {continuationLoading ? ui("Analyzing...") : ui("Show")}
+                          {gameUi(continuationLoading ? ui("Analyzing...") : ui("Show"))}
                         </button>
-                      )}
+                      ))}
                     </div>
 
-                    {continuation && (
+                    {gameUi(continuation && (
                       <div className="mt-3">
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] text-zinc-600">{ui("Engine eval")}</span>
                           <span className="text-xs font-bold text-zinc-300">
-                            {continuation.evaluation}
+                            {gameUi(continuation.evaluation)}
                           </span>
                         </div>
 
@@ -2459,11 +2460,11 @@ export default function ChessGameReview({
                                   key={`${move}-${index}`}
                                   className="flex items-center gap-1.5"
                                 >
-                                  {index > 0 && (
+                                  {gameUi(index > 0 && (
                                     <span className="text-[10px] font-black text-zinc-700">
                                       →
                                     </span>
-                                  )}
+                                  ))}
 
                                   <button
                                     type="button"
@@ -2477,10 +2478,10 @@ export default function ChessGameReview({
                                     }`}
                                   >
                                     <span className="text-[10px]">
-                                      {moveColor === "w" ? "♔" : "♚"}
+                                      {gameUi(moveColor === "w" ? "♔" : "♚")}
                                     </span>
                                     <span className="font-mono text-[11px] font-bold text-zinc-200">
-                                      {move}
+                                      {gameUi(move)}
                                     </span>
                                   </button>
                                 </div>
@@ -2489,13 +2490,13 @@ export default function ChessGameReview({
                           </div>
                         </div>
                       </div>
-                    )}
+                    ))}
 
-                    {continuationError && (
+                    {gameUi(continuationError && (
                       <p className="mt-2 text-xs text-red-300">
-                        {continuationError}
+                        {gameUi(continuationError)}
                       </p>
-                    )}
+                    ))}
                   </div>
                 </>
               )}
@@ -2520,7 +2521,7 @@ export default function ChessGameReview({
                   moveAnimation={moveAnimation}
                 />
 
-                {continuationMove && selected && (
+                {gameUi(continuationMove && selected && (
                   <div className="mt-2 flex flex-col items-center gap-2 rounded-xl border border-yellow-300/20 bg-yellow-300/[0.07] px-3 py-2 text-center text-xs text-yellow-100/85 sm:flex-row sm:justify-between sm:text-left">
                     <span>{ui("Continuation preview · the yellow squares show the move you clicked")}</span>
                     <button
@@ -2532,11 +2533,11 @@ export default function ChessGameReview({
                       {ui("Play from here")}
                     </button>
                   </div>
-                )}
+                ))}
 
-                {!continuationMove && alternativeMove && selected && (
+                {gameUi(!continuationMove && alternativeMove && selected && (
                   <div className="mt-2 rounded-xl border border-amber-400/20 bg-amber-400/[0.07] px-3 py-2 text-center text-xs text-amber-200">{ui("Showing Stockfish alternative instead of the played move")}</div>
-                )}
+                ))}
               </div>
             </main>
 
@@ -2544,7 +2545,7 @@ export default function ChessGameReview({
                 SIMPLE — SAME MOVE REVIEW AS DETAILS
                =============================================== */}
 
-            {renderMoveReviewPanel(false)}
+            {gameUi(renderMoveReviewPanel(false))}
           </div>
         )}
       </div>
@@ -2985,7 +2986,7 @@ function PhaseBadge({ phase }: { phase: GamePhase }) {
   useUiLanguage();
   return (
     <span className="rounded-full border border-white/[0.06] bg-white/[0.04] px-2 py-1 text-[8px] font-black uppercase tracking-wider text-zinc-500">
-      {phase}
+      {gameUi(phase)}
     </span>
   );
 }
@@ -2994,7 +2995,7 @@ function MoveTagBadge({ tag }: { tag: MoveTag }) {
   useUiLanguage();
   return (
     <span className="rounded-full border border-amber-300/10 bg-amber-300/[0.045] px-2 py-1 text-[8px] font-black uppercase tracking-wider text-amber-200/75">
-      {formatMoveTag(tag)}
+      {gameUi(formatMoveTag(tag))}
     </span>
   );
 }
@@ -3024,7 +3025,7 @@ function FilterSelect({
       >
         {options.map(([optionValue, optionLabel]) => (
           <option key={optionValue} value={optionValue}>
-            {optionLabel}
+            {gameUi(optionLabel)}
           </option>
         ))}
       </select>
@@ -3043,7 +3044,7 @@ function MovePiece({ review }: { review: MoveReview }) {
 
   return (
     <span className="w-6 text-center text-xl leading-none">
-      {pieceSymbols[piece.color][piece.type]}
+      {gameUi(pieceSymbols[piece.color][piece.type])}
     </span>
   );
 }
@@ -3077,18 +3078,18 @@ function PairedReviewCell({
       style={{ borderLeftColor: color }}
     >
       <span className="w-4 shrink-0 text-center text-base leading-none">
-        {pieceType ? pieceSymbols[review.color][pieceType] : "·"}
+        {gameUi(pieceType ? pieceSymbols[review.color][pieceType] : "·")}
       </span>
 
       <span className="min-w-0 flex-1 truncate font-mono text-xs font-bold text-zinc-200">
-        {review.san}
+        {gameUi(review.san)}
       </span>
 
-      {showLoss && review.centipawnLoss > 0 && (
+      {gameUi(showLoss && review.centipawnLoss > 0 && (
         <span className="shrink-0 text-[8px] font-bold text-zinc-600">
-          {(review.centipawnLoss / 100).toFixed(2)}
+          {gameUi((review.centipawnLoss / 100).toFixed(2))}
         </span>
-      )}
+      ))}
 
       <span className="shrink-0" style={{ color }}>
         <ReviewQualityIcon quality={quality} size={12} />
@@ -3215,7 +3216,7 @@ function ReviewPlaybackBar({
 
         <button
           type="button"
-          aria-label={playing ? ui("Pause") : ui("Play")}
+          aria-label={gameUi(playing ? ui("Pause") : ui("Play"))}
           onClick={onTogglePlay}
           className="grid h-9 w-9 place-items-center rounded-full border border-amber-200/25 bg-[linear-gradient(180deg,rgba(245,190,92,.98),rgba(207,145,53,.96))] text-[#161007] shadow-[0_6px_18px_rgba(190,126,40,.22)] transition hover:brightness-105"
         >
@@ -3251,7 +3252,7 @@ function ReviewPlaybackBar({
         onChange={(event) => onSpeedChange(Number(event.target.value))}
         className="h-8 shrink-0 rounded-lg border border-white/10 bg-[#101c29] px-1 text-xs font-semibold text-amber-100 focus-visible:outline-2 focus-visible:outline-amber-300"
       >
-        {REVIEW_SPEEDS.map((value) => <option key={value} value={value}>{value}×</option>)}
+        {REVIEW_SPEEDS.map((value) => <option key={value} value={value}>{gameUi(value)}×</option>)}
       </select>
 
       <div className="relative order-last min-w-0 basis-full pb-3 sm:order-none sm:flex-1 sm:basis-auto">
@@ -3305,11 +3306,11 @@ function ReviewPlaybackBar({
                 background: `${phaseColors[segment.phase]}24`,
               }}
             >
-              {width >= 9 && (
+              {gameUi(width >= 9 && (
                 <span className="truncate px-1 text-[8px] font-black uppercase tracking-[0.14em]" style={{ color: `${phaseColors[segment.phase]}cc` }}>
                   {ui(segment.phase)}
                 </span>
-              )}
+              ))}
             </div>
           );
         })}
@@ -3326,12 +3327,12 @@ function ReviewPlaybackBar({
           />
         ))}
 
-        {hoverPly !== null && hoverPly !== ply && (
+        {gameUi(hoverPly !== null && hoverPly !== ply && (
           <span
             className="pointer-events-none absolute inset-y-0 w-px -translate-x-1/2 bg-amber-200/70"
             style={{ left: `${Math.min(99.6, Math.max(0.4, (hoverPly / total) * 100))}%` }}
           />
-        )}
+        ))}
 
         {markers.map((row) => {
           const color = qualityColor(displayQuality(row));
@@ -3351,7 +3352,7 @@ function ReviewPlaybackBar({
         />
       </div>
 
-      {total > 0 && (
+      {gameUi(total > 0 && (
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-3">
           {moveLabels.map((move) => (
             <span
@@ -3359,19 +3360,19 @@ function ReviewPlaybackBar({
               className="absolute top-0.5 -translate-x-1/2 font-mono text-[8px] font-bold leading-none text-zinc-500"
               style={{ left: `${Math.min(97, Math.max(2, ((move * 2 - 1) / total) * 100))}%` }}
             >
-              {move}
+              {gameUi(move)}
             </span>
           ))}
         </div>
-      )}
+      ))}
       </div>
 
       <div className="ml-auto w-14 shrink-0 text-right sm:ml-0 sm:w-20">
         <p className="text-[8px] font-black uppercase tracking-wider text-zinc-600">
-          {shownPly}/{total}
+          {gameUi(shownPly)}/{gameUi(total)}
         </p>
         <p className={`truncate font-mono text-xs font-bold ${hoverPly !== null && hoverPly !== ply ? "text-amber-200" : "text-zinc-300"}`}>
-          {current ? `${current.review.moveNumber}${current.review.color === "w" ? "." : "..."} ${current.review.san}` : ui("Start")}
+          {gameUi(current ? `${current.review.moveNumber}${current.review.color === "w" ? "." : "..."} ${current.review.san}` : ui("Start"))}
         </p>
       </div>
     </div>
@@ -3406,14 +3407,14 @@ function CorrectMoveButton({
 
       <span className="min-w-0 flex-1">
         <span className="block text-xs font-black text-violet-100">
-          {showing ? ui("Show played move") : ui("Show correct move")}
+          {gameUi(showing ? ui("Show played move") : ui("Show correct move"))}
         </span>
         <span className="mt-0.5 block text-[10px] text-violet-200/60">
           {showing ? (
             ui("Back to the move from the game")
           ) : (
             <>
-              {ui("The winning move was")}{" "}
+              {ui("The winning move was")}{gameUi(" ")}
               <strong className="font-mono text-violet-100">{san}</strong>
             </>
           )}
@@ -3421,7 +3422,7 @@ function CorrectMoveButton({
       </span>
 
       <span aria-hidden="true" className="text-violet-200/70">
-        {showing ? "↺" : "▶"}
+        {gameUi(showing ? "↺" : "▶")}
       </span>
     </button>
   );
@@ -3459,7 +3460,7 @@ function CurrentMoveButton({
       <span className="flex items-center justify-between gap-3">
         <span className="flex items-center gap-3">
           <MovePiece review={review} />
-          <span className="font-mono text-3xl font-black text-[#f1e4ca]">{review.san}</span>
+          <span className="font-mono text-3xl font-black text-[#f1e4ca]">{gameUi(review.san)}</span>
         </span>
         <QualityBadge quality={quality} />
       </span>
@@ -3493,7 +3494,7 @@ function SortableHeader({
         {ui(label)}
 
         <span className={`text-[8px] ${active ? "opacity-100" : "opacity-25"}`}>
-          {active ? (direction === "asc" ? "▲" : "▼") : "◆"}
+          {gameUi(active ? (direction === "asc" ? "▲" : "▼") : "◆")}
         </span>
       </button>
     </th>

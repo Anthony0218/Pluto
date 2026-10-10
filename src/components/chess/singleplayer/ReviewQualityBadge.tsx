@@ -1,8 +1,10 @@
+import { useGameLanguage } from "../../../i18n/gameUi.ts";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { qualityVisuals, type ReviewVisualQuality } from "./reviewQualityVisuals";
 
 /** Glows in its own color; hovering the icon or a `group/quality` parent gives it a small lift and tilt. */
 export function ReviewQualityIcon({ quality, size = 14 }: { quality: ReviewVisualQuality; size?: number }) {
+  useGameLanguage();
   const { Icon } = qualityVisuals[quality];
   return (
     <span

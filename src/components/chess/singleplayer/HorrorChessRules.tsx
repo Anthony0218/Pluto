@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 export default function HorrorChessRules() {
@@ -86,13 +87,13 @@ function RuleCard({
     <section className="mb-4 rounded-3xl border border-rose-400/10 bg-zinc-900/70 p-5 shadow-lg shadow-black/10">
       <div className="flex items-start gap-4">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-400/10 text-xl">
-          {icon}
+          {gameUi(icon)}
         </span>
 
         <div>
           <h2 className="font-black text-white">{ui(title)}</h2>
 
-          <p className="mt-2 text-sm leading-7 text-zinc-400">{children}</p>
+          <p className="mt-2 text-sm leading-7 text-zinc-400">{gameUi(children)}</p>
         </div>
       </div>
     </section>
@@ -125,7 +126,7 @@ function HorrorLegendItem({
           ${className}
         `}
       >
-        {icon}
+        {gameUi(icon)}
       </span>
 
       <span className="text-[10px] font-bold text-zinc-400">{ui(label)}</span>

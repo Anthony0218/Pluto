@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { memo } from "react";
 import type { LibraryEntry } from "@/games/chess/custom/library/metadata";
 import { getBoardTheme } from "@/games/chess/custom/themes";
@@ -21,6 +22,7 @@ const actionClass =
 
 /** A saved variant presented as a playable game. */
 function VariantCard({ entry, editing, guide, actions }: { entry: LibraryEntry; editing?: "clean" | "dirty"; guide?: boolean; actions: VariantCardActions }) {
+  useGameLanguage();
   const theme = getBoardTheme(entry.preview?.theme ?? "classic-wood");
   const isPublic = entry.meta.visibility === "public";
   const layers = entry.layerCount ?? 1;
@@ -30,7 +32,7 @@ function VariantCard({ entry, editing, guide, actions }: { entry: LibraryEntry; 
       <div className="relative" style={{ background: theme.backdrop }}>
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_120%,rgba(56,189,248,.14),transparent_60%)]" />
         <button type="button" onClick={() => actions.onPlay(entry)} tabIndex={-1} aria-hidden="true" className="block w-full px-8 pb-5 pt-9">
-          <BoardThumbnail preview={entry.preview} label={`${entry.name} ${ui("board preview")}`} className="mx-auto aspect-square w-full max-w-[200px] drop-shadow-[0_14px_22px_rgba(0,0,0,.55)] transition duration-300 motion-safe:group-hover/card:scale-[1.03]" />
+          <BoardThumbnail preview={entry.preview} label={gameUi(`${entry.name} ${ui("board preview")}`)} className="mx-auto aspect-square w-full max-w-[200px] drop-shadow-[0_14px_22px_rgba(0,0,0,.55)] transition duration-300 motion-safe:group-hover/card:scale-[1.03]" />
         </button>
         <span
           className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold backdrop-blur-md ${
@@ -38,54 +40,54 @@ function VariantCard({ entry, editing, guide, actions }: { entry: LibraryEntry; 
           }`}
         >
           {isPublic ? <PublicIcon size={13} /> : <PrivateIcon size={13} />}
-          {isPublic ? ui("Public") : ui("Private")}
-          {isPublic && entry.meta.publishedOutdated && <span className="text-amber-200" title={ui("Edited since publishing")}>·&nbsp;{ui("update available")}</span>}
+          {gameUi(isPublic ? ui("Public") : ui("Private"))}
+          {isPublic && entry.meta.publishedOutdated && <span className="text-amber-200" title={ui("Edited since publishing")}>{gameUi("·")}{ui("update available")}</span>}
         </span>
-        {editing && (
+        {gameUi(editing && (
           <span className="absolute right-3 top-3 rounded-full border border-amber-300/40 bg-amber-300/15 px-2.5 py-1 text-[11px] font-bold text-amber-100 backdrop-blur-md">
-            {editing === "dirty" ? ui("Editing · unsaved") : ui("Open in Create")}
+            {gameUi(editing === "dirty" ? ui("Editing · unsaved") : ui("Open in Create"))}
           </span>
-        )}
-        {layers > 1 && (
+        ))}
+        {gameUi(layers > 1 && (
           <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[11px] font-semibold text-sky-100 backdrop-blur-md">
             <LayersIcon size={13} />
-            {layers}
+            {gameUi(layers)}
           </span>
-        )}
+        ))}
       </div>
 
       <div className="flex flex-1 flex-col p-4">
         <h3 id={headingId} className="truncate font-serif text-xl text-white">
-          {entry.name}
+          {gameUi(entry.name)}
         </h3>
-        {entry.description ? <p className="mt-1 line-clamp-2 text-sm leading-5 text-zinc-400">{entry.description}</p> : <p className="mt-1 text-sm italic text-zinc-600">{ui("No description yet.")}</p>}
+        {entry.description ? <p className="mt-1 line-clamp-2 text-sm leading-5 text-zinc-400">{gameUi(entry.description)}</p> : <p className="mt-1 text-sm italic text-zinc-600">{ui("No description yet.")}</p>}
         <dl className="mt-3 flex flex-wrap gap-1.5 text-[11px] font-semibold">
           <div className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-zinc-300">
             <dt className="sr-only">{ui("Board")}</dt>
-            <dd>{entry.boardSize}</dd>
+            <dd>{gameUi(entry.boardSize)}</dd>
           </div>
-          {layers > 1 && (
+          {gameUi(layers > 1 && (
             <div className="rounded-full border border-sky-400/25 bg-sky-400/10 px-2 py-0.5 text-sky-200">
               <dt className="sr-only">{ui("Layers")}</dt>
               <dd>
-                {layers} {ui("Layers")}
+                {gameUi(layers)} {ui("Layers")}
               </dd>
             </div>
-          )}
-          {(entry.teamCount ?? 2) > 2 && (
+          ))}
+          {gameUi((entry.teamCount ?? 2) > 2 && (
             <div className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-zinc-300">
               <dt className="sr-only">{ui("Players")}</dt>
               <dd>
-                {entry.teamCount} {ui("players")}
+                {gameUi(entry.teamCount)} {ui("players")}
               </dd>
             </div>
-          )}
-          {entry.kingRule && (
+          ))}
+          {gameUi(entry.kingRule && (
             <div className="rounded-full border border-amber-300/25 bg-amber-300/10 px-2 py-0.5 text-amber-200">
               <dt className="sr-only">{ui("King rule")}</dt>
               <dd>{ui(entry.kingRule)}</dd>
             </div>
-          )}
+          ))}
           {entry.victory?.slice(0, 1).map((label) => (
             <div key={label} className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-zinc-300">
               <dt className="sr-only">{ui("Victory")}</dt>
@@ -94,7 +96,7 @@ function VariantCard({ entry, editing, guide, actions }: { entry: LibraryEntry; 
           ))}
         </dl>
         <p className="mt-3 text-[11px] text-zinc-500">
-          {ui("Edited")} <time dateTime={entry.meta.updatedAt}>{timeAgo(entry.meta.updatedAt)}</time>
+          {ui("Edited")} <time dateTime={entry.meta.updatedAt}>{gameUi(timeAgo(entry.meta.updatedAt))}</time>
         </p>
 
         <div className="mt-auto flex items-center gap-1.5 pt-4">
@@ -113,14 +115,14 @@ function VariantCard({ entry, editing, guide, actions }: { entry: LibraryEntry; 
             className={`${actionClass} hidden sm:inline-flex ${isPublic ? "border-sky-400/40 bg-sky-400/15 text-sky-100 hover:bg-sky-400/25" : "border-white/10 bg-white/[0.04] text-zinc-200 hover:border-white/20 hover:text-white"}`}
           >
             <ShareIcon size={15} />
-            {isPublic ? ui("Manage Sharing") : ui("Share")}
+            {gameUi(isPublic ? ui("Manage Sharing") : ui("Share"))}
           </button>
-          <button type="button" onClick={() => actions.onDelete(entry)} aria-label={`${ui("Delete")} ${entry.name}`} title={ui("Delete")} className={`${actionClass} hidden border-red-400/20 bg-red-500/[0.06] text-red-200 hover:bg-red-500/15 sm:inline-flex`}>
+          <button type="button" onClick={() => actions.onDelete(entry)} aria-label={gameUi(`${ui("Delete")} ${entry.name}`)} title={ui("Delete")} className={`${actionClass} hidden border-red-400/20 bg-red-500/[0.06] text-red-200 hover:bg-red-500/15 sm:inline-flex`}>
             <DeleteIcon size={15} />
             <span className="hidden xl:inline">{ui("Delete")}</span>
           </button>
           <OverflowMenu
-            label={`${ui("More actions for")} ${entry.name}`}
+            label={gameUi(`${ui("More actions for")} ${entry.name}`)}
             guide={guide ? "card-more" : undefined}
             className="ml-auto"
             items={[

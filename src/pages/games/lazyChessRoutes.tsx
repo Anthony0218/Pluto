@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { lazy, Suspense, type ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { legacyChessCustomTarget } from "@/games/chess/custom/library/navigation";
@@ -16,7 +17,8 @@ export function JanmannRulesRoute() {
 }
 
 function Lazy({ children }: { children: ReactNode }) {
-  return <Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#07090b]" />}>{children}</Suspense>;
+  useGameLanguage();
+  return <Suspense fallback={<main className="min-h-[var(--app-height)] bg-[#07090b]" />}>{gameUi(children)}</Suspense>;
 }
 
 export function Chess3DAiRoute() {

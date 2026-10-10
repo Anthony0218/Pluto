@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -960,34 +961,34 @@ export default function BossBattleBoard({
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <div className="rounded-full border border-red-400/20 bg-red-400/[0.07] px-3 py-1.5 text-xs font-black text-red-200">
-              ♚ {bossHearts(displayedBossState.hp)}
+              ♚ {gameUi(bossHearts(displayedBossState.hp))}
             </div>
 
-            {displayedBossState.armorPliesRemaining > 0 && (
+            {gameUi(displayedBossState.armorPliesRemaining > 0 && (
               <div className="rounded-full border border-cyan-300/20 bg-cyan-300/[0.07] px-3 py-1.5 text-xs font-black text-cyan-200">
-                🛡 {displayedBossState.armorPliesRemaining}
+                🛡 {gameUi(displayedBossState.armorPliesRemaining)}
               </div>
-            )}
+            ))}
 
             <div className="rounded-full border border-orange-300/15 bg-orange-300/[0.06] px-3 py-1.5 text-xs font-black text-orange-200">
-              🔥 {t("Rage")} {rage}/{BOSS_MAX_RAGE}
+              🔥 {t("Rage")} {gameUi(rage)}/{gameUi(BOSS_MAX_RAGE)}
             </div>
 
-            {!finishedGame && !historyPreview && (
+            {gameUi(!finishedGame && !historyPreview && (
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
                 <span
                   className={`h-2 w-2 animate-pulse rounded-full ${game.turn() === "w" ? "bg-amber-300" : "bg-red-400"}`}
                 />
-                {game.turn() === "w" ? t("White to move") : t("Boss to move")}
+                {gameUi(game.turn() === "w" ? t("White to move") : t("Boss to move"))}
               </div>
-            )}
+            ))}
           </div>
         </ChessPageHeader>
 
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+              <section data-chess-controls className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
                 <PanelTitle
                   title={t("Game Controls")}
                   subtitle={t("Players, game and actions")}
@@ -1038,7 +1039,7 @@ export default function BossBattleBoard({
                     compact
                   />
                   <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
-                    {history.length}
+                    {gameUi(history.length)}
                   </span>
                 </div>
 
@@ -1052,8 +1053,8 @@ export default function BossBattleBoard({
                     moveNumber: entry.moveNumber,
                     content: (
                       <>
-                        <span className="text-base leading-none">{historySymbol(entry.color, entry.piece)}</span>
-                        <span className="truncate text-xs font-bold text-zinc-300">{entry.san}</span>
+                        <span className="text-base leading-none">{gameUi(historySymbol(entry.color, entry.piece))}</span>
+                        <span className="truncate text-xs font-bold text-zinc-300">{gameUi(entry.san)}</span>
                       </>
                     ),
                     trailing: entry.bossDamaged ? <span className="text-red-300">♥−1</span> : null,
@@ -1077,9 +1078,9 @@ export default function BossBattleBoard({
                       {t("History Preview")}
                     </p>
                     <p className="mt-1 text-sm font-bold text-white">
-                      {historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
+                      {gameUi(historyPreview.moveNumber)}
+                      {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                      {gameUi(historyPreview.san)}
                     </p>
                   </div>
                   <button
@@ -1092,7 +1093,7 @@ export default function BossBattleBoard({
                 </div>
               )}
 
-              {pendingPromotion && !historyPreview && (
+              {gameUi(pendingPromotion && !historyPreview && (
                 <div className="mb-3">
                   <PromotionBar
                     onPromote={(piece) => {
@@ -1104,16 +1105,16 @@ export default function BossBattleBoard({
                     }}
                   />
                 </div>
-              )}
+              ))}
 
-              {bossTargetMode && !historyPreview && (
+              {gameUi(bossTargetMode && !historyPreview && (
                 <div className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-violet-400/20 bg-violet-400/[0.07] px-4 py-3">
                   <div>
                     <p className="text-[9px] font-black uppercase tracking-widest text-violet-300">
                       {t("Boss Power Targeting")}
                     </p>
                     <p className="mt-1 text-sm font-bold text-white">
-                      {bossTargetMode === "summon" ? t("Choose a pawn summon square") : t("Choose a Dark Step destination")}
+                      {gameUi(bossTargetMode === "summon" ? t("Choose a pawn summon square") : t("Choose a Dark Step destination"))}
                     </p>
                   </div>
                   <button
@@ -1124,11 +1125,11 @@ export default function BossBattleBoard({
                     {t("Cancel")}
                   </button>
                 </div>
-              )}
+              ))}
 
-              {finishedGame && !historyPreview && (
+              {gameUi(finishedGame && !historyPreview && (
                 <VisibleGameResult />
-              )}
+              ))}
 
               <Board
                 board={displayedBoard}
@@ -1195,11 +1196,11 @@ export default function BossBattleBoard({
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-xs font-black uppercase tracking-wider text-zinc-500">{ui("HP")}</span>
                     <span className="text-sm font-black text-red-300">
-                      {displayedBossState.hp}/{BOSS_MAX_HP}
+                      {gameUi(displayedBossState.hp)}/{gameUi(BOSS_MAX_HP)}
                     </span>
                   </div>
                   <div className="mt-2 text-2xl font-black tracking-wider text-red-300">
-                    {bossHearts(displayedBossState.hp)}
+                    {gameUi(bossHearts(displayedBossState.hp))}
                   </div>
                 </div>
 
@@ -1250,13 +1251,13 @@ export default function BossBattleBoard({
                   <span className="text-2xl">⚡</span>
                 </div>
 
-                {game.turn() === "b" && game.isCheck() && !historyPreview && (
+                {gameUi(game.turn() === "b" && game.isCheck() && !historyPreview && (
                   <div className="mb-3 rounded-xl border border-red-400/15 bg-red-400/[0.06] px-3 py-2.5 text-[10px] font-bold text-red-300">
                     {t(
                       "The Boss is in check — powers are locked until the check is answered normally.",
                     )}
                   </div>
-                )}
+                ))}
 
                 <div className="space-y-2">
                   {(["shockwave", "summon", "dark_step"] as BossPowerId[]).map(
@@ -1411,24 +1412,24 @@ function PowerButton({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex gap-2.5">
-          <span className="text-xl">{bossPowerIcon(power)}</span>
+          <span className="text-xl">{gameUi(bossPowerIcon(power))}</span>
           <div>
             <p className="text-xs font-black text-white">
               {t(bossPowerLabel(power))}
             </p>
-            <p className="mt-1 text-[10px] leading-4 text-zinc-500">{detail}</p>
+            <p className="mt-1 text-[10px] leading-4 text-zinc-500">{gameUi(detail)}</p>
           </div>
         </div>
 
         <span
           className={`shrink-0 rounded-lg px-2 py-1 text-[9px] font-black uppercase ${cooldown > 0 ? "bg-zinc-800 text-zinc-500" : "bg-emerald-400/10 text-emerald-300"}`}
         >
-          {cooldown > 0 ? `${cooldown} ${t("turns")}` : selected ? t("Choose") : t("Ready")}
+          {gameUi(cooldown > 0 ? `${cooldown} ${t("turns")}` : selected ? t("Choose") : t("Ready"))}
         </span>
       </div>
 
       <p className="mt-2 text-[9px] text-zinc-600">
-        {t("Cooldown when used now:")} {nextCooldown} {t("Boss turns suffix")}
+        {t("Cooldown when used now:")} {gameUi(nextCooldown)} {t("Boss turns suffix")}
       </p>
     </button>
   );
@@ -1447,8 +1448,8 @@ function StatusCard({
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <div className="flex items-start justify-between gap-2">
-        <span className="text-lg">{icon}</span>
-        <span className="text-sm font-black text-white">{value}</span>
+        <span className="text-lg">{gameUi(icon)}</span>
+        <span className="text-sm font-black text-white">{gameUi(value)}</span>
       </div>
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
@@ -1462,7 +1463,7 @@ function RuleLine({ icon, text }: { icon: string; text: string }) {
   return (
     <div className="flex gap-2 rounded-xl border border-white/[0.04] bg-black/15 px-3 py-2">
       <span className="w-7 shrink-0 text-center font-black text-red-300">
-        {icon}
+        {gameUi(icon)}
       </span>
       <span>{ui(text)}</span>
     </div>
@@ -1482,7 +1483,7 @@ function MiniRule({
   return (
     <div className="rounded-2xl border border-white/5 bg-zinc-900/55 p-3">
       <div className="flex items-center gap-2">
-        <span className="text-lg">{icon}</span>
+        <span className="text-lg">{gameUi(icon)}</span>
         <span className="text-xs font-black text-zinc-200">{ui(title)}</span>
       </div>
       <p className="mt-2 text-[10px] leading-4 text-zinc-600">{ui(text)}</p>
@@ -1525,13 +1526,13 @@ function CapturedPiecesGrid({
           {t("White")}
         </span>
         <div className="flex min-h-7 flex-wrap gap-1 text-xl leading-none text-[#fff3d5]">
-          {capturedWhite.length === 0 ? (
+          {gameUi(capturedWhite.length === 0 ? (
             <span className="text-xs text-zinc-700">—</span>
           ) : (
             capturedWhite.map((piece, index) => (
-              <span key={`${piece}-${index}`}>{whiteSymbols[piece]}</span>
+              <span key={`${piece}-${index}`}>{gameUi(whiteSymbols[piece])}</span>
             ))
-          )}
+          ))}
         </div>
       </div>
 
@@ -1540,13 +1541,13 @@ function CapturedPiecesGrid({
           {t("Black")}
         </span>
         <div className="flex min-h-7 flex-wrap gap-1 text-xl leading-none text-zinc-300">
-          {capturedBlack.length === 0 ? (
+          {gameUi(capturedBlack.length === 0 ? (
             <span className="text-xs text-zinc-700">—</span>
           ) : (
             capturedBlack.map((piece, index) => (
-              <span key={`${piece}-${index}`}>{blackSymbols[piece]}</span>
+              <span key={`${piece}-${index}`}>{gameUi(blackSymbols[piece])}</span>
             ))
-          )}
+          ))}
         </div>
       </div>
     </div>

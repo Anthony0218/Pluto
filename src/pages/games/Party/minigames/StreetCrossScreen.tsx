@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { useEffect, useRef, useState } from "react";
 import { COLORS } from "../../../../games/party/config.ts";
 import {
@@ -26,6 +27,7 @@ const VEHICLE_FILL = { bike: "#ffb347", car: "#6fa8ff", truck: "#e86a5b", bus: "
 
 // Virtual joystick: drag the knob; direction is sent as intent (up = forward on the course).
 function Joystick({ onMove, disabled }: { onMove: (dx: number, dy: number) => void; disabled: boolean }) {
+  useGameLanguage();
   const pad = useRef<HTMLDivElement>(null);
   const [knob, setKnob] = useState({ x: 0, y: 0 });
   const update = (clientX: number, clientY: number) => {
@@ -53,7 +55,7 @@ function Joystick({ onMove, disabled }: { onMove: (dx: number, dy: number) => vo
       ref={pad}
       className={`sc-joystick ${disabled ? "disabled" : ""}`}
       role="application"
-      aria-label="Movement joystick"
+      aria-label={gameUi("Movement joystick")}
       onPointerDown={(e) => {
         if (disabled) return;
         e.currentTarget.setPointerCapture(e.pointerId);
@@ -80,6 +82,7 @@ export default function StreetCrossScreen({
   online,
   sendInput,
 }: MinigameViewProps) {
+  useGameLanguage();
   const view = minigame.state as StreetCrossView;
   const canvas = useRef<HTMLCanvasElement>(null);
   const offset = useServerOffset(minigame.serverNow);
@@ -245,12 +248,12 @@ export default function StreetCrossScreen({
             style={{ "--pawn-color": colors[player.id] } as React.CSSProperties}
           >
             <i /> {player.name}
-            {player.id === playerId ? " · you" : ""}
-            <b>{Math.min(100, Math.round((runner.bestY / FINISH_ROW) * 100))}%</b>
+            {gameUi(player.id === playerId ? " · you" : "")}
+            <b>{gameUi(Math.min(100, Math.round((runner.bestY / FINISH_ROW) * 100)))}%</b>
           </span>
         ))}
         <span className={`tp-timer ${secondsLeft <= 10 ? "urgent" : ""}`} role="timer">
-          {secondsLeft}
+          {gameUi(secondsLeft)}
           <small>s</small>
         </span>
       </div>
@@ -258,16 +261,16 @@ export default function StreetCrossScreen({
         <canvas
           ref={canvas}
           className="sc-course"
-          aria-label="Street Cross course: reach the checkered finish at the top"
+          aria-label={gameUi("Street Cross course: reach the checkered finish at the top")}
         />
         {me && <Joystick onMove={move} disabled={!online || me.finishedAt !== null} />}
       </div>
       <p className="duel-help">
-        {me
+        {gameUi(me
           ? me.hits > 0
             ? `Hit ${me.hits}× — you restart on your last safe strip. Joystick or WASD / arrows.`
             : "Reach the checkered line first. Safe green strips are checkpoints. Joystick or WASD / arrows."
-          : "Spectating the duel."}
+          : "Spectating the duel.")}
       </p>
     </div>
   );

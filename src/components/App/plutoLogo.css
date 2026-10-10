@@ -1,0 +1,15 @@
+.pluto-logo { display: inline-flex; align-items: center; gap: 7px; }
+.pluto-mark { flex: none; width: 28px; height: 28px; overflow: visible; transition: transform .6s cubic-bezier(.3, 1.4, .5, 1); }
+.pluto-logo-letter { display: inline-block; }
+.pluto-mark-heart, .pluto-mark-charon { transform-box: view-box; transform-origin: 15px 15px; }
+
+.pluto-logo:is(:hover, :focus-visible):not([data-still]) .pluto-mark { transform: rotate(360deg) scale(1.12); }
+.pluto-logo:is(:hover, :focus-visible):not([data-still]) .pluto-mark-heart { animation: pluto-beat .7s ease-in-out infinite; }
+.pluto-logo:is(:hover, :focus-visible):not([data-still]) .pluto-mark-charon { animation: pluto-orbit 1.4s linear infinite; }
+.pluto-logo:is(:hover, :focus-visible):not([data-still]) .pluto-logo-letter { animation: pluto-hop .6s ease-in-out both; animation-delay: calc(var(--i) * 70ms); }
+
+@keyframes pluto-beat { 50% { transform: scale(1.25); } }
+@keyframes pluto-orbit { to { transform: rotate(360deg); } }
+@keyframes pluto-hop { 40% { transform: translateY(-5px) rotate(-6deg); } }
+
+@media (prefers-reduced-motion: reduce) { .pluto-logo * { animation: none !important; } .pluto-mark { transition: none; } }

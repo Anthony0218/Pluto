@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 export default function ActionTimingMeter({
   title,
   value,
@@ -9,10 +10,11 @@ export default function ActionTimingMeter({
   lowLabel: string;
   highLabel: string;
 }) {
+  useGameLanguage();
   return (
     <div className="rounded-xl border border-[#86623a]/70 bg-[#2e2015]/80 p-3">
       <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#bfa77e]">
-        {title}
+        {gameUi(title)}
       </div>
 
       <div className="mt-3">
@@ -33,9 +35,9 @@ export default function ActionTimingMeter({
         </div>
 
         <div className="mt-2 flex justify-between text-[9px] font-bold uppercase tracking-wide text-[#a58b66]">
-          <span>{lowLabel}</span>
-          <span className="text-sm text-[#ffe7ad]">{Math.round(value)}%</span>
-          <span>{highLabel}</span>
+          <span>{gameUi(lowLabel)}</span>
+          <span className="text-sm text-[#ffe7ad]">{gameUi(Math.round(value))}%</span>
+          <span>{gameUi(highLabel)}</span>
         </div>
       </div>
     </div>

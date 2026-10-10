@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { memo, useMemo } from "react";
 import type { Army, Campaign, District, House } from "../../../games/MedievalKingdoms/edravane/types.ts";
 import { BIOMES, center, neighbors, NATIONS } from "../../../games/MedievalKingdoms/edravane/world.ts";
@@ -22,6 +23,7 @@ type Props = {
 
 /** Camera motion reuses this layer until the visible hex window or game state changes. */
 export const HexFields = memo(function HexFields({ view, house, overlay, regional, detailed, mini, viewport, supplyArmy, onSelect }: Props) {
+  useGameLanguage();
   const fields = useMemo(() => mini ? view.districts.filter((d) => d.nation || d.biome === "legacy") : visibleMapDistricts(view.districts, viewport), [view.districts, mini, viewport]);
   const visibleIds = useMemo(() => new Set(fields.map((d) => d.id)), [fields]);
   return <g className={mini ? "ed-minimap-fields" : "ed-map-fields"}>
@@ -56,14 +58,14 @@ export const HexFields = memo(function HexFields({ view, house, overlay, regiona
                 onKeyDown={mini ? undefined : (e) => {
                   if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); onSelect(d); }
                 }}
-                aria-label={`${d.name}, ${owner?.name ?? d.biome}${landControl === "domain" ? ", your direct domain" : landControl === "vassal" ? ", vassal estate" : ""}`}
+                aria-label={gameUi(`${d.name}, ${owner?.name ?? d.biome}${landControl === "domain" ? ", your direct domain" : landControl === "vassal" ? ", vassal estate" : ""}`)}
                 className={!mini ? "ed-hex" : ""}
               >
                 <title>
-                  {d.biome === "sea" ? `${d.name}\nShips only` : [
+                  {gameUi(d.biome === "sea" ? `${d.name}\nShips only` : [
                     d.settlement === "Hamlet" ? d.name : d.settlement,
                     owner ? `House ${owner.name}` : d.biome === "legacy" ? "Unavailable" : d.biome,
-                  ].map((line) => line.length > 36 ? `${line.slice(0, 35)}…` : line).join("\n")}
+                  ].map((line) => line.length > 36 ? `${line.slice(0, 35)}…` : line).join("\n"))}
                 </title>
                 <polygon
                   points={points(d)}
@@ -125,7 +127,7 @@ export const HexFields = memo(function HexFields({ view, house, overlay, regiona
                     fill="#132b28"
                     opacity=".8"
                   >
-                    {d.biome === "legacy"
+                    {gameUi(d.biome === "legacy"
                       ? "🔒"
                       : overlay === "resources"
                         ? {
@@ -137,7 +139,7 @@ export const HexFields = memo(function HexFields({ view, house, overlay, regiona
                             herbs: "✿",
                             luxury: "✧",
                           }[d.resource]
-                        : BIOMES[d.biome].icon}
+                        : BIOMES[d.biome].icon)}
                   </text>
                 )}
                 {detailed && owned && (

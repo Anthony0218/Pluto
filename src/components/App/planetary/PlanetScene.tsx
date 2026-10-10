@@ -1,5 +1,5 @@
 import { Tabs } from "@base-ui/react/tabs";
-import { ArrowLeft, ArrowRight, AudioWaveform, Binary, BookOpen, Calculator, CalendarClock, ChartNoAxesCombined, Dices, Drum, Dumbbell, Flame, Gift, Gamepad2, Globe, Goal, Grid2X2, Hash, Infinity as InfinityIcon, Music, Music4, NotebookPen, Percent, QrCode, Receipt, Ruler, ShieldCheck, Sigma, Spline, Swords, Trophy, Variable, Waypoints, Wallet } from "lucide-react";
+import { ListTodo, ArrowLeft, ArrowRight, AudioWaveform, Binary, BookOpen, Calculator, CalendarClock, ChartNoAxesCombined, Dices, Drum, Dumbbell, Flame, Gift, Gamepad2, Globe, Goal, Grid2X2, Hash, Infinity as InfinityIcon, Music, Music4, NotebookPen, Percent, QrCode, Receipt, Ruler, ShieldCheck, Sigma, Spline, Swords, Trophy, Variable, Waypoints, Wallet } from "lucide-react";
 import * as m from "motion/react-m";
 import { useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useMotionValueEvent, useTransform } from "motion/react";
@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { games } from "@/data/games";
 import { useLandingReducedMotion as useReducedMotion } from "../landing/motionPreference";
 import { ui, useUiLanguage } from "@/i18n/ui";
+import { planetSurfaces, rimPieces } from "./planetSurfaces";
 import { heroPlanets, type PlanetConfig } from "./planetConfig";
 import { landingTools, universeBooks, universeCategories, type BookDesign, type UniverseCategory } from "./universeCatalog";
 import { landingBookTitle, landingCopy } from "./landingCopy";
@@ -17,11 +18,19 @@ import { usePlanetLanding } from "../landing/usePlanetLanding";
 import "./planetScene.css";
 import "./universeScene.css";
 
+/** A game's picture on the face of its planet; the markup is static and comes from `planetSurfaces`. */
+export function SurfaceArt({ markup }: { markup: string }) {
+  return <svg className="solar-surface" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" focusable="false" dangerouslySetInnerHTML={{ __html: markup }} />;
+}
+
 export function PlanetArt({ config }: { config: PlanetConfig }) {
-  return <span className="solar-art" aria-hidden="true">
+  const surface = planetSurfaces[config.tone];
+  return <span className={`solar-art${surface && !rimPieces.has(config.tone) ? " solar-art--bare" : ""}`} aria-hidden="true">
     <span className="solar-atmosphere" />
     {config.ring && <span className="solar-ring" />}
-    <span className="solar-sphere" />
+    <span className={`solar-sphere${surface ? " solar-sphere--surface" : ""}`}>
+      {surface && <SurfaceArt markup={surface} />}
+    </span>
     <span className="solar-symbol">{config.symbol}</span>
     <span className="solar-detail solar-detail--one" />
     <span className="solar-detail solar-detail--two" />
@@ -53,7 +62,7 @@ function UniverseItem({ id, route, title, className = "", style, children, statu
 }
 
 const toolIcons = {
-  calculator: Calculator, "percentage-calculator": Percent, "number-system-converter": Binary, "unit-converter": Ruler,
+  "todo-list": ListTodo, calculator: Calculator, "percentage-calculator": Percent, "number-system-converter": Binary, "unit-converter": Ruler,
   "workout-timer": Dumbbell, "bill-splitter": Receipt, "time-zone-planner": Globe, "budget-tracker": Wallet,
   "calorie-tracker": Flame, notes: NotebookPen, "day-planner": CalendarClock, "qr-code-creator": QrCode, "birthday-reminders": Gift,
 };

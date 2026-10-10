@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Match, MinigameInput, MinigameRuntime } from "../../../../games/party/types.ts";
 import type { MinigameDefinition } from "../../../../games/party/minigames/types.ts";
@@ -5,6 +6,7 @@ import { minigameViews } from "./views.ts";
 
 // A separate local simulation: practice inputs never reach the connection or the real match.
 export default function MinigamePractice({ definition, match, participants, playerId }: { definition: MinigameDefinition; match: Match; participants: string[]; playerId: string }) {
+  useGameLanguage();
   const participantKey = participants.join("|");
   const participantIds = useMemo(() => participantKey.split("|"), [participantKey]);
   const live = useRef<{ state: unknown; startedAt: number; endsAt: number } | null>(null);
@@ -35,7 +37,7 @@ export default function MinigamePractice({ definition, match, participants, play
     try { definition.tick?.(game.state, now); definition.applyInput(game.state, playerId, parsed, now); } catch { /* Invalid practice input has no effect. */ }
   };
   const View = minigameViews[definition.id];
-  return <div className="mg-practice-box"><div className="mg-practice-label"><b>✦ PRACTICE PLAYGROUND</b><span>Try the controls · Space marks you ready · use touch buttons to practise jumps / dash / firing</span></div>
+  return <div className="mg-practice-box"><div className="mg-practice-label"><b>{gameUi("✦ PRACTICE PLAYGROUND")}</b><span>{gameUi("Try the controls · Space marks you ready · use touch buttons to practise jumps / dash / firing")}</span></div>
     {runtime && View && <View key={runtime.startedAt} match={match} minigame={runtime} playerId={playerId} online now={runtime.serverNow!} sendInput={sendInput}/>}
   </div>;
 }

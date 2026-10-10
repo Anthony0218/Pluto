@@ -200,7 +200,7 @@ function loadTs(path, modules) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2023, jsx: ts.JsxEmit.ReactJSX },
   }).outputText;
   const exports = {};
-  new Function('require', 'exports', source)(name => modules[name] ?? require(name), exports);
+  new Function('require', 'exports', source)(name => name.endsWith('/i18n/gameUi.ts') ? { gameUi: value => value, useGameLanguage: () => ({ language: 'en' }) } : modules[name] ?? require(name), exports);
   return exports;
 }
 
