@@ -1,3 +1,4 @@
+import { useGameLanguage } from "../../../i18n/gameUi.ts";
 import { Component, Suspense, useEffect, useMemo, type ReactNode } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
@@ -33,6 +34,7 @@ export class SceneBoundary extends Component<{ children: ReactNode }, { failed: 
 function Dividend({ id, piece, control, progress, selected, target, eligible, showControl, onSelect }: {
   id: DividendId; piece?: Piece; control: Control; progress: number; selected: boolean; target: boolean; eligible: boolean; showControl: boolean; onSelect: BoardProps["onSelect"];
 }) {
+  useGameLanguage();
   const node = NODES[id];
   const { geometry, outline, flat, sphere, flatOutline, sphereOutline } = useMemo(() => {
     const polygon = getDividendPolygon(node.dividendIndex);
@@ -108,6 +110,7 @@ function SnubCube({ progress }: { progress: number }) {
 }
 
 export default function JanmannBoard(props: BoardProps) {
+  useGameLanguage();
   const { state, control, progress, selected, targets, eligible, showControl, onSelect } = props;
   return <SceneBoundary>
     <Canvas camera={{ position: [10, 9, 12], fov: 42, near: .1, far: 100 }} dpr={[1, 1.5]} style={{ height: "100%", minHeight: 420 }} fallback={<p className="p-6">{ui("3D view unavailable. Use the sector board below to play.")}</p>}>

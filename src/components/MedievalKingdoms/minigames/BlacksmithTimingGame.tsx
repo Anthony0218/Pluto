@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import GameXpReward from "@/components/games/GameXpReward";
 import {
   useEffect,
@@ -10,6 +11,7 @@ export default function BlacksmithTimingGame({
 }: {
   onComplete: () => void;
 }) {
+  useGameLanguage();
   const [
     marker,
     setMarker,
@@ -144,13 +146,9 @@ export default function BlacksmithTimingGame({
           ⚒️
         </div>
 
-        <h2 className="mt-3 text-2xl font-black text-[#ffe3a0]">
-          Forge the Moonblade
-        </h2>
+        <h2 className="mt-3 text-2xl font-black text-[#ffe3a0]">{gameUi(" Forge the Moonblade ")}</h2>
 
-        <p className="mt-2 text-sm text-[#bfa67d]">
-          Land 5 good hammer strikes. The bright center gives the best hit.
-        </p>
+        <p className="mt-2 text-sm text-[#bfa67d]">{gameUi(" Land 5 good hammer strikes. The bright center gives the best hit. ")}</p>
 
         <div className="mt-8">
           <div className="relative h-16 overflow-hidden rounded-xl border-2 border-[#7c5831] bg-[#20150e]">
@@ -173,30 +171,26 @@ export default function BlacksmithTimingGame({
               strike
             }
             className="mt-5 rounded-2xl border-2 border-[#d39c45] bg-[#8c431f] px-8 py-4 text-lg font-black text-[#fff0c5] shadow-xl hover:bg-[#a65328]"
-          >
-            STRIKE
-          </button>
+          >{gameUi(" STRIKE ")}</button>
         </div>
 
         <div className="mt-5 text-sm font-black text-[#f4d188]">
           {
-            feedback
+            gameUi(feedback)
           }
         </div>
 
         <div className="mt-3 flex justify-center gap-6 text-xs text-[#bda77f]">
-          <span>
-            Good hits:{" "}
+          <span>{gameUi(" Good hits:")}{gameUi(" ")}
             <b className="text-[#ffe3a0]">
-              {goodHits}/5
+              {gameUi(goodHits)}/5
             </b>
           </span>
 
-          <span>
-            Attempts:{" "}
+          <span>{gameUi(" Attempts:")}{gameUi(" ")}
             <b className="text-[#ffe3a0]">
               {
-                attempts
+                gameUi(attempts)
               }
             </b>
           </span>

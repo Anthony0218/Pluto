@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useCallback } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
@@ -17,6 +18,7 @@ import {
 import type { FactionId } from "../../../games/MedievalKingdoms/types";
 
 export default function MedievalKingdomsBattlePage() {
+  useGameLanguage();
   const { campaignId, battleNodeId } = useParams<{
     campaignId: string;
 
@@ -46,15 +48,13 @@ export default function MedievalKingdomsBattlePage() {
     return (
       <main className="min-h-screen bg-transparent px-4 py-8 text-[#f5e4c1]">
         <div className="mx-auto max-w-xl rounded-2xl border border-[#795a34] bg-[#3b2a1b] p-6">
-          <h1 className="text-xl font-black">Battle not found</h1>
+          <h1 className="text-xl font-black">{gameUi("Battle not found")}</h1>
 
           <button
             type="button"
             onClick={() => navigate("/games/medieval-kingdoms/legacy")}
             className="mt-4 rounded-xl border border-[#a57c43] bg-[#5a4024] px-4 py-2 font-bold"
-          >
-            Return to continent
-          </button>
+          >{gameUi(" Return to continent ")}</button>
         </div>
       </main>
     );
@@ -66,11 +66,9 @@ export default function MedievalKingdomsBattlePage() {
         <div className="mx-auto max-w-xl rounded-2xl border border-[#795a34] bg-[#3b2a1b] p-6">
           <div className="text-3xl">🔒</div>
 
-          <h1 className="mt-2 text-xl font-black">Battle locked</h1>
+          <h1 className="mt-2 text-xl font-black">{gameUi("Battle locked")}</h1>
 
-          <p className="mt-2 text-sm text-[#bda77f]">
-            Complete the previous regional battle first.
-          </p>
+          <p className="mt-2 text-sm text-[#bda77f]">{gameUi(" Complete the previous regional battle first. ")}</p>
 
           <button
             type="button"
@@ -78,9 +76,7 @@ export default function MedievalKingdomsBattlePage() {
               navigate(`/games/medieval-kingdoms/campaign/${campaign.id}`)
             }
             className="mt-4 rounded-xl border border-[#a57c43] bg-[#5a4024] px-4 py-2 font-bold"
-          >
-            Return to region
-          </button>
+          >{gameUi(" Return to region ")}</button>
         </div>
       </main>
     );

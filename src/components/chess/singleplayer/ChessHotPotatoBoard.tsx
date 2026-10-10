@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -934,8 +935,8 @@ export default function ChessHotPotatoBoard({
             sm:flex-row
             sm:items-center
             sm:justify-between
-          " description={<> {t("Pass the danger")} · {t("Random fuse")}{" "}
-                {HOT_POTATO_MIN_FUSE_MOVES}–{HOT_POTATO_MAX_FUSE_MOVES}{" "}
+          " description={<> {t("Pass the danger")} · {t("Random fuse")}{gameUi(" ")}
+                {gameUi(HOT_POTATO_MIN_FUSE_MOVES)}–{gameUi(HOT_POTATO_MAX_FUSE_MOVES)}{gameUi(" ")}
                 {t("moves")} </>}>
 
 
@@ -959,7 +960,7 @@ export default function ChessHotPotatoBoard({
               <span aria-hidden="true">💣</span>
 
               <span>
-                {(["w", "b"] as const)
+                {gameUi((["w", "b"] as const)
                   .map((owner) => {
                     const potato = displayedHotPotatoes[owner];
 
@@ -967,11 +968,11 @@ export default function ChessHotPotatoBoard({
                       ? `${owner === "w" ? "W" : "B"} ${potato.movesUntilExplosion}{potato.dropped ? " · Paused on ground" : ""}`
                       : `${owner === "w" ? "W" : "B"} ❄${potato.respawnMovesRemaining}`;
                   })
-                  .join(" · ")}
+                  .join(" · "))}
               </span>
             </div>
 
-            {!finishedGame && !historyPreview && (
+            {gameUi(!finishedGame && !historyPreview && (
               <div
                 className="
                   flex
@@ -989,9 +990,9 @@ export default function ChessHotPotatoBoard({
                 "
               >
                 <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
-                {game.turn() === "w" ? t("White to move") : t("Black to move")}
+                {gameUi(game.turn() === "w" ? t("White to move") : t("Black to move"))}
               </div>
-            )}
+            ))}
           </div>
         </ChessPageHeader>
 
@@ -1078,11 +1079,11 @@ export default function ChessHotPotatoBoard({
                           : "bg-white/5 text-zinc-500"
                     }`}
                   >
-                    {materialDifference > 0 &&
-                      `${t("White")} +${materialDifference}`}
-                    {materialDifference < 0 &&
-                      `${t("Black")} +${Math.abs(materialDifference)}`}
-                    {materialDifference === 0 && t("Equal")}
+                    {gameUi(materialDifference > 0 &&
+                      `${t("White")} +${materialDifference}`)}
+                    {gameUi(materialDifference < 0 &&
+                      `${t("Black")} +${Math.abs(materialDifference)}`)}
+                    {gameUi(materialDifference === 0 && t("Equal"))}
                   </span>
                 </div>
 
@@ -1109,7 +1110,7 @@ export default function ChessHotPotatoBoard({
                   </div>
 
                   <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
-                    {history.length}
+                    {gameUi(history.length)}
                   </span>
                 </div>
 
@@ -1123,8 +1124,8 @@ export default function ChessHotPotatoBoard({
                     moveNumber: move.moveNumber,
                     content: (
                       <>
-                        <span className="text-base leading-none">{getHistoryPieceSymbol(move.color, move.piece)}</span>
-                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{move.san}</span>
+                        <span className="text-base leading-none">{gameUi(getHistoryPieceSymbol(move.color, move.piece))}</span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(move.san)}</span>
                       </>
                     ),
                     trailing:
@@ -1151,11 +1152,11 @@ export default function ChessHotPotatoBoard({
 
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
-              {finishedGame && !historyPreview && (
+              {gameUi(finishedGame && !historyPreview && (
                 <VisibleGameResult />
-              )}
+              ))}
 
-              {pendingPromotion && !historyPreview && (
+              {gameUi(pendingPromotion && !historyPreview && (
                 <div className="mb-3 rounded-2xl border border-amber-500/20 bg-zinc-900/90 p-3 shadow-xl">
                   <PromotionBar
                     onPromote={(piece) =>
@@ -1167,7 +1168,7 @@ export default function ChessHotPotatoBoard({
                     }
                   />
                 </div>
-              )}
+              ))}
 
               {historyPreview && (
                 <div className="mb-3 flex items-center justify-between gap-4 rounded-xl border border-blue-400/20 bg-blue-400/[0.07] px-4 py-3">
@@ -1177,20 +1178,20 @@ export default function ChessHotPotatoBoard({
                     </p>
 
                     <p className="mt-1 text-sm font-bold text-white">
-                      {t("Move")} {historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
+                      {t("Move")} {gameUi(historyPreview.moveNumber)}
+                      {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                      {gameUi(historyPreview.san)}
                     </p>
 
                     <p className="mt-1 text-[10px] font-semibold text-zinc-500">
-                      {(["w", "b"] as const)
+                      {gameUi((["w", "b"] as const)
                         .map((owner) => {
                           const potato = historyPreview.hotPotatoesAfter[owner];
                           return potato.square
                             ? `${owner === "w" ? "W" : "B"} 💣 ${potato.movesUntilExplosion}{potato.dropped ? " · Paused on ground" : ""}`
                             : `${owner === "w" ? "W" : "B"} ${t("Cooldown")} ${potato.respawnMovesRemaining}`;
                         })
-                        .join(" · ")}
+                        .join(" · "))}
                     </p>
                   </div>
 
@@ -1239,14 +1240,14 @@ export default function ChessHotPotatoBoard({
               <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-zinc-900/75 px-4 py-3 xl:hidden">
                 <span className="text-sm text-zinc-500">{t("Hot Potato")}</span>
                 <span className="text-sm font-bold text-zinc-200">
-                  {(["w", "b"] as const)
+                  {gameUi((["w", "b"] as const)
                     .map((owner) => {
                       const potato = displayedHotPotatoes[owner];
                       return potato.square
                         ? `${owner === "w" ? "W" : "B"} 💣 ${potato.movesUntilExplosion}{potato.dropped ? " · Paused on ground" : ""}`
                         : `${owner === "w" ? "W" : "B"} ❄ ${potato.respawnMovesRemaining}`;
                     })
-                    .join(" · ")}
+                    .join(" · "))}
                 </span>
               </div>
             </div>
@@ -1289,27 +1290,27 @@ export default function ChessHotPotatoBoard({
                       >
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                            {owner === "w" ? ui("White bomb") : ui("Black bomb")}
+                            {gameUi(owner === "w" ? ui("White bomb") : ui("Black bomb"))}
                           </p>
                           <span className="rounded-full border border-white/10 bg-black/25 px-2 py-1 text-[10px] font-black text-zinc-300">
-                            {patternLabel}
+                            {gameUi(patternLabel)}
                           </span>
                         </div>
 
-                        {potato.square ? (
+                        {gameUi(potato.square ? (
                           <>
                             <div className="mt-3 flex items-end justify-between gap-4">
                               <div>
                                 <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">{ui("Carrier")}</p>
                                 <p className="mt-1 font-mono text-xl font-black uppercase text-white">
-                                  {potato.square}
+                                  {gameUi(potato.square)}
                                 </p>
                               </div>
 
                               <div className="text-right">
                                 <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">{ui("Explodes in")}</p>
                                 <p className="mt-1 text-3xl font-black text-orange-200">
-                                  {potato.movesUntilExplosion}{potato.dropped ? ui(" · Paused on ground") : ""}
+                                  {gameUi(potato.movesUntilExplosion)}{gameUi(potato.dropped ? ui(" · Paused on ground") : "")}
                                 </p>
                               </div>
                             </div>
@@ -1338,10 +1339,10 @@ export default function ChessHotPotatoBoard({
                               <p className="mt-1 text-xs text-zinc-500">{ui("A new random bomb will spawn for this side.")}</p>
                             </div>
                             <span className="text-2xl font-black text-cyan-200">
-                              {potato.respawnMovesRemaining}
+                              {gameUi(potato.respawnMovesRemaining)}
                             </span>
                           </div>
-                        )}
+                        ))}
                       </div>
                     );
                   })}
@@ -1362,7 +1363,7 @@ export default function ChessHotPotatoBoard({
                   </div>
 
                   <span className="rounded-full border border-orange-400/15 bg-orange-400/[0.07] px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-orange-300">
-                    {history.length} {t("plies")}
+                    {gameUi(history.length)} {t("plies")}
                   </span>
                 </div>
 
@@ -1474,16 +1475,16 @@ function StatCard({
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <div className="flex items-start justify-between gap-2">
         <span className="text-lg" aria-hidden="true">
-          {icon}
+          {gameUi(icon)}
         </span>
-        <span className="text-xl font-black text-white">{value}</span>
+        <span className="text-xl font-black text-white">{gameUi(value)}</span>
       </div>
 
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
       </p>
 
-      {detail && <p className="mt-0.5 text-[10px] text-zinc-700">{detail}</p>}
+      {detail && <p className="mt-0.5 text-[10px] text-zinc-700">{gameUi(detail)}</p>}
     </div>
   );
 }
@@ -1493,7 +1494,7 @@ function RuleLine({ icon, text }: { icon: string; text: string }) {
   return (
     <div className="flex gap-2 rounded-xl border border-white/[0.04] bg-black/15 px-3 py-2">
       <span className="w-7 shrink-0 text-center font-black text-orange-300">
-        {icon}
+        {gameUi(icon)}
       </span>
       <span>{ui(text)}</span>
     </div>
@@ -1535,13 +1536,13 @@ function CapturedPiecesGrid({
           {t("White")}
         </span>
         <div className="flex min-h-7 flex-wrap gap-1 text-xl leading-none text-[#fff3d5]">
-          {capturedWhite.length === 0 ? (
+          {gameUi(capturedWhite.length === 0 ? (
             <span className="text-xs text-zinc-700">—</span>
           ) : (
             capturedWhite.map((piece, index) => (
-              <span key={`${piece}-${index}`}>{whiteSymbols[piece]}</span>
+              <span key={`${piece}-${index}`}>{gameUi(whiteSymbols[piece])}</span>
             ))
-          )}
+          ))}
         </div>
       </div>
 
@@ -1550,13 +1551,13 @@ function CapturedPiecesGrid({
           {t("Black")}
         </span>
         <div className="flex min-h-7 flex-wrap gap-1 text-xl leading-none text-zinc-300">
-          {capturedBlack.length === 0 ? (
+          {gameUi(capturedBlack.length === 0 ? (
             <span className="text-xs text-zinc-700">—</span>
           ) : (
             capturedBlack.map((piece, index) => (
-              <span key={`${piece}-${index}`}>{blackSymbols[piece]}</span>
+              <span key={`${piece}-${index}`}>{gameUi(blackSymbols[piece])}</span>
             ))
-          )}
+          ))}
         </div>
       </div>
     </div>

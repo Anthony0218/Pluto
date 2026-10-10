@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import useChessBoardFit from "@/components/chess/useChessBoardFit";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
@@ -748,9 +749,9 @@ export default function Board({
 
                 return (
                   <button
-                    key={square}
+                    key={gameUi(square)}
                     type="button"
-                    aria-label={square}
+                    aria-label={gameUi(square)}
                     style={{ background: isLight ? colors.light : colors.dark }}
                     onClick={() => {
                       if (orientationAnimating) {
@@ -968,7 +969,7 @@ export default function Board({
                         `}
                           aria-hidden="true"
                         >
-                          {isDestroyLuckySquare ? "💥" : isTeleportLuckySquare ? "🌀" : isSwapLuckySquare ? "🔄" : isPromoteLuckySquare ? "🎴" : "?"}
+                          {gameUi(isDestroyLuckySquare ? "💥" : isTeleportLuckySquare ? "🌀" : isSwapLuckySquare ? "🔄" : isPromoteLuckySquare ? "🎴" : "?")}
                         </span>
                       </>
                     )}
@@ -1063,10 +1064,10 @@ export default function Board({
                                         : "border-orange-100/70 text-orange-100"
                                   }
                                 `}
-                              aria-label={`Hot Potato explodes in ${potato.movesRemaining} moves`}
+                              aria-label={gameUi(`Hot Potato explodes in ${potato.movesRemaining} moves`)}
                             >
                               <span aria-hidden="true">💣</span>
-                              <span>{potato.movesRemaining}</span>
+                              <span>{gameUi(potato.movesRemaining)}</span>
                             </span>
                           ))}
                         </span>
@@ -1151,7 +1152,7 @@ export default function Board({
                           `}
                           aria-hidden="true"
                         >
-                          {bossPowerTargetMode === "summon" ? "♟+" : "✦"}
+                          {gameUi(bossPowerTargetMode === "summon" ? "♟+" : "✦")}
                         </span>
                       </>
                     )}
@@ -1228,7 +1229,7 @@ export default function Board({
                             "
                             aria-hidden="true"
                           >
-                            🔥{bossRage}
+                            🔥{gameUi(bossRage)}
                           </span>
                         )}
                       </>
@@ -1577,8 +1578,8 @@ export default function Board({
                           }
                         `}
                         >
-                          {isWhiteMissionTargetSquare &&
-                          isBlackMissionTargetSquare ? "♔♚" : isWhiteMissionTargetSquare ? "♔" : "♚"}
+                          {gameUi(isWhiteMissionTargetSquare &&
+                          isBlackMissionTargetSquare ? "♔♚" : isWhiteMissionTargetSquare ? "♔" : "♚")}
                         </span>
 
                         <span
@@ -1897,11 +1898,11 @@ export default function Board({
                       PIECE
                      ========================= */}
 
-                    {piece &&
+                    {gameUi(piece &&
                       !isHotPotatoBlownUpKingSquare &&
                       !isCollapsedSquare &&
                       slide?.to !== square &&
-                      renderPiece(piece, true)}
+                      renderPiece(piece, true))}
 
                     {isFogSquare && (
                       <>
@@ -1960,7 +1961,7 @@ export default function Board({
                         ${isLight ? "text-[#66452f]/70" : "text-[#f1ddbe]/70"}
                       `}
                       >
-                        {file}
+                        {gameUi(file)}
                       </span>
                     )}
 
@@ -1989,7 +1990,7 @@ export default function Board({
                         ${isLight ? "text-[#66452f]/70" : "text-[#f1ddbe]/70"}
                       `}
                       >
-                        {rank}
+                        {gameUi(rank)}
                       </span>
                     )}
                     {annotationBadges.filter((badge) => badge.square === square).map((badge, index) => (
@@ -2035,7 +2036,7 @@ export default function Board({
                   height: "12.5%",
                 }}
               >
-                {renderPiece(slidePiece, false)}
+                {gameUi(renderPiece(slidePiece, false))}
               </span>
             )}
             {annotationArrows.length > 0 && (

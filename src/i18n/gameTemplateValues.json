@@ -1,0 +1,2212 @@
+{
+  "{0}{1}random=1&bestOf={2}&modes={3}&series={4}": [
+    "1"
+  ],
+  "atlas-page atlas-trials-hub atlas-hub{0}": [
+    "0"
+  ],
+  "{0} rules": [
+    "0"
+  ],
+  "Selected: {0}": [
+    "0"
+  ],
+  "Play {0}": [
+    "0"
+  ],
+  "Two players, up to {0} different modes. First to {1} game wins; draws use a game without awarding a win. Start with {2}.": [
+    "2"
+  ],
+  "{0} round{1} won": [
+    "1"
+  ],
+  "· {0} pin{1} already placed and hidden": [
+    "1"
+  ],
+  "Click anywhere to place a pin. {0} counts as 0 km.": [
+    "0"
+  ],
+  "{0} · Game {1} of {2}": [
+    "0"
+  ],
+  "Share this code — {0} seat{1} open.{2}": [
+    "1",
+    "2"
+  ],
+  "{0} wins{1}": [
+    "1"
+  ],
+  "atlas-play-layout {0}": [
+    "0"
+  ],
+  "Your pin: {0}° {1}, {2}° {3}{4}": [
+    "1",
+    "3",
+    "4"
+  ],
+  "Waiting for {0} more player{1}…": [
+    "1"
+  ],
+  "{0} different modes in a shuffled order{1}. First to {2} game wins; draws use a game without awarding a win.": [
+    "1"
+  ],
+  ", including {0}": [
+    "0"
+  ],
+  "atlas-duel-card {0}": [
+    "0"
+  ],
+  "atlas-room-player {0} {1}": [
+    "0",
+    "1"
+  ],
+  "atlas-ready-check {0}": [
+    "0"
+  ],
+  "atlas-feedback {0}": [
+    "0"
+  ],
+  "atlas-guess-result {0}": [
+    "0"
+  ],
+  "{0} player{1} still racing. Scores update live.": [
+    "1"
+  ],
+  "atlas-duel-card trial-accent-{0} {1}": [
+    "1"
+  ],
+  "-mb-px border-b-2 px-4 py-2 text-sm font-semibold transition {0}": [
+    "0"
+  ],
+  "group relative overflow-hidden rounded-[18px] border p-4 text-left transition duration-300 hover:-translate-y-0.5 sm:p-5 {0}": [
+    "0"
+  ],
+  "flex h-14 w-14 items-center justify-center rounded-2xl border text-3xl {0}": [
+    "0"
+  ],
+  "mt-4 text-[8px] font-black uppercase tracking-[0.24em] {0}": [
+    "0"
+  ],
+  "group relative flex items-center gap-4 rounded-[18px] border p-3.5 text-left transition duration-300 hover:-translate-y-0.5 sm:p-4 xl:block xl:min-h-[142px] xl:p-3 {0}": [
+    "0"
+  ],
+  "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border text-2xl xl:h-10 xl:w-10 xl:text-xl {0}": [
+    "0"
+  ],
+  "block text-[8px] font-black uppercase tracking-[0.22em] {0}": [
+    "0"
+  ],
+  "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-lg transition duration-300 xl:absolute xl:right-3 xl:top-3 xl:h-8 xl:w-8 {0}": [
+    "0"
+  ],
+  "Play as {0}": [
+    "0"
+  ],
+  "group flex w-full items-center justify-between gap-4 rounded-3xl border p-4 text-left shadow-xl shadow-black/20 backdrop-blur-md transition {0}": [
+    "0"
+  ],
+  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl transition {0}": [
+    "0"
+  ],
+  "relative h-6 w-11 shrink-0 rounded-full border transition {0}": [
+    "0"
+  ],
+  "absolute top-0.5 h-4 w-4 rounded-full transition-all {0}": [
+    "0"
+  ],
+  "mt-4 w-full rounded-xl border px-4 py-3 text-sm font-bold transition {0} disabled:cursor-not-allowed disabled:opacity-40": [
+    "0"
+  ],
+  "flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-left transition {0}": [
+    "0"
+  ],
+  "flex h-6 w-6 items-center justify-center rounded-md text-[10px] font-black {0}": [
+    "0"
+  ],
+  "font-mono text-sm font-bold {0}": [
+    "0"
+  ],
+  "mt-0.5 block text-[9px] font-bold {0}": [
+    "0"
+  ],
+  "rounded-3xl border p-3.5 shadow-2xl shadow-black/30 backdrop-blur-xl transition {0}": [
+    "0"
+  ],
+  "group relative overflow-hidden rounded-[22px] border bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 xl:p-7 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border text-[30px] shadow-inner transition duration-300 sm:h-[74px] sm:w-[74px] {0}": [
+    "0"
+  ],
+  "mt-1.5 font-serif text-[27px] leading-tight sm:text-[31px] xl:text-[34px] {0}": [
+    "0"
+  ],
+  "flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold {0}": [
+    "0"
+  ],
+  "rounded-xl px-2.5 py-1 text-xs font-bold {0}": [
+    "0"
+  ],
+  "shrink-0 space-y-2 {0}": [
+    "0"
+  ],
+  "w-full rounded-3xl border border-white/10 bg-zinc-900 text-center shadow-2xl shadow-black/50 {0}": [
+    "0"
+  ],
+  "{0} font-black text-white": [
+    "0"
+  ],
+  "{0} text-zinc-400": [
+    "0"
+  ],
+  "flex aspect-[.72] flex-col items-center justify-center rounded-[24px] border p-5 shadow-xl transition duration-300 {0}": [
+    "0"
+  ],
+  "relative overflow-hidden rounded-[22px] border bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 xl:p-7 {0}": [
+    "0"
+  ],
+  "flex h-16 w-16 items-center justify-center rounded-2xl border text-[30px] shadow-inner sm:h-[74px] sm:w-[74px] {0}": [
+    "0"
+  ],
+  "mt-5 text-[9px] font-black uppercase tracking-[0.26em] {0}": [
+    "0"
+  ],
+  "mx-auto flex w-full flex-col gap-4 xl:gap-5 {0}": [
+    "0"
+  ],
+  "grid gap-4 {0}": [
+    "0"
+  ],
+  "rounded-xl px-4 py-3 text-sm font-bold transition {0}": [
+    "0"
+  ],
+  "{0}/{1}/game": [
+    "0"
+  ],
+  "group relative overflow-hidden rounded-[22px] border bg-black/20 p-5 shadow-[0_16px_40px_rgba(0,0,0,.22)] backdrop-blur-md sm:p-6 {0}{1}": [
+    "0",
+    "1"
+  ],
+  "flex h-[74px] w-[74px] shrink-0 items-center justify-center overflow-hidden rounded-2xl border text-[32px] shadow-inner {0}": [
+    "0"
+  ],
+  "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold {0}": [
+    "0"
+  ],
+  "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-bold {0}": [
+    "0"
+  ],
+  "h-1.5 w-1.5 rounded-full {0}": [
+    "0"
+  ],
+  "h-2 w-2 rounded-full {0}": [
+    "0"
+  ],
+  "grid gap-2 {0}": [
+    "0"
+  ],
+  "rounded-xl border px-2 py-2 text-xs font-bold transition focus-visible:outline-2 focus-visible:outline-amber-300 disabled:opacity-40 {0}": [
+    "0"
+  ],
+  "rounded-xl px-4 py-2.5 text-sm font-bold transition {0}": [
+    "0"
+  ],
+  "rounded-2xl border p-3 {0}": [
+    "0"
+  ],
+  "{0} flex flex-wrap items-end justify-between gap-5": [
+    "0"
+  ],
+  "flex flex-wrap items-center gap-2 {0}": [
+    "0"
+  ],
+  "rounded-lg px-4 py-2 text-sm font-bold {0}": [
+    "0"
+  ],
+  "relative rounded-[22px] border border-amber-300/25 bg-gradient-to-br from-amber-300/[.08] to-white/[.02] p-5 sm:p-6 {0}": [
+    "0"
+  ],
+  "#{0}{1}": [
+    "1"
+  ],
+  "rounded-full border px-3 py-1 text-[9px] font-black uppercase tracking-[0.17em] {0}": [
+    "0"
+  ],
+  "h-1.5 rounded-full transition-all {0}": [
+    "0"
+  ],
+  "eat-quest-note eat-glass {0}": [
+    "0"
+  ],
+  "eat-seat-avatar {0}": [
+    "0"
+  ],
+  "eat-map-card eat-map-{0} {1}": [
+    "1"
+  ],
+  "Account sync unavailable: {0}": [
+    "0"
+  ],
+  "mt-2 rounded-xl border px-4 py-2 text-right font-mono text-3xl font-bold tabular-nums {0}": [
+    "0"
+  ],
+  "brickstone-unit {0}": [
+    "0"
+  ],
+  "ed-character-portrait{0}": [
+    "0"
+  ],
+  "ed-world-svg{0}": [
+    "0"
+  ],
+  "ed-nation {0}": [
+    "0"
+  ],
+  "ed-app ed-playing ed-panel-{0} {1}": [
+    "1"
+  ],
+  "{0}: {1} → {2} · {3}": [
+    "0"
+  ],
+  "ed-army-bar {0}": [
+    "0"
+  ],
+  "ed-panel {0}": [
+    "0"
+  ],
+  "Move sidebar {0}": [
+    "0"
+  ],
+  "{0}, {1}{2}": [
+    "2"
+  ],
+  "{0}{1}{2} {3}": [
+    "0"
+  ],
+  "ed-effect {0}": [
+    "0"
+  ],
+  "{0} would inherit{1}": [
+    "1"
+  ],
+  "{0} hexes · {1} without friendly supply · {2} food turns remaining at arrival{3}.": [
+    "3"
+  ],
+  "{0} · {1} SPACE{2}": [
+    "2"
+  ],
+  "pp-aim-field {0}": [
+    "0"
+  ],
+  "pp-aim-ring core {0}": [
+    "0"
+  ],
+  "✦ {0} Golden Pluto{1} · 🪙 {2} coins": [
+    "1"
+  ],
+  "🪙 {0} coins · ✦ {1} Golden Pluto{2}": [
+    "2"
+  ],
+  "{0} minigame win{1} ·": [
+    "1"
+  ],
+  "{0} duel win{1} ·": [
+    "1"
+  ],
+  "{0} turn{1}": [
+    "1"
+  ],
+  "Moved {0} space{1}": [
+    "1"
+  ],
+  "pp-item-slot {0}": [
+    "0"
+  ],
+  "{0}:{1}:{2}:{3}": [
+    "3"
+  ],
+  "pp-slot {0}": [
+    "0"
+  ],
+  "pp-ready {0}": [
+    "0"
+  ],
+  "pp-map-card pp-map-{0} {1}": [
+    "1"
+  ],
+  "pp-hp {0}": [
+    "0"
+  ],
+  "pp-eyebrow pp-turn-owner {0}": [
+    "0"
+  ],
+  "({0}, {1} space{2})": [
+    "2"
+  ],
+  "☢ {0} irradiated landing{1}": [
+    "1"
+  ],
+  "pp-target-bar {0}": [
+    "0"
+  ],
+  "pp-alert {0}": [
+    "0"
+  ],
+  "Available in {0} round{1}": [
+    "1"
+  ],
+  "{0} · {1} space{2} away": [
+    "2"
+  ],
+  "rounded-2xl border p-5 text-left transition {0}": [
+    "0"
+  ],
+  "flex items-center gap-2 rounded-xl border px-3 py-2 {0}": [
+    "0"
+  ],
+  "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black {0}": [
+    "0"
+  ],
+  "min-w-0 flex-1 rounded-lg border bg-zinc-950/70 px-3 py-2 text-sm text-white outline-none transition {0}": [
+    "0"
+  ],
+  "flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 {0}": [
+    "0"
+  ],
+  "text-[11px] font-black {0}": [
+    "0"
+  ],
+  "relative shrink-0 overflow-hidden rounded-[10px] {0}": [
+    "0"
+  ],
+  "rounded-xl px-5 py-2.5 text-sm font-bold transition {0}": [
+    "0"
+  ],
+  "rounded-xl px-4 py-2.5 text-sm font-black transition {0}": [
+    "0"
+  ],
+  "w-full rounded-2xl border p-3 text-left transition {0}": [
+    "0"
+  ],
+  "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-black {0}": [
+    "0"
+  ],
+  "mt-6 grid gap-3 {0}": [
+    "0"
+  ],
+  "relative rounded-2xl border p-4 text-center transition {0}": [
+    "0"
+  ],
+  "mt-1 text-[10px] font-bold {0}": [
+    "0"
+  ],
+  "rounded-xl border p-2 {0}": [
+    "0"
+  ],
+  "mt-2 text-center text-[9px] font-black uppercase tracking-wider {0}": [
+    "0"
+  ],
+  "flex h-16 items-center justify-center rounded-xl border transition {0}": [
+    "0"
+  ],
+  "rounded-lg border px-2 py-2 text-[11px] font-bold transition {0}": [
+    "0"
+  ],
+  "rounded-2xl border p-4 text-left transition sm:p-5 {0}": [
+    "0"
+  ],
+  "h-10 w-14 rounded-lg text-sm font-black transition {0}": [
+    "0"
+  ],
+  "rounded-lg px-3 py-2 text-sm font-bold transition {0}": [
+    "0"
+  ],
+  "rounded-xl border p-3 {0}": [
+    "0"
+  ],
+  "watten-single-seat is-{0} {1}": [
+    "1"
+  ],
+  "aspect-[2/3] rounded border text-xs font-bold {0}": [
+    "0"
+  ],
+  "watten-single-hand-card relative rounded-md transition hover:-translate-y-2 focus-visible:outline-2 focus-visible:outline-amber-200 disabled:cursor-default motion-reduce:transform-none {0} {1}": [
+    "0",
+    "1"
+  ],
+  "absolute right-0 top-0 rounded-bl-md px-1 text-[10px] font-black {0}": [
+    "0"
+  ],
+  "block {0}": [
+    "0"
+  ],
+  "Quiz: {0}": [
+    "0"
+  ],
+  "arena-damage-number {0}": [
+    "0"
+  ],
+  "mg-countdown {0}": [
+    "0"
+  ],
+  "mg-reward {0}": [
+    "0"
+  ],
+  "Animated 3D {0}. Four private quadrants with fox, bunny, explorer and ghost characters.": [
+    "0"
+  ],
+  "{0} place-{1}": [
+    "0"
+  ],
+  "tp-timer {0}": [
+    "0"
+  ],
+  "FINAL ROUND {0} · MOST {1} WINS": [
+    "1"
+  ],
+  "arena-hit-marker {0}": [
+    "0"
+  ],
+  "arena-hp-box {0}": [
+    "0"
+  ],
+  "sc-joystick {0}": [
+    "0"
+  ],
+  "duel-side {0}": [
+    "0"
+  ],
+  "{0} target, {1}{2}": [
+    "1"
+  ],
+  "{0} {1} Trefferquote": [
+    "1"
+  ],
+  "sk-card-tab {0}": [
+    "0"
+  ],
+  "Online · {0}": [
+    "0"
+  ],
+  "{0} {1} {2} {3} {4}": [
+    "1",
+    "3"
+  ],
+  "{0}.md": [
+    "0"
+  ],
+  "„{0}“ für alle Teilnehmer endgültig löschen?": [
+    "0"
+  ],
+  "„{0}“ aus deiner Liste entfernen? Der Tisch bleibt für die anderen erhalten.": [
+    "0"
+  ],
+  "sk-simple-seat sk-simple-seat-{0} {1}": [
+    "1"
+  ],
+  "sk-avatar sk-avatar-{0} {1}": [
+    "1"
+  ],
+  "sk-trick-stack-{0}": [
+    "0"
+  ],
+  "Stichstapel von {0}, {1} Stiche{2}{3}": [
+    "3"
+  ],
+  "sk-toggle {0}": [
+    "0"
+  ],
+  "{0} · {1}{2}": [
+    "0",
+    "2"
+  ],
+  "sk-page sk-game-page {0} {1} {2} {3}": [
+    "0",
+    "1",
+    "3"
+  ],
+  "{0} öffnen": [
+    "0"
+  ],
+  "{0} schließen": [
+    "0"
+  ],
+  "Tabs in {0}": [
+    "0"
+  ],
+  "sk-avatar-option {0}": [
+    "0"
+  ],
+  "sk-deck-option {0}": [
+    "0"
+  ],
+  "sk-score-dialog sk-review-hub {0} {1}": [
+    "0",
+    "1"
+  ],
+  "sk-hand-slot {0}": [
+    "0"
+  ],
+  "sk-card {0}": [
+    "0"
+  ],
+  "Dein Stichstapel, {0} Stiche{1}{2}": [
+    "2"
+  ],
+  "sk-table-sidebar {0} {1} {2} {3} {4} {5} {6} {7}": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+  ],
+  "sk-action-timer {0}": [
+    "0"
+  ],
+  "sk-action-timer sk-legen-timer {0}": [
+    "0"
+  ],
+  "{0} ist mit dieser Hand oder dem aktuellen Gebot nicht möglich": [
+    "0"
+  ],
+  "sk-suit-card {0}": [
+    "0"
+  ],
+  "Ramsch · {0} {1}": [
+    "1"
+  ],
+  "group relative h-32 w-[84px] shrink-0 transition-all duration-150 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "ml-1 transition-transform {0}": [
+    "0"
+  ],
+  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all {0}": [
+    "0"
+  ],
+  "flex-1 text-sm font-semibold {0}": [
+    "0"
+  ],
+  "relative h-14 w-9 rounded-md border border-white/20 bg-zinc-900 shadow-md {0}": [
+    "0"
+  ],
+  "rounded-lg px-4 py-2 text-sm font-semibold transition {0}": [
+    "0"
+  ],
+  "w-full rounded-xl border px-4 py-2 text-xs font-bold shadow-lg transition {0}": [
+    "0"
+  ],
+  "relative h-20 w-12 rounded-lg border border-white/20 bg-zinc-950 shadow-lg transition-all duration-200 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "abheben-card-flip relative h-full w-full {0}": [
+    "0"
+  ],
+  "flex flex-col items-center rounded-2xl p-4 {0}": [
+    "0"
+  ],
+  "h-2 rounded-full {0}": [
+    "0"
+  ],
+  "relative flex flex-col items-center rounded-2xl p-4 {0}": [
+    "0"
+  ],
+  "relative h-14 w-9 rounded-md border border-white/20 bg-zinc-900 shadow-md transition-all duration-200 ease-out hover:z-20 hover:-translate-y-2 hover:scale-110 hover:border-amber-300/50 hover:shadow-xl {0}": [
+    "0"
+  ],
+  "group relative mx-auto block h-28 w-24 transition max-md:h-20 max-md:w-16 {0}": [
+    "0"
+  ],
+  "Das Spiel wurde gestartet, aber das Ziel konnte nicht auf {0} Punkte gesetzt werden: {1}": [
+    "1"
+  ],
+  "The game started, but the target could not be set to {0} points: {1}": [
+    "1"
+  ],
+  "Schlag konnte nicht gespeichert werden: {0}": [
+    "0"
+  ],
+  "Could not save Schlag: {0}": [
+    "0"
+  ],
+  "Die Farbe konnte nicht gespeichert werden: {0}": [
+    "0"
+  ],
+  "Could not save the suit: {0}": [
+    "0"
+  ],
+  "Der nächste Stich konnte nicht gestartet werden: {0}": [
+    "0"
+  ],
+  "Could not continue to the next trick: {0}": [
+    "0"
+  ],
+  "Gehen konnte nicht erhöht werden: {0}": [
+    "0"
+  ],
+  "Could not raise: {0}": [
+    "0"
+  ],
+  "Die Entscheidung konnte nicht gespeichert werden: {0}": [
+    "0"
+  ],
+  "Could not save the decision: {0}": [
+    "0"
+  ],
+  "Die nächste Runde konnte nicht gestartet werden: {0}": [
+    "0"
+  ],
+  "Could not start the next round: {0}": [
+    "0"
+  ],
+  "h-3 w-3 rounded-full {0}": [
+    "0"
+  ],
+  "rounded-2xl border p-4 {0}": [
+    "0"
+  ],
+  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-black {0}": [
+    "0"
+  ],
+  "mt-1 text-[10px] font-black uppercase tracking-wider {0}": [
+    "0"
+  ],
+  "min-w-0 flex-1 rounded-lg px-2 py-2 text-sm font-black transition {0}": [
+    "0"
+  ],
+  "Warte auf {0} {1}": [
+    "1"
+  ],
+  "Waiting for {0} more {1}": [
+    "1"
+  ],
+  "relative h-20 w-12 rounded-[7px] border border-amber-100/20 bg-zinc-950 shadow-lg transition-all duration-200 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "pointer-events-none rounded-xl transition-all duration-500 {0}": [
+    "0"
+  ],
+  "relative inline-block rounded-2xl border px-5 py-3 max-md:px-3 max-md:py-2 {0}": [
+    "0"
+  ],
+  "rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest {0}": [
+    "0"
+  ],
+  "relative rounded-xl transition-all duration-200 {0} {1} {2} {3} {4}": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ],
+  "w-48 max-w-48 shrink-0 rounded-2xl border px-5 py-4 max-md:w-28 max-md:max-w-28 max-md:rounded-xl max-md:px-2 max-md:py-2 text-center shadow-xl backdrop-blur-md transition-all duration-300 {0} {1} {2}": [
+    "0",
+    "1"
+  ],
+  "rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-wider {0}": [
+    "0"
+  ],
+  "relative h-12 w-8 rounded-md border border-amber-100/20 bg-zinc-950 shadow-lg transition-all duration-200 ease-out hover:z-30 hover:-translate-y-2 hover:scale-110 hover:border-amber-300/50 hover:shadow-xl {0}": [
+    "0"
+  ],
+  "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black {0}": [
+    "0"
+  ],
+  "Das Spiel konnte nicht gestartet werden: {0}": [
+    "0"
+  ],
+  "The game could not be started: {0}": [
+    "0"
+  ],
+  "relative overflow-hidden rounded-2xl border p-4 transition {0}": [
+    "0"
+  ],
+  "h-16 w-16 shrink-0 overflow-hidden rounded-2xl border {0}": [
+    "0"
+  ],
+  "h-2.5 w-2.5 rounded-full {0}": [
+    "0"
+  ],
+  "mt-1 truncate text-lg font-black {0}": [
+    "0"
+  ],
+  "rounded-2xl border p-3 transition {0}": [
+    "0"
+  ],
+  "rounded-full px-2 py-0.5 text-[9px] font-black uppercase {0}": [
+    "0"
+  ],
+  "relative h-12 w-8 rounded-md border border-white/20 bg-zinc-950 shadow-md max-md:h-9 max-md:w-6 {0}": [
+    "0"
+  ],
+  "group relative mx-auto block h-28 w-24 transition {0}": [
+    "0"
+  ],
+  "w-52 rounded-2xl border p-3 text-center shadow-xl backdrop-blur max-md:w-40 max-md:p-2 {0}": [
+    "0"
+  ],
+  "mt-1 inline-block rounded-full px-2 py-0.5 text-[9px] font-black uppercase {0}": [
+    "0"
+  ],
+  "rounded-xl px-4 py-3 font-black transition {0}": [
+    "0"
+  ],
+  "rounded-lg px-3 py-2 text-xs font-black transition {0}": [
+    "0"
+  ],
+  "relative h-20 w-12 rounded-[7px] border bg-zinc-950 shadow-lg transition-all duration-300 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "w-40 rounded-2xl p-3 {0}": [
+    "0"
+  ],
+  "relative rounded-3xl border p-4 shadow-2xl backdrop-blur max-md:rounded-2xl max-md:p-2 {0}": [
+    "0"
+  ],
+  "watten-turn-notice {0}": [
+    "0"
+  ],
+  "block font-semibold {0}": [
+    "0"
+  ],
+  "w-full accent-indigo-400 {0}": [
+    "0"
+  ],
+  "flex items-center justify-between gap-4 border-t border-white/10 font-semibold {0}": [
+    "0"
+  ],
+  "flex w-full min-w-0 items-center gap-1.5 rounded-lg {0} py-1 text-left transition enabled:hover:bg-white/[0.05] disabled:cursor-default {1} {2}": [
+    "0",
+    "1",
+    "2"
+  ],
+  "flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md px-1.5 py-0.5 text-[9px] font-black transition {0}": [
+    "0"
+  ],
+  "flex min-w-0 items-center gap-1 {0}": [
+    "0"
+  ],
+  "font-serif text-[22px] leading-none {0}": [
+    "0"
+  ],
+  "flex min-w-0 flex-col items-center rounded-lg border p-1.5 transition hover:border-amber-300/60 focus-visible:outline-2 focus-visible:outline-amber-300 {0}": [
+    "0"
+  ],
+  "relative h-full overflow-hidden bg-[#080e15] {0}": [
+    "0"
+  ],
+  "room-invite-button rounded-xl border border-amber-300/50 bg-[#282015] px-4 py-2 text-sm font-bold text-amber-100 shadow-lg transition hover:border-amber-200 hover:bg-[#3c2e1a] focus-visible:outline-2 focus-visible:outline-amber-200 {0}": [
+    "0"
+  ],
+  "relative h-full overflow-hidden bg-[#10141e] {0}": [
+    "0"
+  ],
+  "inline-grid shrink-0 place-items-center rounded-2xl border bg-gradient-to-br shadow-[inset_0_1px_rgba(255,255,255,.35),0_10px_24px_rgba(0,0,0,.35)] {0} {1}": [
+    "1"
+  ],
+  "relative flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3.5 transition has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-amber-300 {0}": [
+    "0"
+  ],
+  "grid h-5 w-5 shrink-0 place-items-center rounded-md border text-[12px] font-black transition {0}": [
+    "0"
+  ],
+  "text-2xl leading-none {0}": [
+    "0"
+  ],
+  "block text-sm font-black {0}": [
+    "0"
+  ],
+  "flex w-full items-center justify-between rounded-xl border px-4 py-3.5 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-40 {0}": [
+    "0"
+  ],
+  "top-rank-badge{0}{1} {2}": [
+    "0",
+    "1"
+  ],
+  "relative overflow-hidden bg-gradient-to-br {0} {1}": [
+    "1"
+  ],
+  "absolute left-4 top-4 font-black tracking-widest opacity-45 {0}": [
+    "0"
+  ],
+  "absolute right-4 top-4 font-black tracking-widest opacity-45 {0}": [
+    "0"
+  ],
+  "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[52%] select-none leading-none drop-shadow-[0_18px_28px_rgba(0,0,0,.65)] transition duration-500 group-hover:scale-105 {0}": [
+    "0"
+  ],
+  "absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap font-black uppercase tracking-[0.22em] opacity-45 {0}": [
+    "0"
+  ],
+  "shrink-0 rounded-full border px-2 py-1 text-[7px] font-black uppercase tracking-wider {0}": [
+    "0"
+  ],
+  "rounded-2xl border px-4 py-3 font-bold transition {0}": [
+    "0"
+  ],
+  "rounded-2xl border p-3 text-left transition {0}": [
+    "0"
+  ],
+  "relative flex h-8 w-7 items-center justify-center rounded-md border text-xl transition focus-visible:outline-2 focus-visible:outline-amber-200 sm:h-9 sm:w-8 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "absolute bottom-0.5 right-0.5 h-1 w-1 rounded-full {0}": [
+    "0"
+  ],
+  "flex w-full items-center justify-between rounded-xl border px-3 py-3 text-left transition disabled:cursor-not-allowed disabled:opacity-40 {0}": [
+    "0"
+  ],
+  "rounded-xl border px-1 py-2 text-center {0}": [
+    "0"
+  ],
+  "rounded-xl border px-3 py-2.5 text-xs font-black {0}": [
+    "0"
+  ],
+  "flex items-center justify-between rounded-xl border px-3 py-2.5 transition disabled:cursor-not-allowed disabled:opacity-30 {0}": [
+    "0"
+  ],
+  "col-span-2 rounded-xl border px-3 py-2.5 text-xs font-black transition disabled:opacity-30 {0}": [
+    "0"
+  ],
+  "flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-left text-xs {0}": [
+    "0"
+  ],
+  "rounded-xl border px-4 py-3 font-black transition {0}": [
+    "0"
+  ],
+  "mb-2 w-full rounded-xl border px-3 py-2 text-left text-xs font-bold transition {0}": [
+    "0"
+  ],
+  "truncate font-mono text-xs font-black {0}": [
+    "0"
+  ],
+  "{0}'s private vision": [
+    "0"
+  ],
+  "rounded-lg px-2 py-2 text-[10px] font-black {0}": [
+    "0"
+  ],
+  "flex w-full items-center justify-between border-b border-white/5 px-3 py-2.5 text-xs {0}": [
+    "0"
+  ],
+  "relative z-10 flex min-w-0 flex-col justify-between overflow-hidden border p-1.5 shadow-inner sm:p-2.5 {0} {1} {2} {3}": [
+    "2",
+    "3"
+  ],
+  "group relative flex aspect-square items-center justify-center overflow-hidden border-0 p-0 transition {0}": [
+    "0"
+  ],
+  "{0} places the next seeded piece": [
+    "0"
+  ],
+  "{0}{1} {2}": [
+    "1"
+  ],
+  "flex aspect-square items-center justify-center rounded-lg border text-lg {0}": [
+    "0"
+  ],
+  "w-full border-b border-white/5 px-3 py-2 text-left text-xs font-bold {0}": [
+    "0"
+  ],
+  "rounded-xl border px-4 py-2 text-right font-mono text-3xl font-bold tabular-nums {0}": [
+    "0"
+  ],
+  "aspect-[3/4] rounded-xl border text-2xl font-black transition {0} disabled:cursor-default": [
+    "0"
+  ],
+  "mb-1 flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition {0}": [
+    "0"
+  ],
+  "absolute {0} -translate-x-1/2 -translate-y-1/2 rounded-lg border px-2 py-1 text-[10px] font-black transition {1}": [
+    "1"
+  ],
+  "rounded-full border px-3 py-1.5 text-xs font-black {0}": [
+    "0"
+  ],
+  "rounded-3xl border p-4 shadow-xl shadow-black/20 backdrop-blur-md {0}": [
+    "0"
+  ],
+  "grid h-14 w-14 shrink-0 place-items-center rounded-2xl border text-3xl {0}": [
+    "0"
+  ],
+  "rounded-full border px-2 py-0.5 {0}": [
+    "0"
+  ],
+  "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 {0}": [
+    "0"
+  ],
+  "mt-2 flex w-full items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-left transition focus-visible:outline-2 focus-visible:outline-amber-300 {0}": [
+    "0"
+  ],
+  "block text-xs font-bold {0}": [
+    "0"
+  ],
+  "relative h-5 w-9 shrink-0 rounded-full border transition-colors duration-200 {0}": [
+    "0"
+  ],
+  "absolute left-0.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full bg-white shadow-md transition-transform duration-200 {0}": [
+    "0"
+  ],
+  "pointer-events-none relative flex h-full w-full items-center justify-center select-none font-serif text-[10cqw] leading-none transition-transform duration-150 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "group relative flex aspect-square items-center justify-center {0} border-0 p-0 transition-[filter,box-shadow] duration-150 focus:outline-none disabled:cursor-default disabled:opacity-100 {1} {2} hover:brightness-105": [
+    "0",
+    "1",
+    "2"
+  ],
+  "pointer-events-none absolute inset-0 z-[5] {0} {1}": [
+    "0",
+    "1"
+  ],
+  "pointer-events-none absolute left-1/2 top-1/2 z-[8] flex h-[62%] w-[62%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 bg-zinc-950/45 text-[clamp(1.3rem,3.5vw,2.6rem)] font-black leading-none shadow-[0_0_22px_rgba(255,255,255,0.16)] {0} {1}": [
+    "0",
+    "1"
+  ],
+  "flex min-w-10 items-center justify-center gap-0.5 rounded-full border bg-zinc-950/90 px-1.5 py-1 text-[10px] font-black leading-none shadow-[0_2px_10px_rgba(0,0,0,0.55)] {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute inset-[6%] z-[13] rounded-md border-2 border-dashed {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute bottom-1 right-1 z-[19] rounded-full border bg-zinc-950/90 px-1.5 py-0.5 text-[10px] font-black {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute inset-0 z-[2] {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute bottom-1.5 left-1.5 z-[18] flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-black leading-none shadow-[0_2px_8px_rgba(0,0,0,0.35)] {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute left-1/2 top-1/2 z-[19] flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border font-black leading-none shadow-[0_2px_12px_rgba(0,0,0,0.45)] {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute bottom-1 right-1 z-[19] text-[15px] font-black leading-none {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute bottom-1 right-1.5 z-20 font-black {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute left-1.5 top-1 z-20 font-black {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute left-0 top-0 z-[31] grid h-6 w-6 place-items-center rounded-full border border-white/35 bg-[#06131e] shadow-lg max-sm:h-4 max-sm:w-4 max-sm:[&_svg]:h-2.5 max-sm:[&_svg]:w-2.5 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "h-2 w-2 animate-pulse rounded-full {0}": [
+    "0"
+  ],
+  "shrink-0 rounded-lg px-2 py-1 text-[9px] font-black uppercase {0}": [
+    "0"
+  ],
+  "rounded-lg px-2 py-2 text-[10px] font-black uppercase tracking-wide transition {0}": [
+    "0"
+  ],
+  "rounded-lg border px-2.5 py-1.5 font-mono text-[10px] font-black transition {0}": [
+    "0"
+  ],
+  "w-full rounded-xl border px-3 py-3 text-left transition {0}": [
+    "0"
+  ],
+  "shrink-0 rounded-lg px-2 py-1 text-[9px] font-black {0}": [
+    "0"
+  ],
+  "flex h-12 w-12 items-center justify-center rounded-full border text-3xl font-black {0}": [
+    "0"
+  ],
+  "grid grid-cols-[36px_1fr_1fr] items-center gap-1 rounded-lg px-2 py-1 {0}": [
+    "0"
+  ],
+  "rounded-lg px-2 py-2 text-left font-mono text-xs transition hover:bg-amber-300/10 focus-visible:outline-2 focus-visible:outline-amber-200 disabled:opacity-30 {0}": [
+    "0"
+  ],
+  "rounded-full border px-3 py-1.5 text-xs font-bold {0}": [
+    "0"
+  ],
+  "rounded-xl border px-3 py-2.5 text-[11px] font-black transition disabled:cursor-not-allowed disabled:opacity-40 {0}": [
+    "0"
+  ],
+  "mx-auto overflow-hidden rounded-2xl border border-white/10 bg-[#1a120d] p-1.5 shadow-lg shadow-black/20 {0}": [
+    "0"
+  ],
+  "relative flex aspect-square items-center justify-center {0}": [
+    "0"
+  ],
+  "relative z-10 select-none font-serif leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.55)] {0} {1}": [
+    "0",
+    "1"
+  ],
+  "pointer-events-none absolute text-[6px] font-bold {0} {1}": [
+    "0",
+    "1"
+  ],
+  "rounded-3xl border p-5 shadow-xl shadow-black/10 {0}": [
+    "0"
+  ],
+  "rounded-full border px-4 py-2 text-xs font-black transition {0}": [
+    "0"
+  ],
+  "relative flex aspect-square items-center justify-center overflow-hidden transition {0} {1}": [
+    "0",
+    "1"
+  ],
+  "relative z-10 select-none font-serif text-[30px] leading-none drop-shadow-[0_2px_2px_rgba(0,0,0,0.55)] sm:text-[40px] lg:text-[46px] {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute text-[8px] font-black {0} {1}": [
+    "0",
+    "1"
+  ],
+  "rounded-full border px-3 py-1.5 text-xs font-black transition {0}": [
+    "0"
+  ],
+  "group relative min-h-[146px] rounded-[1.4rem] border p-3 text-left transition hover:-translate-y-0.5 {0}": [
+    "0"
+  ],
+  "rounded-full border px-2 py-1 text-[9px] font-black {0}": [
+    "0"
+  ],
+  "text-[10px] font-black transition {0}": [
+    "0"
+  ],
+  "flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition {0}": [
+    "0"
+  ],
+  "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-serif text-2xl {0}": [
+    "0"
+  ],
+  "Training puzzle “{0}” saved from your {1} game.": [
+    "1"
+  ],
+  "flex items-center justify-center gap-1 rounded-md px-1.5 py-1 text-[9px] font-black transition {0}": [
+    "0"
+  ],
+  "h-2 w-2 rounded-full border {0}": [
+    "0"
+  ],
+  "rounded-md border px-1.5 py-0.5 text-[8px] font-bold transition {0}": [
+    "0"
+  ],
+  "cursor-pointer border-b border-white/5 transition last:border-0 {0}": [
+    "0"
+  ],
+  "rounded-xl border px-3 py-2 text-xs font-black transition {0}": [
+    "0"
+  ],
+  "inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-left transition {0}": [
+    "0"
+  ],
+  "The move captured a {0} worth {1} material point{2}.": [
+    "2"
+  ],
+  "group/quality flex w-full min-w-0 items-center gap-1.5 rounded-lg border-l-2 px-1.5 py-1.5 text-left transition {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute bottom-0 w-px -translate-x-1/2 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "truncate font-mono text-xs font-bold {0}": [
+    "0"
+  ],
+  "flex w-full flex-col gap-3 rounded-2xl border p-4 text-left transition {0}": [
+    "0"
+  ],
+  "flex items-center gap-1 transition {0}": [
+    "0"
+  ],
+  "text-[8px] {0}": [
+    "0"
+  ],
+  "{0} {1}{potato.dropped ? \" · Paused on ground\" : \"\"}": [
+    "0"
+  ],
+  "{0} ❄{1}": [
+    "0"
+  ],
+  "{0} 💣 {1}{potato.dropped ? \" · Paused on ground\" : \"\"}": [
+    "0"
+  ],
+  "{0} ❄ {1}": [
+    "0"
+  ],
+  "mx-auto overflow-hidden rounded-2xl border border-white/10 p-1.5 shadow-lg shadow-black/20 {0}": [
+    "0"
+  ],
+  "flex h-full w-full items-center justify-center relative z-10 select-none font-serif leading-none drop-shadow-[0_1px_1px_rgba(0,0,0,0.55)] {0} {1}": [
+    "0",
+    "1"
+  ],
+  "group relative overflow-hidden rounded-[1.6rem] border p-5 shadow-2xl shadow-black/20 backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 {0}": [
+    "0"
+  ],
+  "relative flex aspect-square items-center justify-center overflow-hidden transition {0}": [
+    "0"
+  ],
+  "flex h-full w-full items-center justify-center relative z-10 select-none font-serif text-[30px] leading-none drop-shadow-[0_2px_2px_rgba(0,0,0,0.55)] sm:text-[40px] lg:text-[46px] {0}": [
+    "0"
+  ],
+  "{0} grid items-start gap-4 lg:grid-cols-[270px_minmax(0,1fr)_260px] xl:grid-cols-[330px_minmax(0,1fr)_300px] 2xl:grid-cols-[390px_minmax(0,1fr)_340px]": [
+    "0"
+  ],
+  "rounded-xl px-2 py-2 text-[9px] font-black uppercase tracking-[0.08em] transition {0}": [
+    "0"
+  ],
+  "text-xs text-amber-200/65 transition-transform {0}": [
+    "0"
+  ],
+  "rounded-lg border px-2.5 py-2 text-left text-[10px] font-black transition {0}": [
+    "0"
+  ],
+  "text-xs text-violet-200/65 transition-transform {0}": [
+    "0"
+  ],
+  "text-xs text-sky-200/60 transition-transform {0}": [
+    "0"
+  ],
+  "flex w-full items-center justify-between rounded-lg border px-2.5 py-2 text-left text-[10px] font-black transition {0}": [
+    "0"
+  ],
+  "group w-full rounded-[1.35rem] border p-3 text-left transition hover:-translate-y-0.5 {0}": [
+    "0"
+  ],
+  "rounded-full border px-2 py-0.5 text-[8px] font-black uppercase tracking-wider {0}": [
+    "0"
+  ],
+  "rounded-full border px-2 py-0.5 text-[8px] font-black {0}": [
+    "0"
+  ],
+  "{0} mistake{1}": [
+    "1"
+  ],
+  "text-[10px] font-black uppercase tracking-[0.22em] {0}": [
+    "0"
+  ],
+  "font-serif text-base font-semibold {0}": [
+    "0"
+  ],
+  "font-mono text-xs font-black {0}": [
+    "0"
+  ],
+  "flex h-10 w-10 items-center justify-center rounded-xl border {0}": [
+    "0"
+  ],
+  "{0} max-w-5xl font-serif font-medium leading-[0.88] tracking-[-0.05em] text-[#f2e4c7]": [
+    "0"
+  ],
+  "{0} max-w-2xl text-sm leading-7 text-zinc-400 sm:text-base": [
+    "0"
+  ],
+  "group relative overflow-hidden rounded-[1.65rem] border px-4 py-4 text-left shadow-xl shadow-black/10 transition duration-300 hover:-translate-y-0.5 {0}": [
+    "0"
+  ],
+  "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border font-serif text-2xl transition {0}": [
+    "0"
+  ],
+  "font-serif text-lg font-semibold {0}": [
+    "0"
+  ],
+  "mt-3 h-px transition {0}": [
+    "0"
+  ],
+  "{0} rounded-[2rem] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(6,12,19,.88),rgba(3,8,13,.92))] p-4 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-6 lg:p-7": [
+    "0"
+  ],
+  "text-[9px] font-black uppercase tracking-[0.2em] {0}": [
+    "0"
+  ],
+  "relative aspect-[3/4] overflow-hidden rounded-xl border font-black transition-all duration-500 {0}": [
+    "0"
+  ],
+  "font-serif text-4xl {0}": [
+    "0"
+  ],
+  "mt-6 rounded-2xl border p-5 text-center transition-all duration-500 {0}": [
+    "0"
+  ],
+  "font-serif text-7xl leading-none {0}": [
+    "0"
+  ],
+  "mt-0.5 text-[10px] {0}": [
+    "0"
+  ],
+  "flex items-center justify-between rounded-xl border px-3 py-2.5 text-left transition {0} disabled:cursor-not-allowed disabled:opacity-30": [
+    "0"
+  ],
+  "col-span-2 rounded-xl border px-3 py-2.5 text-xs font-black transition {0}": [
+    "0"
+  ],
+  "relative flex aspect-square items-center justify-center overflow-hidden {0} {1} {2}": [
+    "0",
+    "1",
+    "2"
+  ],
+  "pointer-events-none absolute left-1 top-0.5 z-30 text-[7px] font-black {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute bottom-0.5 right-1 z-30 text-[7px] font-black {0}": [
+    "0"
+  ],
+  "rounded-lg px-2 py-2 text-[10px] font-black uppercase {0}": [
+    "0"
+  ],
+  "rounded-xl border px-3 py-2.5 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-40 {0}": [
+    "0"
+  ],
+  "relative flex aspect-square items-center justify-center overflow-hidden {0} {1}": [
+    "0",
+    "1"
+  ],
+  "relative z-10 text-[clamp(18px,4.3vw,34px)] leading-none {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute left-1 top-0.5 z-40 text-[7px] font-black {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute bottom-0.5 right-1 z-40 text-[7px] font-black {0}": [
+    "0"
+  ],
+  "rounded-lg border px-1 py-2 text-center {0}": [
+    "0"
+  ],
+  "group/quality flex w-full items-center justify-between rounded-xl border px-3 py-3 text-left transition {0}": [
+    "0"
+  ],
+  "{0} ×{1}": [
+    "0"
+  ],
+  "relative aspect-square outline-none transition-[filter] hover:brightness-110 focus-visible:z-30 focus-visible:shadow-[inset_0_0_0_2px_#38bdf8] {0} {1}": [
+    "1"
+  ],
+  "absolute inset-[6%] z-10 flex items-center justify-center {0}": [
+    "0"
+  ],
+  "group relative flex flex-col items-center gap-1 rounded-t-xl px-3 pb-2.5 pt-3 text-xs font-semibold transition focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-amber-300 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm {0}": [
+    "0"
+  ],
+  "absolute inset-x-3 -bottom-px h-[3px] rounded-full transition {0}": [
+    "0"
+  ],
+  "rounded-2xl border transition {0} bg-[#0d1014]/90": [
+    "0"
+  ],
+  "relative h-5 w-9 rounded-full border transition {0}": [
+    "0"
+  ],
+  "absolute top-0.5 h-3.5 w-3.5 rounded-full bg-white transition-all {0}": [
+    "0"
+  ],
+  "inline-flex items-center gap-2 rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition {0}": [
+    "0"
+  ],
+  "relative aspect-square transition {0}": [
+    "0"
+  ],
+  "inline-flex h-9 w-9 items-center justify-center rounded-xl border transition focus-visible:outline-2 focus-visible:outline-amber-300 {0}": [
+    "0"
+  ],
+  "flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm transition focus-visible:outline-none {0}": [
+    "0"
+  ],
+  "rounded-xl border transition {0}": [
+    "0"
+  ],
+  "group relative overflow-hidden rounded-xl border text-left transition {0}": [
+    "0"
+  ],
+  "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-bold transition {0} {1}": [
+    "0"
+  ],
+  "space-y-1 overflow-y-auto p-2 {0}": [
+    "0"
+  ],
+  "inline-flex items-center gap-1 font-semibold {0}": [
+    "0"
+  ],
+  "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border transition disabled:cursor-not-allowed disabled:opacity-35 focus-visible:outline-2 focus-visible:outline-amber-300 {0} {1}": [
+    "0"
+  ],
+  "flex items-start justify-between gap-4 {0}": [
+    "0"
+  ],
+  "relative mt-0.5 h-6 w-11 shrink-0 rounded-full border transition focus-visible:outline-2 focus-visible:outline-amber-300 {0}": [
+    "0"
+  ],
+  "absolute top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-all {0}": [
+    "0"
+  ],
+  "rounded-lg font-semibold transition focus-visible:outline-2 focus-visible:outline-amber-300 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "min-w-6 text-center text-sm font-bold {0}": [
+    "0"
+  ],
+  "flex cursor-pointer items-center gap-3 rounded-2xl border p-2.5 transition has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-amber-300 {0}": [
+    "0"
+  ],
+  "inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition {0}": [
+    "0"
+  ],
+  "font-mono text-[10px] {0}": [
+    "0"
+  ],
+  "group flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition focus-visible:outline-2 focus-visible:outline-amber-300 {0}": [
+    "0"
+  ],
+  "relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border bg-[#0b0d10] transition {0}": [
+    "0"
+  ],
+  "font-mono text-[11px] font-bold {0}": [
+    "0"
+  ],
+  "truncate text-sm {0}": [
+    "0"
+  ],
+  "relative flex max-h-[min(92vh,var(--app-height,100vh))] w-full {0} flex-col overflow-hidden rounded-t-3xl border bg-[#0d1014] text-zinc-100 shadow-[0_30px_80px_rgba(0,0,0,.7)] outline-none sm:rounded-3xl {1}": [
+    "1"
+  ],
+  "flex cursor-pointer items-start gap-3 rounded-2xl border p-3 transition has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-amber-300 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border {0}": [
+    "0"
+  ],
+  "mt-8 flex flex-wrap items-center gap-3 rounded-2xl border px-4 py-3 text-sm {0}": [
+    "0"
+  ],
+  "absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold backdrop-blur-md {0}": [
+    "0"
+  ],
+  "{0} hidden sm:inline-flex {1}": [
+    "1"
+  ],
+  "h-1.5 rounded-full {0} {1}": [
+    "1"
+  ],
+  "rounded-full border px-3 py-1.5 {0}": [
+    "0"
+  ],
+  "Waiting for {0} more player{1} to join…": [
+    "1"
+  ],
+  "{0} to move{1}": [
+    "1"
+  ],
+  "w-full rounded-md px-2 py-1 text-left text-xs transition {0}": [
+    "0"
+  ],
+  "flex w-full items-center gap-2 rounded-md px-2 py-1 text-left transition {0}": [
+    "0"
+  ],
+  "rounded-md px-2 py-0.5 font-semibold transition {0}": [
+    "0"
+  ],
+  "max-h-56 space-y-0.5 overflow-y-auto rounded-lg p-1.5 font-mono {0}": [
+    "0"
+  ],
+  "flex items-center gap-2 rounded-xl border px-2.5 py-2 text-left text-xs font-semibold transition {0}": [
+    "0"
+  ],
+  "{0} layer{1}": [
+    "1"
+  ],
+  "rounded-xl border px-3 py-2 text-left text-xs {0}": [
+    "0"
+  ],
+  "flex h-9 w-9 items-center justify-center rounded-lg border {0}": [
+    "0"
+  ],
+  "mb-4 rounded-xl border px-4 py-3 text-sm {0}": [
+    "0"
+  ],
+  "flex h-full w-full flex-col rounded-2xl border p-2.5 text-left transition focus-visible:outline-2 focus-visible:outline-amber-300 {0}": [
+    "0"
+  ],
+  "flex h-11 w-11 items-center justify-center rounded-xl border {0}": [
+    "0"
+  ],
+  "flex h-8 w-8 items-center justify-center rounded-lg border text-lg transition {0}": [
+    "0"
+  ],
+  "inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-xs font-semibold transition {0}": [
+    "0"
+  ],
+  "flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition {0}": [
+    "0"
+  ],
+  "relative aspect-square rounded-lg border p-0.5 transition {0}": [
+    "0"
+  ],
+  "absolute bottom-0 right-0.5 text-[9px] font-bold {0}": [
+    "0"
+  ],
+  "relative rounded-xl border p-4 text-left transition {0}": [
+    "0"
+  ],
+  "rounded-xl border px-3 py-2.5 text-left transition {0}": [
+    "0"
+  ],
+  "{0} flex items-center justify-center rounded-md border transition {1}": [
+    "1"
+  ],
+  "h-7 w-7 rounded-full border-2 transition {0}": [
+    "0"
+  ],
+  "flex items-center justify-center gap-1.5 {0}": [
+    "0"
+  ],
+  "rounded-2xl border p-4 transition {0}": [
+    "0"
+  ],
+  "relative mt-0.5 h-5 w-9 shrink-0 rounded-full border transition {0}": [
+    "0"
+  ],
+  "flex-1 rounded-xl px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.16em] transition {0}": [
+    "0"
+  ],
+  "flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 transition has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-amber-300 {0}": [
+    "0"
+  ],
+  "h-3.5 w-3.5 shrink-0 rounded-full border-2 {0}": [
+    "0"
+  ],
+  "rounded-lg border px-2 py-1.5 text-xs font-semibold transition {0}": [
+    "0"
+  ],
+  "rounded-lg border px-2 py-1 text-xs font-semibold transition {0}": [
+    "0"
+  ],
+  "flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition focus-visible:outline-2 focus-visible:outline-amber-300 {0}": [
+    "0"
+  ],
+  "rounded-lg px-3 py-1.5 text-xs font-black tracking-wider transition {0}": [
+    "0"
+  ],
+  "absolute inset-0 flex items-center justify-center px-4 pt-16 {0}": [
+    "0"
+  ],
+  "rounded-full border px-4 py-1.5 text-sm shadow-lg backdrop-blur-xl {0}": [
+    "0"
+  ],
+  "flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs backdrop-blur-xl {0}": [
+    "0"
+  ],
+  "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition {0}": [
+    "0"
+  ],
+  "rounded px-2 py-0.5 {0}": [
+    "0"
+  ],
+  "flex items-start gap-2 rounded-lg border px-2.5 py-1.5 text-xs {0}": [
+    "0"
+  ],
+  "rounded-md border px-1.5 py-0.5 text-xs {0}": [
+    "0"
+  ],
+  "relative shrink-0 select-none rounded-lg border shadow-lg transition {0} {1} {2} {3}": [
+    "2",
+    "3"
+  ],
+  "absolute left-1 top-0.5 flex flex-col items-center font-black leading-none {0}": [
+    "0"
+  ],
+  "absolute inset-0 flex items-center justify-center text-[2.1em] {0}": [
+    "0"
+  ],
+  "absolute bottom-0.5 right-1 rotate-180 text-[0.85em] font-black leading-none {0}": [
+    "0"
+  ],
+  "{0} face-down card{1}": [
+    "1"
+  ],
+  "Winner{0}: {1}": [
+    "0"
+  ],
+  "rounded-2xl border p-3 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "Seat {0}: {1} (click to switch)": [
+    "1"
+  ],
+  "flex items-center gap-3 rounded-xl border px-3 py-2.5 {0}": [
+    "0"
+  ],
+  "with {0} bot{1}": [
+    "1"
+  ],
+  "rounded-lg px-2.5 py-1 text-xs font-semibold {0}": [
+    "0"
+  ],
+  "flex items-center gap-1 rounded-xl border px-2 py-2 {0} {1}": [
+    "0",
+    "1"
+  ],
+  "rounded-lg border px-3 py-1.5 text-sm font-bold {0}": [
+    "0"
+  ],
+  "{0} in a row{1}{2}": [
+    "1",
+    "2"
+  ],
+  "p-1 {0}": [
+    "0"
+  ],
+  "inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-xs {0}": [
+    "0"
+  ],
+  "rounded-lg border px-2.5 py-1 {0}": [
+    "0"
+  ],
+  "{0}: {1}{2}{3}{4}": [
+    "2",
+    "3"
+  ],
+  ", best move {0}{1}": [
+    "1"
+  ],
+  "go-stone go-stone--{0}{1}{2}{3}": [
+    "1",
+    "2",
+    "3"
+  ],
+  "{0} stone{1} · {2} liberties{3}": [
+    "1",
+    "3"
+  ],
+  "{0} captured · {1} liberties{2}": [
+    "2"
+  ],
+  "rounded-xl border px-5 py-3 text-sm font-bold {0}": [
+    "0"
+  ],
+  "Archerfish food: {0} – {1}. {2}": [
+    "2"
+  ],
+  "{0} {1}!": [
+    "1"
+  ],
+  "af-control-card {0}": [
+    "0"
+  ],
+  "{0} field quiz": [
+    "0"
+  ],
+  "nm-feedback {0}": [
+    "0"
+  ],
+  "Vole · {0} hearts · {1}": [
+    "1"
+  ],
+  "{0}/7 food · {1}": [
+    "1"
+  ],
+  "{0} dodges · {1} hearts · {2}": [
+    "2"
+  ],
+  "{0} · switch in {1}s. {2}": [
+    "0",
+    "2"
+  ],
+  "· {0} hearts · {1}": [
+    "1"
+  ],
+  "PLAYER {0} · {1}": [
+    "1"
+  ],
+  "{0} 3D game": [
+    "0"
+  ],
+  "{0}, interactive 3D habitat": [
+    "0"
+  ],
+  "NATURA / {0}": [
+    "0"
+  ],
+  "WASD swim · Q/E depth · Space {0} · Shift {1}": [
+    "0",
+    "1"
+  ],
+  "You are the {0}: WASD + Space.": [
+    "0"
+  ],
+  "HOTSEAT / {0} / {1}": [
+    "1"
+  ],
+  "Move {0} up": [
+    "0"
+  ],
+  "Move {0} down": [
+    "0"
+  ],
+  "{0} / 10 correct · {1}": [
+    "1"
+  ],
+  "atlas-flag-choices {0}": [
+    "0"
+  ],
+  "atlas-stat-card is-challenger {0}": [
+    "0"
+  ],
+  "Guess {0}": [
+    "0"
+  ],
+  "Find {0}": [
+    "0"
+  ],
+  "World map. Find {0}.": [
+    "0"
+  ],
+  "{0} countries": [
+    "0"
+  ],
+  "{0} gaps": [
+    "0"
+  ],
+  "{0} countr{1}": [
+    "0",
+    "1"
+  ],
+  "atlas-map-shell {0}": [
+    "0"
+  ],
+  "Select {0}": [
+    "0"
+  ],
+  "is-shown {0}": [
+    "0"
+  ],
+  "Solved with {0} clue{1}.": [
+    "1"
+  ],
+  "Not {0}": [
+    "0"
+  ],
+  "{0} {1} left — reveal another clue or guess again.": [
+    "1"
+  ],
+  "trial-panel trial-extreme {0}": [
+    "0"
+  ],
+  "trial-timer {0}": [
+    "0"
+  ],
+  "trial-option-grid {0}": [
+    "0"
+  ],
+  "Time's up — it was {0}": [
+    "0"
+  ],
+  "{0} · {1}. Only the countries shown are compared.": [
+    "0"
+  ],
+  "Flag of {0}": [
+    "0"
+  ],
+  "{0} is spoken in {1}.": [
+    "1"
+  ],
+  "{0} isn't in {1}": [
+    "0"
+  ],
+  "{0} wins — point to {1}": [
+    "0"
+  ],
+  "battle-hand-card {0}": [
+    "0"
+  ],
+  "Round {0}: {1}, {2} wins. You pick first.": [
+    "1",
+    "2"
+  ],
+  "battle-value {0}": [
+    "0"
+  ],
+  "{0} {1} left.": [
+    "1"
+  ],
+  "trial-sortable {0}": [
+    "0"
+  ],
+  "trial-sort-row {0}": [
+    "0"
+  ],
+  "{0}, highest to lowest": [
+    "0"
+  ],
+  "trial-sort-result {0}": [
+    "0"
+  ],
+  "trial-stage {0}": [
+    "0"
+  ],
+  "{0}, correct": [
+    "0"
+  ],
+  "{0}, wrong": [
+    "0"
+  ],
+  "{0}, was correct": [
+    "0"
+  ],
+  "min-w-[195px] rounded-xl border p-2 text-left transition {0}": [
+    "0"
+  ],
+  "rounded-md border px-1.5 py-1 text-center font-black {0}": [
+    "0"
+  ],
+  "flex items-center justify-center rounded-xl border px-3 py-2 text-xs font-black {0}": [
+    "0"
+  ],
+  "Illegal move: {0}.": [
+    "0"
+  ],
+  "{0} — {1} HP.": [
+    "0"
+  ],
+  "relative flex items-center justify-center rounded-full border-[4px] {0}": [
+    "0"
+  ],
+  "h-full w-full object-contain {0}": [
+    "0"
+  ],
+  "absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md border px-2 py-1 text-[9px] font-black uppercase tracking-wide {0}": [
+    "0"
+  ],
+  "absolute z-30 -translate-x-1/2 -translate-y-1/2 transition {0} {1} {2}": [
+    "0",
+    "2"
+  ],
+  "pointer-events-none absolute left-1/2 top-full z-20 mt-1 -translate-x-1/2 whitespace-nowrap rounded-md border border-[#6f5332] bg-[#352518]/95 px-2 py-1 text-[8px] font-black uppercase tracking-wide text-[#efd7a4] {0}": [
+    "0"
+  ],
+  "medieval-world__map relative overflow-hidden rounded-2xl border-2 border-[#755433] bg-[#3b2a1b] shadow-2xl {0}": [
+    "0"
+  ],
+  "group absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 px-2 py-1 text-[10px] font-black uppercase tracking-wide shadow-lg transition duration-150 {0}": [
+    "0"
+  ],
+  "absolute z-[115] -translate-x-1/2 -translate-y-1/2 {0}": [
+    "0"
+  ],
+  "relative flex h-44 w-44 items-center justify-center rounded-full {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full {0}": [
+    "0"
+  ],
+  "absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-black/40 px-3 py-1 text-[9px] font-black uppercase tracking-[0.14em] {0}": [
+    "0"
+  ],
+  "relative min-h-[620px] overflow-hidden rounded-2xl border-2 border-[#755433] bg-[#3a291b] shadow-2xl {0}": [
+    "0"
+  ],
+  "group absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 px-2 py-1 text-[10px] font-black shadow-lg transition {0}": [
+    "0"
+  ],
+  "pointer-events-none absolute -inset-2 z-[-1] rounded-full border-2 {0} shadow-[0_0_12px_rgba(231,199,122,0.65)]": [
+    "0"
+  ],
+  "pointer-events-none absolute -right-3 -top-3 z-50 flex h-7 w-7 items-center justify-center rounded-full border border-[#d9b665] bg-[#4a3521]/95 text-[#f8e7bd] {0}": [
+    "0"
+  ],
+  "relative rounded-full ring-2 {0} ring-offset-1 ring-offset-black/30 transition duration-150 {1} {2} {3} {4} {5} {6}": [
+    "0",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6"
+  ],
+  "absolute rounded-full border transition-colors {0}": [
+    "0"
+  ],
+  "group rounded-2xl border-2 p-5 text-left shadow-xl transition {0}": [
+    "0"
+  ],
+  "rounded-full border px-3 py-1 text-[9px] font-black uppercase tracking-[0.15em] {0}": [
+    "0"
+  ],
+  "rounded-2xl border border-amber-300/25 bg-amber-300/[.06] p-4 {0}": [
+    "0"
+  ],
+  "{0} relative rounded-3xl border px-4 py-3.5 transition-all duration-200 {1}": [
+    "0",
+    "1"
+  ],
+  "h-14 w-14 shrink-0 overflow-hidden rounded-full ring-4 ring-white/[0.025] border {0}": [
+    "0"
+  ],
+  "{0} → {1} ({2}{3})": [
+    "2"
+  ],
+  "{0} {1} the bridge gate.": [
+    "1"
+  ],
+  "Which country shares land borders with both {0} and {1}{2}?": [
+    "0",
+    "1"
+  ],
+  "{0} · {1} people / {2} km²": [
+    "0"
+  ],
+  "Does {0} have more or fewer {1} than {2}?": [
+    "0",
+    "1",
+    "2"
+  ],
+  "Is {0}'s {1} higher or lower than {2}'s?": [
+    "0",
+    "1",
+    "2"
+  ],
+  "It shares land borders with {0} {1}.": [
+    "1"
+  ],
+  "Its capital lies {0} of the Equator and {1} of the prime meridian.": [
+    "0",
+    "1"
+  ],
+  "Find {0}, population {1} ({2}).": [
+    "0"
+  ],
+  "Find {0}, with an area of {1} km².": [
+    "0"
+  ],
+  "Find {0} in {1}.": [
+    "0"
+  ],
+  "Find {0}, where {1} is spoken.": [
+    "0"
+  ],
+  "Find {0}; it shares a land border with a neighboring country.": [
+    "0"
+  ],
+  "Find {0}, which uses the {1}.": [
+    "0"
+  ],
+  "Where is {0}?": [
+    "0"
+  ],
+  "Find {0} on the map.": [
+    "0"
+  ],
+  "Select every country shown that borders {0}.": [
+    "0"
+  ],
+  "What is the capital of {0}?": [
+    "0"
+  ],
+  "Which continent contains {0}?": [
+    "0"
+  ],
+  "Which language is used in {0}?": [
+    "0"
+  ],
+  "Which currency is used in {0}?": [
+    "0"
+  ],
+  "Which flag belongs to {0}?": [
+    "0"
+  ],
+  "Which country is {0}?": [
+    "0"
+  ],
+  "category:{0}": [
+    "0"
+  ],
+  "Order from highest to lowest: {0}": [
+    "0"
+  ],
+  "Fix {0} validation error{1} before publishing.": [
+    "1"
+  ],
+  "{0}+{1}": [
+    "0"
+  ],
+  ";{0}[{1}]": [
+    "0"
+  ],
+  "{0} fish catches it! +1 food": [
+    "0"
+  ],
+  "You survived the full migration with {0} clean dodges and {1} {2} left.": [
+    "2"
+  ],
+  "{0} snares a moth!": [
+    "0"
+  ],
+  "{0} is carried away. One heart lost.": [
+    "0"
+  ],
+  "{0} snaps against the ground and launches!": [
+    "0"
+  ],
+  "{0} reaches ledge {1}. Checkpoint saved.": [
+    "0"
+  ],
+  "{0} was spotted! One heart lost. Hide on matching ground.": [
+    "0"
+  ],
+  "{0}-{1}{2}.": [
+    "2"
+  ],
+  "Legen ist die optionale Klopfrunde zu Beginn einer Runde. Sie findet statt, nachdem du deine ersten vier Karten erhalten hast und bevor die zweite Hand ausgeteilt wird. Wer klopft, verdoppelt die Abrechnung. {0}": [
+    "0"
+  ],
+  "{0}{1}{2}{3}{4}": [
+    "0",
+    "1",
+    "2"
+  ],
+  "{0}-Wenz{1}": [
+    "1"
+  ],
+  "{0} gains 10 prestige{1}. Survivors and wounded return to the campaign.": [
+    "1"
+  ],
+  "{0}: {1} casualties, {2} survivors{3}.": [
+    "3"
+  ],
+  "{0} concluded. {1} holds the field. {2}, applied once.": [
+    "2"
+  ],
+  "River: attackers slowed{0}.": [
+    "0"
+  ],
+  "{0}'s cavalry flank is stopped by {1}.": [
+    "1"
+  ],
+  "{0}. +{1} opinion{2}.": [
+    "2"
+  ],
+  "{0} cost {1}% of the attacking troops before combat.": [
+    "0"
+  ],
+  "seat-{0}-{1}": [
+    "1"
+  ],
+  "{0} {1} garrison": [
+    "1"
+  ],
+  "{0} at {1}": [
+    "0"
+  ],
+  "{0} began an unjustified war ({1} total): +5 realm unrest, −6 royal army loyalty{2}.": [
+    "2"
+  ],
+  "{0} inherits House {1}{2}. {3} houses dispute the succession{4}.": [
+    "2"
+  ],
+  "{0} accepted your request to {1} {2}; its host remains independent.": [
+    "1"
+  ],
+  "{0} commits {1} troops{2}.": [
+    "2"
+  ],
+  "{0} won {1} ({2}/3 rewards at this field).": [
+    "1"
+  ],
+  "{0} {1} {2}, value {3} − {4} transport": [
+    "0"
+  ],
+  "{0}: {1} wounded soldiers recover{2}.": [
+    "2"
+  ],
+  "Automatic {0} response could not resolve: {1}": [
+    "1"
+  ],
+  "{0} {1} {2}'s marriage pact.": [
+    "1"
+  ],
+  "{0} {1} peace with {2}.": [
+    "1"
+  ],
+  "{0}° {1}": [
+    "1"
+  ],
+  "{0} — {1}. In which year?": [
+    "1"
+  ],
+  "Which power did {0} {1} independence from in {2}?": [
+    "0",
+    "1"
+  ],
+  "Which country was formerly known as {0}{1}?": [
+    "0"
+  ],
+  "Which of these countries became independent {0}?": [
+    "0"
+  ],
+  "“{0}” is not possible during this phase.": [
+    "0"
+  ],
+  "It is not your turn to {0}.": [
+    "0"
+  ],
+  "“{0}” is not available right now.": [
+    "0"
+  ],
+  "{0}: {1}{2}{3}.": [
+    "1"
+  ],
+  "Game over — {0}": [
+    "0"
+  ],
+  "the next active player{0} after {1}{2}": [
+    "2"
+  ],
+  "the player holding the {0} card{1} in their {2}": [
+    "0"
+  ],
+  "move {0} to {1}{2}{3}": [
+    "1",
+    "3"
+  ],
+  "move {0} from {1} to {2}{3}{4}": [
+    "2",
+    "4"
+  ],
+  "{0} collects all cards from {1} into the {2}{3}": [
+    "2"
+  ],
+  "{0} collects {1} card{2}.": [
+    "2"
+  ],
+  "{0} becomes {1} {2}": [
+    "1"
+  ],
+  "{0}: {1}{2} {3} (now {4}).": [
+    "1"
+  ],
+  "reject the action (“{0}”)": [
+    "0"
+  ],
+  "{0}: {1}.": [
+    "0"
+  ],
+  "{0} player whose {1} is empty {2}{3}.": [
+    "2"
+  ],
+  "When only one player is still playing, that player {0}{1}.": [
+    "0"
+  ],
+  "When only one player has cards in their {0}, that player {1}{2}.": [
+    "1"
+  ],
+  "When {0}, the game ends{1}{2}{3}{4}.": [
+    "1"
+  ],
+  "Deal {0} card{1} to each player.": [
+    "1"
+  ],
+  "Deal {0} cards to each player (setting “{1}”, {2}–{3}).": [
+    "1"
+  ],
+  "{0}: {1} by default.": [
+    "0"
+  ],
+  "{0} may “{1}”": [
+    "1"
+  ],
+  "Actions: {0}.": [
+    "0"
+  ],
+  "{0}; {1}; {2}.": [
+    "2"
+  ],
+  "Action: {0}": [
+    "0"
+  ],
+  "priority {0}{1}": [
+    "1"
+  ],
+  "Action “{0}” plays a card but has no source zone.": [
+    "0"
+  ],
+  "Action “{0}” has no destination — the card stays where it is unless an effect moves it.": [
+    "0"
+  ],
+  "Action “{0}” needs a target zone.": [
+    "0"
+  ],
+  "Action “{0}” is not allowed in any phase.": [
+    "0"
+  ],
+  "Setting “{0}” is never used by a rule or effect.": [
+    "0"
+  ],
+  "Extract {0} m³ at {1}{2}": [
+    "2"
+  ],
+  "K{0}{1}{2}": [
+    "1"
+  ],
+  "{0} MOVES {1} SPACE{2}": [
+    "2"
+  ],
+  "BLOCKED — {0} ROUND{1}": [
+    "1"
+  ],
+  "{0} COIN{1} EACH": [
+    "1"
+  ],
+  "{0} chose {1}": [
+    "1"
+  ],
+  "🧊 {0} SLID {1} SPACE{2} ACROSS THE ICE": [
+    "2"
+  ],
+  "The {0} is out of service for {1} rounds.": [
+    "0"
+  ],
+  "☢ {0} {1} · {2}": [
+    "1"
+  ],
+  "{0}://{1}/party-socket": [
+    "0"
+  ],
+  "rounded-2xl border px-4 py-3 text-left transition {0}": [
+    "0"
+  ],
+  "rounded-2xl border p-4 text-left transition {0}": [
+    "0"
+  ],
+  "{0} — {1} has no legal moves": [
+    "0"
+  ],
+  "{0} {1}{2}{3}{4}{5}": [
+    "2"
+  ],
+  "{0}, then {1} to {2}": [
+    "1"
+  ],
+  "{0} is occupied by {1}": [
+    "1"
+  ],
+  "custom {0} {1}": [
+    "0"
+  ],
+  "{0}>{1},{2}{3}{4}": [
+    "4"
+  ],
+  "|{0}{1}{2}{3},{4},{5}{6}": [
+    "6"
+  ],
+  "Platz {0}": [
+    "0"
+  ]
+}

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import type { GameResult, Player, PlayMode, Vec } from "../../games/natura/naturaData";
@@ -24,7 +25,8 @@ function HoldControl({ label, title, disabled, onHold, onRelease }: {
   label: string; title: string; disabled: boolean;
   onHold: (id: number) => void; onRelease: (id: number) => void;
 }) {
-  return <button type="button" disabled={disabled} aria-label={title} title={title}
+  useGameLanguage();
+  return <button type="button" disabled={disabled} aria-label={gameUi(title)} title={gameUi(title)}
     onPointerDown={event => {
       event.preventDefault();
       event.currentTarget.setPointerCapture(event.pointerId);
@@ -35,12 +37,13 @@ function HoldControl({ label, title, disabled, onHold, onRelease }: {
     onLostPointerCapture={event => onRelease(event.pointerId)}
     onKeyDown={event => { if (event.code === "Space" || event.code === "Enter") { event.preventDefault(); onHold(-1); } }}
     onKeyUp={event => { if (event.code === "Space" || event.code === "Enter") { event.preventDefault(); onRelease(-1); } }}
-    onBlur={() => onRelease(-1)}>{label}</button>;
+    onBlur={() => onRelease(-1)}>{gameUi(label)}</button>;
 }
 
 export default function ArcherfishGame({ mode, rulesOpen = false, onComplete }: {
   mode: PlayMode; rulesOpen?: boolean; onComplete: (result: GameResult) => void;
 }) {
+  useGameLanguage();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameRef = useRef<ArcherGame>(createArcherGame());
   const keys = useRef(new Set<string>());
@@ -137,18 +140,18 @@ export default function ArcherfishGame({ mode, rulesOpen = false, onComplete }: 
   const active = view.phase === "playing" && !rulesOpen;
   const overlay = view.phase !== "playing" || rulesOpen;
 
-  return <section className="af-game" aria-label="Spit and Sprint archerfish game">
-    <header className="af-heading"><div><p className="natura-eyebrow">05 / THE MANGROVES</p><h1>Spit &amp; Sprint<span>.</span></h1><p>One perfect shot. Two hungry fish.</p></div>
-      <span className="af-badge">AIM · SPIT · INTERCEPT</span></header>
+  return <section className="af-game" aria-label={gameUi("Spit and Sprint archerfish game")}>
+    <header className="af-heading"><div><p className="natura-eyebrow">{gameUi("05 / THE MANGROVES")}</p><h1>{gameUi("Spit & Sprint")}<span>.</span></h1><p>{gameUi("One perfect shot. Two hungry fish.")}</p></div>
+      <span className="af-badge">{gameUi("AIM · SPIT · INTERCEPT")}</span></header>
     <div className="af-arena">
-      <div className="af-hud" aria-label="Archerfish round scores">
-        <div className="af-coral"><small>{fishName(0, mode)} / CORAL</small><strong>{view.fish[0].catches}<span> food</span></strong></div>
-        <div className="af-clock"><small>FIRST TO {ARCHER_TARGET}</small><strong>{view.time}<span>s</span></strong></div>
-        <div className="af-gold"><small>{fishName(1, mode)} / GOLD</small><strong>{view.fish[1].catches}<span> food</span></strong></div>
+      <div className="af-hud" aria-label={gameUi("Archerfish round scores")}>
+        <div className="af-coral"><small>{gameUi(fishName(0, mode))}{gameUi(" / CORAL")}</small><strong>{gameUi(view.fish[0].catches)}<span>{gameUi(" food")}</span></strong></div>
+        <div className="af-clock"><small>{gameUi("FIRST TO ")}{gameUi(ARCHER_TARGET)}</small><strong>{gameUi(view.time)}<span>s</span></strong></div>
+        <div className="af-gold"><small>{gameUi(fishName(1, mode))}{gameUi(" / GOLD")}</small><strong>{gameUi(view.fish[1].catches)}<span>{gameUi(" food")}</span></strong></div>
       </div>
       <div className="af-stage">
         <canvas ref={canvasRef} width={ARCHER_WIDTH} height={ARCHER_HEIGHT} tabIndex={0}
-          aria-label="Two archerfish below insect-covered mangrove branches. Aim a water jet above the surface, then swim to the falling insect."
+          aria-label={gameUi("Two archerfish below insect-covered mangrove branches. Aim a water jet above the surface, then swim to the falling insect.")}
           aria-describedby="archer-controls"
           onPointerMove={aimAt} onPointerDown={event => {
             event.preventDefault(); event.currentTarget.focus(); aimAt(event);
@@ -157,41 +160,41 @@ export default function ArcherfishGame({ mode, rulesOpen = false, onComplete }: 
           }} onPointerLeave={() => { pointerAim.current = undefined; }} />
         {overlay && <div className="af-overlay"><div className="af-dialog">
           {view.phase === "finished" ? <>
-            <span className="af-kicker">THE ESTUARY SETTLES</span>
-            <h2>{view.winner === null ? "A shared victory." : `${fishName(view.winner, mode)} ${mode === "ai" && view.winner === 0 ? "win" : "wins"}!`}</h2>
-            <p>{view.fish[0].catches} – {view.fish[1].catches} food · {view.time > 0 ? "Target reached" : "Time’s up"}</p>
-            <p className="af-result-detail">Accurate shots: {view.fish[0].hits}/{view.fish[0].shots} · {view.fish[1].hits}/{view.fish[1].shots}</p>
-            <button className="natura-primary" onClick={finish}>Continue to animal quiz →</button>
+            <span className="af-kicker">{gameUi("THE ESTUARY SETTLES")}</span>
+            <h2>{gameUi(view.winner === null ? "A shared victory." : `${fishName(view.winner, mode)} ${mode === "ai" && view.winner === 0 ? "win" : "wins"}!`)}</h2>
+            <p>{gameUi(view.fish[0].catches)} – {gameUi(view.fish[1].catches)}{gameUi(" food · ")}{gameUi(view.time > 0 ? "Target reached" : "Time’s up")}</p>
+            <p className="af-result-detail">{gameUi("Accurate shots: ")}{gameUi(view.fish[0].hits)}/{gameUi(view.fish[0].shots)} · {gameUi(view.fish[1].hits)}/{gameUi(view.fish[1].shots)}</p>
+            <button className="natura-primary" onClick={finish}>{gameUi("Continue to animal quiz →")}</button>
           </> : <>
-            <span className="af-kicker">{view.phase === "ready" ? "SURFACE TENSION" : "TAKE A BREATHER"}</span>
-            <h2>{view.phase === "ready" ? "Make your shot count." : "The pond is paused."}</h2>
-            <p>{rulesOpen ? "Close the animal rules above to return to the pond." : view.phase === "ready" ? `Knock insects down. Race to the landing rings. First to ${ARCHER_TARGET} food, or the most after ${ARCHER_SECONDS} seconds, wins.` : "Your fish and the timer are waiting for you."}</p>
-            {!rulesOpen && <button className="natura-primary" onClick={start}>{view.phase === "ready" ? "Enter the estuary →" : "Resume the hunt →"}</button>}
-            {canvasUnavailable && <p role="alert">This browser could not start the canvas. Try a browser with canvas support.</p>}
+            <span className="af-kicker">{gameUi(view.phase === "ready" ? "SURFACE TENSION" : "TAKE A BREATHER")}</span>
+            <h2>{gameUi(view.phase === "ready" ? "Make your shot count." : "The pond is paused.")}</h2>
+            <p>{gameUi(rulesOpen ? "Close the animal rules above to return to the pond." : view.phase === "ready" ? `Knock insects down. Race to the landing rings. First to ${ARCHER_TARGET} food, or the most after ${ARCHER_SECONDS} seconds, wins.` : "Your fish and the timer are waiting for you.")}</p>
+            {!rulesOpen && <button className="natura-primary" onClick={start}>{gameUi(view.phase === "ready" ? "Enter the estuary →" : "Resume the hunt →")}</button>}
+            {canvasUnavailable && <p role="alert">{gameUi("This browser could not start the canvas. Try a browser with canvas support.")}</p>}
           </>}
         </div></div>}
       </div>
-      <div className="af-status"><p role="status">{view.notice}</p><button disabled={!active} onClick={pause}>Ⅱ Pause</button></div>
+      <div className="af-status"><p role="status">{gameUi(view.notice)}</p><button disabled={!active} onClick={pause}>{gameUi("Ⅱ Pause")}</button></div>
     </div>
     <div id="archer-controls" className="af-controls">
       {([0, 1] as const).filter(player => mode !== "ai" || player === 0).map(player => <div key={player} className={`af-control-card ${player === 0 ? "af-coral" : "af-gold"}`}>
-        <div className="af-control-title"><strong>{fishName(player, mode)} · {player === 0 ? "Coral" : "Gold"}</strong><span>{view.fish[player].dash <= 0 ? "DASH READY" : `DASH ${view.fish[player].dash.toFixed(1)}s`}</span></div>
-        <p>{player === 0 ? "A / D swim · W / S aim left / right · Space spit · Left Shift dash" : "← / → swim · ↑ / ↓ aim left / right · Enter spit · Right Shift dash"}</p>
-        <div className="af-touch" role="group" aria-label={`${fishName(player, mode)} touch controls`}>
+        <div className="af-control-title"><strong>{gameUi(fishName(player, mode))} · {gameUi(player === 0 ? "Coral" : "Gold")}</strong><span>{gameUi(view.fish[player].dash <= 0 ? "DASH READY" : `DASH ${view.fish[player].dash.toFixed(1)}s`)}</span></div>
+        <p>{gameUi(player === 0 ? "A / D swim · W / S aim left / right · Space spit · Left Shift dash" : "← / → swim · ↑ / ↓ aim left / right · Enter spit · Right Shift dash")}</p>
+        <div className="af-touch" role="group" aria-label={gameUi(`${fishName(player, mode)} touch controls`)}>
           {([
             ["left", "←", "Swim left"], ["right", "→", "Swim right"], ["aimLeft", "↖", "Aim left"],
             ["aimRight", "↗", "Aim right"], ["shoot", "Spit", "Spit water"], ["dash", "Dash", "Dash while swimming"],
-          ] as const).map(([action, label, title]) => <HoldControl key={action} label={label} title={`${fishName(player, mode)}: ${title}`} disabled={!active}
+          ] as const).map(([action, label, title]) => <HoldControl key={action} label={gameUi(label)} title={gameUi(`${fishName(player, mode)}: ${title}`)} disabled={!active}
             onHold={id => {
               held.current.set(id, { player, action });
               if (player === 0 && (action === "aimLeft" || action === "aimRight")) pointerAim.current = undefined;
             }} onRelease={id => held.current.delete(id)} />)}
         </div>
-        <div className="af-dash-meter" role="progressbar" aria-label={`${fishName(player, mode)} dash recharge`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((1 - view.fish[player].dash / DASH_COOLDOWN) * 100)}>
+        <div className="af-dash-meter" role="progressbar" aria-label={gameUi(`${fishName(player, mode)} dash recharge`)} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((1 - view.fish[player].dash / DASH_COOLDOWN) * 100)}>
           <span style={{ width: `${(1 - view.fish[player].dash / DASH_COOLDOWN) * 100}%` }} />
         </div>
       </div>)}
-      <aside className="af-field-note"><span className="af-kicker">A HUNTER’S HEAD START</span><h3>Watch where it falls.</h3><p>Archerfish predict where dislodged prey will land. Your landing ring makes that skill visible: swim toward it as soon as the insect falls.</p><small>Coral can also aim with a pointer and click or tap above the water to spit. Hold the controls to keep moving. Esc pauses.</small></aside>
+      <aside className="af-field-note"><span className="af-kicker">{gameUi("A HUNTER’S HEAD START")}</span><h3>{gameUi("Watch where it falls.")}</h3><p>{gameUi("Archerfish predict where dislodged prey will land. Your landing ring makes that skill visible: swim toward it as soon as the insect falls.")}</p><small>{gameUi("Coral can also aim with a pointer and click or tap above the water to spit. Hold the controls to keep moving. Esc pauses.")}</small></aside>
     </div>
   </section>;
 }

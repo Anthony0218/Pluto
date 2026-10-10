@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useState, type ChangeEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Download, Trash2, Upload } from "lucide-react";
@@ -9,6 +10,7 @@ import { exportGoSgf, importGoSgf } from "../../../games/go/sgf";
 import { canReviewGoGame } from "../../../games/go/reviewAvailability";
 
 export default function GoAnalysisPage() {
+  useGameLanguage();
   const navigate = useNavigate();
   const { user } = useAuth();
   const userId = user?.id;
@@ -63,16 +65,16 @@ export default function GoAnalysisPage() {
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   return <main className="go-page">
-    <header className="go-page-header"><Link to="/games/go"><ArrowLeft size={16} /> Go</Link><h1>Go Analysis</h1><span>Review, learn, improve</span></header>
-    {game ? <GoGameReview key={selected?.id ?? "latest"} game={game} /> : <section className="go-empty-review"><h2>Ready to review</h2><p>Play and save a Go game, then return here to step through its moves.</p><Link className="go-action" to="/games/go">Start a game</Link></section>}
-    <section className="go-library" aria-label="Saved Go games">
-      <div className="go-library-heading"><div><h2>Saved games</h2><p className="go-muted">{selected ? `${selected.players.black} vs ${selected.players.white} · ${selected.game.moveHistory.length} moves` : "Choose a game to replay and analyze."}</p></div><div className="go-library-tools"><label className="go-action"><Upload size={15} /> Import SGF<input type="file" accept=".sgf,application/x-go-sgf,text/plain" onChange={event => void importFile(event)} hidden /></label><button className="go-action" aria-expanded={libraryOpen} onClick={() => setLibraryOpen(!libraryOpen)}>{libraryOpen ? "Hide library" : "Browse library"}</button></div></div>
-      {message && <p role="status" className="go-muted">{message}</p>}
-      {user && visibleSaved.some(record => !record.ownerId) && <button className="go-action" onClick={() => void claimLocalGoGames(user.id).then(setSaved).then(() => setMessage("Local games synced to your account.")).catch(error => setMessage(error instanceof Error ? error.message : "Could not sync local games."))}>Sync local games to my account</button>}
-      {libraryOpen && (visibleSaved.length ? <div className="go-library-list">{visibleSaved.map(record => <div className="go-library-item" key={record.id}>
-        <Link to={`/games/go/analysis?game=${encodeURIComponent(record.id)}`} onClick={showReview} aria-current={selected?.id === record.id ? "page" : undefined}><strong>{record.players.black} vs {record.players.white}</strong><span>{record.game.boardSize} × {record.game.boardSize} · {record.game.moveHistory.length} moves · {record.game.result ?? "Unfinished"}</span><small>{new Date(record.savedAt).toLocaleString()}</small></Link>
-        <div><Link className="go-action" to={`/games/go/analysis?game=${encodeURIComponent(record.id)}`} onClick={showReview}>Replay / Analyze</Link>{record.game.status === "playing" && (record.mode === "ai" || record.mode === "hotseat") && <Link className="go-action" to={`/games/go/${record.mode}?resume=${encodeURIComponent(record.id)}`}>Continue</Link>}<button className="go-delete" aria-label={`Export ${record.players.black} vs ${record.players.white} as SGF`} onClick={() => exportFile(record)}><Download size={16} /></button><button className="go-delete" aria-label={`Delete ${record.players.black} vs ${record.players.white}`} onClick={() => void remove(record)}><Trash2 size={16} /></button></div>
-      </div>)}</div> : <p className="go-muted">No saved games yet. You can save any ongoing or finished local game.</p>)}
+    <header className="go-page-header"><Link to="/games/go"><ArrowLeft size={16} />{gameUi(" Go")}</Link><h1>{gameUi("Go Analysis")}</h1><span>{gameUi("Review, learn, improve")}</span></header>
+    {game ? <GoGameReview key={selected?.id ?? "latest"} game={game} /> : <section className="go-empty-review"><h2>{gameUi("Ready to review")}</h2><p>{gameUi("Play and save a Go game, then return here to step through its moves.")}</p><Link className="go-action" to="/games/go">{gameUi("Start a game")}</Link></section>}
+    <section className="go-library" aria-label={gameUi("Saved Go games")}>
+      <div className="go-library-heading"><div><h2>{gameUi("Saved games")}</h2><p className="go-muted">{gameUi(selected ? `${selected.players.black} vs ${selected.players.white} · ${selected.game.moveHistory.length} moves` : "Choose a game to replay and analyze.")}</p></div><div className="go-library-tools"><label className="go-action"><Upload size={15} />{gameUi(" Import SGF")}<input type="file" accept=".sgf,application/x-go-sgf,text/plain" onChange={event => void importFile(event)} hidden /></label><button className="go-action" aria-expanded={libraryOpen} onClick={() => setLibraryOpen(!libraryOpen)}>{gameUi(libraryOpen ? "Hide library" : "Browse library")}</button></div></div>
+      {message && <p role="status" className="go-muted">{gameUi(message)}</p>}
+      {user && visibleSaved.some(record => !record.ownerId) && <button className="go-action" onClick={() => void claimLocalGoGames(user.id).then(setSaved).then(() => setMessage("Local games synced to your account.")).catch(error => setMessage(error instanceof Error ? error.message : "Could not sync local games."))}>{gameUi("Sync local games to my account")}</button>}
+      {gameUi(libraryOpen && (visibleSaved.length ? <div className="go-library-list">{visibleSaved.map(record => <div className="go-library-item" key={record.id}>
+        <Link to={`/games/go/analysis?game=${encodeURIComponent(record.id)}`} onClick={showReview} aria-current={selected?.id === record.id ? "page" : undefined}><strong>{gameUi(record.players.black)}{gameUi(" vs ")}{gameUi(record.players.white)}</strong><span>{gameUi(record.game.boardSize)} × {gameUi(record.game.boardSize)} · {gameUi(record.game.moveHistory.length)}{gameUi(" moves · ")}{gameUi(record.game.result ?? "Unfinished")}</span><small>{gameUi(new Date(record.savedAt).toLocaleString())}</small></Link>
+        <div><Link className="go-action" to={`/games/go/analysis?game=${encodeURIComponent(record.id)}`} onClick={showReview}>{gameUi("Replay / Analyze")}</Link>{record.game.status === "playing" && (record.mode === "ai" || record.mode === "hotseat") && <Link className="go-action" to={`/games/go/${record.mode}?resume=${encodeURIComponent(record.id)}`}>{gameUi("Continue")}</Link>}<button className="go-delete" aria-label={gameUi(`Export ${record.players.black} vs ${record.players.white} as SGF`)} onClick={() => exportFile(record)}><Download size={16} /></button><button className="go-delete" aria-label={gameUi(`Delete ${record.players.black} vs ${record.players.white}`)} onClick={() => void remove(record)}><Trash2 size={16} /></button></div>
+      </div>)}</div> : <p className="go-muted">{gameUi("No saved games yet. You can save any ongoing or finished local game.")}</p>))}
     </section>
   </main>;
 }

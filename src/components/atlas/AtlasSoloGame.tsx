@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { AtlasFitContent } from "./AtlasFitContent";
 import AtlasAreaReference from "./AtlasAreaReference";
 import { AtlasResultHero } from "./AtlasResultHero";
@@ -58,6 +59,7 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
   data: AtlasDataset; mode: AtlasMode; settings: SoloSettings; seed: string; title: string; player?: PlayerTag;
   onFinish: (summary: SoloSummary) => void; onExit: () => void; onScore?: (score: number) => void;
 }) {
+  useGameLanguage();
   const [pendingMap, setPendingMap] = useState<{ id: string; label: string } | null>(null);
   const mapSelection = useRef<AtlasMapSelectionControl>(null);
   const [run] = useState(() => buildRun(data, mode, settings, seed));
@@ -194,39 +196,39 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
   return (
     <main className="atlas-game-page">
       <header className="atlas-game-header">
-        <button type="button" className="atlas-icon-button" onClick={onExit} aria-label="Exit game"><ArrowLeft /></button>
-        <div><span className="atlas-eyebrow">{title}</span><strong>{counter}</strong></div>
+        <button type="button" className="atlas-icon-button" onClick={onExit} aria-label={gameUi("Exit game")}><ArrowLeft /></button>
+        <div><span className="atlas-eyebrow">{gameUi(title)}</span><strong>{gameUi(counter)}</strong></div>
         <div className="atlas-game-stats">
           {player && <span className="atlas-turn-chip" style={{ "--player": player.color } as CSSProperties}><i />{player.name}</span>}
-          <span><Trophy size={16} />{score}</span>
-          {mode !== "map_fill" && <span><Clock3 size={16} />{(remainingMs / 1000).toFixed(1)}</span>}
-          <span>{mode === "map_fill" ? `${fillState.found.length}/${fillState.targets.length}` : `${stats.correct} ✓`}</span>
+          <span><Trophy size={16} />{gameUi(score)}</span>
+          {mode !== "map_fill" && <span><Clock3 size={16} />{gameUi((remainingMs / 1000).toFixed(1))}</span>}
+          <span>{gameUi(mode === "map_fill" ? `${fillState.found.length}/${fillState.targets.length}` : `${stats.correct} ✓`)}</span>
         </div>
       </header>
       <section className={`atlas-play-layout ${PANEL_ONLY.includes(mode) ? "is-panel-only" : mode === "guess_country" ? "is-guess-country" : ""}`}>
         <div className="atlas-question-panel"><AtlasFitContent>
           <div className="atlas-progress"><i style={{ width: `${progress}%` }} /></div>
-          <span className="atlas-eyebrow">{mode === "map_fill" ? `${fillState.targets.length - fillState.found.length} remaining` : guessing ? `Tip ${guess.tip + 1} of ${guessing.clues.length}` : currentQuestion?.category}</span>
-          <h1>{mode === "map_fill" ? `Find ${expectedFill?.shortName || "the next country"}` : currentQuestion?.prompt}</h1>
-          {(currentQuestion?.interaction === "map_click" || currentQuestion?.interaction === "closest_click") && currentQuestion.flagAsset && <img className="atlas-question-flag" src={currentQuestion.flagAsset} alt="Country flag to identify" />}
+          <span className="atlas-eyebrow">{gameUi(mode === "map_fill" ? `${fillState.targets.length - fillState.found.length} remaining` : guessing ? `Tip ${guess.tip + 1} of ${guessing.clues.length}` : currentQuestion?.category)}</span>
+          <h1>{gameUi(mode === "map_fill" ? `Find ${expectedFill?.shortName || "the next country"}` : currentQuestion?.prompt)}</h1>
+          {(currentQuestion?.interaction === "map_click" || currentQuestion?.interaction === "closest_click") && currentQuestion.flagAsset && <img className="atlas-question-flag" src={currentQuestion.flagAsset} alt={gameUi("Country flag to identify")} />}
           {mode === "flags" && currentQuestion?.interaction === "single_choice" && <><FlagPrompt question={currentQuestion} topology={data.topology} /><FlagChoices question={currentQuestion} disabled={Boolean(feedback)} selected={feedback?.selected} correctId={feedback ? currentQuestion.answer : null} onAnswer={answer} /></>}
           {currentQuestion?.interaction === "higher_lower" && <HigherLowerCards key={currentQuestion.id} question={currentQuestion} revealed={Boolean(feedback)} disabled={Boolean(feedback)} chosen={feedback?.selected} correct={feedback?.correct} onAnswer={answer} />}
-          {guessing && <>{!guess.result && <div className="atlas-suspects" role="group" aria-label="Country suspects">{guessing.choices?.map(choice => <button key={choice.id} type="button" disabled={remainingMs <= 0 || guess.wrong.includes(choice.id)} aria-pressed={guess.selectedId === choice.id} onClick={() => setGuess(current => ({ ...current, selectedId: choice.id }))}>{choice.label}</button>)}</div>}{!guess.result && <CountryGuessInput entities={data.countries} selectedId={guess.selectedId} disabled={remainingMs <= 0} excluded={guess.wrong} onSelect={(id) => setGuess((current) => ({ ...current, selectedId: id }))} onSubmit={submitGuess} />}
-            {guess.wrong.length > 0 && <p className="atlas-guess-misses">Not {guess.wrong.map(nameOf).join(", not ")}.</p>}
+          {guessing && <>{!guess.result && <div className="atlas-suspects" role="group" aria-label="Country suspects">{guessing.choices?.map(choice => <button key={choice.id} type="button" disabled={remainingMs <= 0 || guess.wrong.includes(choice.id)} aria-pressed={guess.selectedId === choice.id} onClick={() => setGuess(current => ({ ...current, selectedId: choice.id }))}>{gameUi(choice.label)}</button>)}</div>}{!guess.result && <CountryGuessInput entities={data.countries} selectedId={guess.selectedId} disabled={remainingMs <= 0} excluded={guess.wrong} onSelect={(id) => setGuess((current) => ({ ...current, selectedId: id }))} onSubmit={submitGuess} />}
+            {guess.wrong.length > 0 && <p className="atlas-guess-misses">{gameUi("Not ")}{gameUi(guess.wrong.map(nameOf).join(", not "))}.</p>}
             {!guess.result && guess.tip + 1 < guessing.clues.length && <button type="button" className="atlas-submit atlas-secondary" disabled={remainingMs <= 0} onClick={() => submitGuess("")}>Reveal next clue · lower award</button>}
             <GuessClueList excludeIds={guessing.choices?.map(choice => choice.id)} entityId={guessing.entityId} clues={guessing.clues.slice(0, guess.result ? guessing.clues.length : guess.tip + 1)} total={guessing.clues.length} />
-            {guess.result && <div className={`atlas-feedback ${guess.result.correct ? "is-correct" : "is-wrong"}`}>{guess.result.correct ? <Check /> : <X />}<div><strong>{guess.result.correct ? `${nameOf(guessing.entityId)} — +${guess.result.award!.total} points` : `It was ${nameOf(guessing.entityId)}`}</strong><span>{guess.result.award ? `${guess.result.award.base} for solving${guess.result.award.bonus ? ` + ${guess.result.award.bonus} tip-${guess.tip + 1} bonus` : ""}` : "No points this time"}</span></div></div>}
+            {guess.result && <div className={`atlas-feedback ${guess.result.correct ? "is-correct" : "is-wrong"}`}>{guess.result.correct ? <Check /> : <X />}<div><strong>{gameUi(guess.result.correct ? `${nameOf(guessing.entityId)} — +${guess.result.award!.total} points` : `It was ${nameOf(guessing.entityId)}`)}</strong><span>{gameUi(guess.result.award ? `${guess.result.award.base} for solving${guess.result.award.bonus ? ` + ${guess.result.award.bonus} tip-${guess.tip + 1} bonus` : ""}` : "No points this time")}</span></div></div>}
             {guess.result && <button type="button" className="atlas-submit atlas-guess-continue" onClick={() => { stopAdvanceTimer(); advanceFrom(questionIndex); }}>{questionIndex + 1 >= questions.length ? "See results" : "Next country"} <small>or wait {GUESS_SCORING.revealSeconds}s</small></button>}</>}
           {pinning && <div className="atlas-pin-controls">
-            <p>{pin ? `Your pin: ${Math.abs(pin[1]).toFixed(2)}° ${pin[1] >= 0 ? "N" : "S"}, ${Math.abs(pin[0]).toFixed(2)}° ${pin[0] >= 0 ? "E" : "W"}${closest ? "" : " — click again to move it."}` : `Click anywhere to place a pin. ${pinning.targetRadiusKm ? "Within 20 km of the city center" : "Inside the country"} counts as 0 km.`}</p>
-            <button type="button" className="atlas-submit" disabled={!pin || Boolean(closest)} onClick={submitPin}><MapPin size={18} />{closest ? "Pin locked" : "Submit pin"}</button>
+            <p>{gameUi(pin ? `Your pin: ${Math.abs(pin[1]).toFixed(2)}° ${pin[1] >= 0 ? "N" : "S"}, ${Math.abs(pin[0]).toFixed(2)}° ${pin[0] >= 0 ? "E" : "W"}${closest ? "" : " — click again to move it."}` : `Click anywhere to place a pin. ${pinning.targetRadiusKm ? "Within 20 km of the city center" : "Inside the country"} counts as 0 km.`)}</p>
+            <button type="button" className="atlas-submit" disabled={!pin || Boolean(closest)} onClick={submitPin}><MapPin size={18} />{gameUi(closest ? "Pin locked" : "Submit pin")}</button>
           </div>}
-          {closest && <div className={`atlas-feedback ${closest.points >= 300 ? "is-correct" : "is-wrong"}`}><Crosshair /><div><strong>{closest.distanceKm < .5 ? `${pinning?.targetRadiusKm ? "Inside the city target" : `Inside ${nameOf(currentQuestion?.entityId)}`} — +1,000` : `${Math.round(closest.distanceKm).toLocaleString("en")} km from ${pinning?.targetRadiusKm ? "the city target" : nameOf(currentQuestion?.entityId)} — +${closest.points}`}</strong><span>{pinning?.targetRadiusKm ? "Measured from a 20 km radius around the city center" : "Measured to the nearest border"}</span></div></div>}
+          {closest && <div className={`atlas-feedback ${closest.points >= 300 ? "is-correct" : "is-wrong"}`}><Crosshair /><div><strong>{gameUi(closest.distanceKm < .5 ? `${pinning?.targetRadiusKm ? "Inside the city target" : `Inside ${nameOf(currentQuestion?.entityId)}`} — +1,000` : `${Math.round(closest.distanceKm).toLocaleString("en")} km from ${pinning?.targetRadiusKm ? "the city target" : nameOf(currentQuestion?.entityId)} — +${closest.points}`)}</strong><span>{gameUi(pinning?.targetRadiusKm ? "Measured from a 20 km radius around the city center" : "Measured to the nearest border")}</span></div></div>}
           {currentQuestion && !["map_click", "guess_country", "closest_click"].includes(currentQuestion.interaction) && (mode === "speed_run" || !PANEL_ONLY.includes(mode)) && <QuestionControls question={currentQuestion} feedback={feedback} answers={multiAnswers} setAnswers={setMultiAnswers} onAnswer={answer} />}
           {currentQuestion && <AtlasAreaReference values={areaValuesFromText(currentQuestion.prompt)} />}
           {!PANEL_ONLY.includes(mode) && <AtlasMapConfirm reserve={!pinning} pending={pendingMap} onConfirm={() => mapSelection.current?.confirm()} onCancel={() => mapSelection.current?.cancel()} />}
-          {feedback && <div className={`atlas-feedback ${feedback.correct ? "is-correct" : "is-wrong"}`}>{feedback.correct ? <Check /> : <X />}<div><strong>{feedback.timedOut ? "Time's up" : feedback.correct ? "Correct" : mode === "higher_lower" ? "Streak over" : "Not quite"}</strong><span>{currentQuestion?.interaction === "higher_lower" && currentQuestion.second ? currentQuestion.second.label : nameOf(currentQuestion?.entityId)}{currentQuestion?.sourceMetadata[0] ? ` · ${currentQuestion.sourceMetadata[0].source}${currentQuestion.sourceMetadata[0].year ? ` ${currentQuestion.sourceMetadata[0].year}` : ""}` : ""}</span></div></div>}
-          {mode === "map_fill" && <div className="atlas-fill-meta"><span>{fillState.mistakes} mistakes</span><span>{fillState.streak} streak</span><span>{Math.round(fillState.found.length / Math.max(1, fillState.targets.length) * 100)}% complete</span><span>{Math.floor(elapsedMs / 1000)}s elapsed</span></div>}
+          {feedback && <div className={`atlas-feedback ${feedback.correct ? "is-correct" : "is-wrong"}`}>{feedback.correct ? <Check /> : <X />}<div><strong>{feedback.timedOut ? "Time's up" : feedback.correct ? "Correct" : mode === "higher_lower" ? "Streak over" : "Not quite"}</strong><span>{gameUi(currentQuestion?.interaction === "higher_lower" && currentQuestion.second ? currentQuestion.second.label : nameOf(currentQuestion?.entityId))}{gameUi(currentQuestion?.sourceMetadata[0] ? ` · ${currentQuestion.sourceMetadata[0].source}${currentQuestion.sourceMetadata[0].year ? ` ${currentQuestion.sourceMetadata[0].year}` : ""}` : "")}</span></div></div>}
+          {mode === "map_fill" && <div className="atlas-fill-meta"><span>{gameUi(fillState.mistakes)}{gameUi(" mistakes")}</span><span>{gameUi(fillState.streak)}{gameUi(" streak")}</span><span>{gameUi(Math.round(fillState.found.length / Math.max(1, fillState.targets.length) * 100))}{gameUi("% complete")}</span><span>{gameUi(Math.floor(elapsedMs / 1000))}{gameUi("s elapsed")}</span></div>}
         </AtlasFitContent></div>
         {!PANEL_ONLY.includes(mode) && <AtlasWorldMap ref={mapSelection} onPendingChange={setPendingMap} confirmationKey={`${currentQuestion?.id}:${guess.tip}:${fillState.found.length}`} topology={data.topology} entities={data.countries} onSelect={selectMap} onPoint={pinning && !closest ? setPin : undefined} pins={pins}
           selectedId={guessing ? guess.selectedId : feedback?.selected || (currentQuestion?.interaction === "single_choice" && currentQuestion.category === "countries" ? currentQuestion.entityId : null)}
@@ -240,40 +242,43 @@ export function AtlasSoloGame({ data, mode, settings, seed, title, player, onFin
 }
 
 function QuestionControls({ question, feedback, answers, setAnswers, onAnswer }: { question: AtlasQuestion; feedback: { selected: string; correct: boolean } | null; answers: string[]; setAnswers: (answers: string[]) => void; onAnswer: (answer: string | string[]) => void }) {
-  if (question.interaction === "single_choice") return <div className="atlas-choice-grid">{question.choices.map((choice) => <button type="button" aria-label={choice.label} disabled={Boolean(feedback)} className={feedback?.selected === choice.id ? "selected" : ""} key={choice.id} onClick={() => onAnswer(choice.id)}>{choice.flagAsset && <img src={choice.flagAsset} alt="" />}{question.category !== "flags" && choice.label}</button>)}</div>;
-  if (question.interaction === "multi_select") return <><div className="atlas-choice-grid">{question.choices.map((choice) => <button type="button" disabled={Boolean(feedback)} aria-pressed={answers.includes(choice.id)} className={answers.includes(choice.id) ? "selected" : ""} key={choice.id} onClick={() => setAnswers(answers.includes(choice.id) ? answers.filter((id) => id !== choice.id) : [...answers, choice.id])}>{choice.label}</button>)}</div><button type="button" className="atlas-submit" disabled={!answers.length || Boolean(feedback)} onClick={() => onAnswer(answers)}>Submit selection</button></>;
+  useGameLanguage();
+  if (question.interaction === "single_choice") return <div className="atlas-choice-grid">{question.choices.map((choice) => <button type="button" aria-label={gameUi(choice.label)} disabled={Boolean(feedback)} className={feedback?.selected === choice.id ? "selected" : ""} key={choice.id} onClick={() => onAnswer(choice.id)}>{choice.flagAsset && <img src={choice.flagAsset} alt="" />}{gameUi(question.category !== "flags" && choice.label)}</button>)}</div>;
+  if (question.interaction === "multi_select") return <><div className="atlas-choice-grid">{question.choices.map((choice) => <button type="button" disabled={Boolean(feedback)} aria-pressed={answers.includes(choice.id)} className={answers.includes(choice.id) ? "selected" : ""} key={choice.id} onClick={() => setAnswers(answers.includes(choice.id) ? answers.filter((id) => id !== choice.id) : [...answers, choice.id])}>{gameUi(choice.label)}</button>)}</div><button type="button" className="atlas-submit" disabled={!answers.length || Boolean(feedback)} onClick={() => onAnswer(answers)}>{gameUi("Submit selection")}</button></>;
   return null;
 }
 
 /** Headline, score and the four stat tiles after a run; `actions` decides what comes next (again, next player…). */
 export function SoloResults({ mode, summary, entities, eyebrow = "Expedition complete", actions }: { mode: AtlasMode; summary: SoloSummary; entities: GeographicEntity[]; eyebrow?: string; actions: ReactNode }) {
+  useGameLanguage();
   const answered = summary.correct + summary.wrong;
   const headline = mode === "map_fill" && summary.fill?.complete ? "Region mastered" : mode === "higher_lower" ? `Streak of ${summary.bestStreak}`
     : "Great run";
   const tiles = mode === "closest_wins"
       ? [{ value: summary.correct, label: "Bullseyes" }, { value: `${Math.round(summary.averageKm ?? 0).toLocaleString("en")} km`, label: "Average distance" }, { value: answered, label: "Pins" }, { value: `${Math.round(summary.elapsedMs / 1000)}s`, label: "Elapsed" }]
       : [{ value: summary.correct, label: "Correct" }, { value: mode === "map_fill" ? summary.wrong : `${answered ? Math.round(summary.correct / answered * 100) : 0}%`, label: mode === "map_fill" ? "Mistakes" : "Accuracy" }, { value: summary.bestStreak, label: "Best streak" }, { value: `${Math.round(summary.elapsedMs / 1000)}s`, label: "Elapsed" }];
-  return <main className="atlas-page atlas-center atlas-random-results"><AtlasFitContent><AtlasResultHero eyebrow={eyebrow} title={headline} />
-    <p className="atlas-result-score">{new Intl.NumberFormat("en").format(summary.score)} <small>points</small></p>
-    <div className="atlas-result-grid">{tiles.map((tile) => <div key={tile.label}><strong>{tile.value}</strong><span>{tile.label}</span></div>)}</div>
-    {summary.missed.length > 0 && <p className="atlas-missed">Review: {[...new Set(summary.missed)].slice(0, 5).map((id) => entities.find((entity) => entity.id === id)?.shortName).filter(Boolean).join(", ")}</p>}
-    <div className="atlas-result-actions">{actions}</div></AtlasFitContent></main>;
+  return <main className="atlas-page atlas-center atlas-random-results"><AtlasFitContent><AtlasResultHero eyebrow={eyebrow} title={gameUi(headline)} />
+    <p className="atlas-result-score">{gameUi(new Intl.NumberFormat("en").format(summary.score))} <small>{gameUi("points")}</small></p>
+    <div className="atlas-result-grid">{tiles.map((tile) => <div key={gameUi(tile.label)}><strong>{gameUi(tile.value)}</strong><span>{gameUi(tile.label)}</span></div>)}</div>
+    {summary.missed.length > 0 && <p className="atlas-missed">{gameUi("Review: ")}{gameUi([...new Set(summary.missed)].slice(0, 5).map((id) => entities.find((entity) => entity.id === id)?.shortName).filter(Boolean).join(", "))}</p>}
+    <div className="atlas-result-actions">{gameUi(actions)}</div></AtlasFitContent></main>;
 }
 
 /** Difficulty plus whatever the mode needs (categories, comparison stats, Map Fill region). */
 export function SoloSettingsForm({ mode, settings, onChange }: { mode: ArenaModeDef; settings: SoloSettings; onChange: (settings: SoloSettings) => void }) {
+  useGameLanguage();
   const arenaMode = mode.solo.kind === "arena" ? mode.solo.mode : null;
   const note = (item: AtlasDifficulty) => arenaMode === "guess_country" ? `${item === "beginner" ? "Big" : item === "intermediate" ? "Most" : "All"} countries`
     : arenaMode === "higher_lower" ? `${item === "beginner" ? "Clear" : item === "intermediate" ? "Closer" : "Tight"} gaps`
       : arenaMode && ["map_click", "flags", "speed_run"].includes(arenaMode) ? `${roundSecondsFor(arenaMode, item)}s per answer`
         : `${item === "beginner" ? "Well-known" : item === "intermediate" ? "Most" : "Every"} countr${item === "expert" ? "y" : "ies"}`;
   return <>
-    {arenaMode !== "map_fill" && <><label className="atlas-label">Difficulty</label>
-      <div className="atlas-segmented">{(["beginner", "intermediate", "expert"] as const).map((item) => <button type="button" className={settings.difficulty === item ? "active" : ""} key={item} onClick={() => onChange({ ...settings, difficulty: item })}>{DIFFICULTY_LABELS[item]}<small>{note(item)}</small></button>)}</div></>}
-    {mode.options.includes("scope") && <><label className="atlas-label">Region</label>
-      <div className="atlas-chip-grid">{FILL_SCOPES.map((scope) => <button type="button" className={settings.scope === scope ? "active" : ""} key={scope} onClick={() => onChange({ ...settings, scope })}>{scope}</button>)}</div>
-      <p className="atlas-setup-note">{settings.scope === "World" ? "All 195 countries on the full world map." : `The map zooms to ${settings.scope} automatically.`}</p></>}
+    {arenaMode !== "map_fill" && <><label className="atlas-label">{gameUi("Difficulty")}</label>
+      <div className="atlas-segmented">{(["beginner", "intermediate", "expert"] as const).map((item) => <button type="button" className={settings.difficulty === item ? "active" : ""} key={item} onClick={() => onChange({ ...settings, difficulty: item })}>{gameUi(DIFFICULTY_LABELS[item])}<small>{gameUi(note(item))}</small></button>)}</div></>}
+    {mode.options.includes("scope") && <><label className="atlas-label">{gameUi("Region")}</label>
+      <div className="atlas-chip-grid">{FILL_SCOPES.map((scope) => <button type="button" className={settings.scope === scope ? "active" : ""} key={gameUi(scope)} onClick={() => onChange({ ...settings, scope })}>{gameUi(scope)}</button>)}</div>
+      <p className="atlas-setup-note">{gameUi(settings.scope === "World" ? "All 195 countries on the full world map." : `The map zooms to ${settings.scope} automatically.`)}</p></>}
     {mode.options.includes("categories") && <AtlasCategoryPicker options={MAP_BATTLE_CATEGORIES} selected={settings.categories} onChange={(categories) => onChange({ ...settings, categories })} />}
-    {mode.options.includes("stats") && <AtlasCategoryPicker options={COMPARISON_CATEGORIES} selected={settings.stats} onChange={(stats) => onChange({ ...settings, stats })} label="Comparison categories" />}
+    {mode.options.includes("stats") && <AtlasCategoryPicker options={COMPARISON_CATEGORIES} selected={settings.stats} onChange={(stats) => onChange({ ...settings, stats })} label={gameUi("Comparison categories")} />}
   </>;
 }

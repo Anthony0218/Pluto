@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -472,7 +473,7 @@ export default function WattenMultiplayerRoom() {
   if (!user) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-transparent text-white">
-        <p>{l("Bitte zuerst einloggen.", "Please sign in first.")}</p>
+        <p>{gameUi(l("Bitte zuerst einloggen.", "Please sign in first."))}</p>
       </main>
     );
   }
@@ -484,7 +485,7 @@ export default function WattenMultiplayerRoom() {
           <div className="mx-auto h-9 w-9 animate-spin rounded-full border-4 border-white/15 border-t-amber-300" />
 
           <p className="mt-4 font-bold text-zinc-300">
-            {l("Raum wird geladen...", "Loading room...")}
+            {gameUi(l("Raum wird geladen...", "Loading room..."))}
           </p>
         </div>
       </main>
@@ -495,7 +496,7 @@ export default function WattenMultiplayerRoom() {
     return (
       <main className="flex min-h-screen items-center justify-center bg-transparent px-6 text-white">
         <div className="text-center">
-          <p className="text-red-300">{error}</p>
+          <p className="text-red-300">{gameUi(error)}</p>
 
           <button
             type="button"
@@ -521,18 +522,17 @@ export default function WattenMultiplayerRoom() {
         <header className="flex flex-wrap items-start justify-between gap-4 rounded-[30px] border border-white/10 bg-zinc-950/70 p-6 shadow-2xl shadow-black/30">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300">
-              {t("Bavarian Watten")} · Multiplayer
-            </p>
+              {t("Bavarian Watten")}{gameUi(" · Multiplayer ")}</p>
 
             <h1 className="mt-1 text-3xl font-black">
-              {l("4 Spieler · 2 gegen 2", "4 Players · 2 vs 2")}
+              {gameUi(l("4 Spieler · 2 gegen 2", "4 Players · 2 vs 2"))}
             </h1>
 
             <p className="mt-2 text-sm text-zinc-400">
-              {l(
+              {gameUi(l(
                 "Team A: Sitz 1 + 3 · Team B: Sitz 2 + 4",
                 "Team A: seats 1 + 3 · Team B: seats 2 + 4",
-              )}
+              ))}
             </p>
           </div>
 
@@ -564,9 +564,9 @@ export default function WattenMultiplayerRoom() {
           </p>
 
           <p className="mt-3 text-xs font-bold text-zinc-500">
-            {copied
+            {gameUi(copied
               ? `✓ ${t("Copied to clipboard")}`
-              : t("Click this box to copy the code")}
+              : t("Click this box to copy the code"))}
           </p>
         </button>
 
@@ -580,14 +580,14 @@ export default function WattenMultiplayerRoom() {
               </p>
 
               <h2 className="mt-1 text-2xl font-black">
-                {players.length}/4 {l("verbunden", "connected")}
+                {gameUi(players.length)}/4 {gameUi(l("verbunden", "connected"))}
               </h2>
             </div>
 
             <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-black text-zinc-400">
-              {players.length === 4
+              {gameUi(players.length === 4
                 ? l("Bereit", "Ready")
-                : l("Warteraum", "Waiting room")}
+                : l("Warteraum", "Waiting room"))}
             </div>
           </div>
 
@@ -651,7 +651,7 @@ export default function WattenMultiplayerRoom() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-3">
                         <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
-                          {l("Sitz", "Seat")} {seat + 1}
+                          {gameUi(l("Sitz", "Seat"))} {gameUi(seat + 1)}
                         </p>
 
                         <span
@@ -668,9 +668,9 @@ export default function WattenMultiplayerRoom() {
                           player ? "text-white" : "text-zinc-600"
                         }`}
                       >
-                        {player
+                        {gameUi(player
                           ? player.display_name
-                          : l("Wartet auf Spieler...", "Waiting for player...")}
+                          : l("Wartet auf Spieler...", "Waiting for player..."))}
                       </p>
 
                       <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -681,20 +681,20 @@ export default function WattenMultiplayerRoom() {
                               : "bg-emerald-400/15 text-emerald-300"
                           }`}
                         >
-                          {isTeamA ? "Team A" : "Team B"}
+                          {gameUi(isTeamA ? "Team A" : "Team B")}
                         </span>
 
                         {player?.user_id === user.id && (
                           <span className="rounded-full bg-sky-400/15 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-sky-300">
-                            {l("Du", "You")}
+                            {gameUi(l("Du", "You"))}
                           </span>
                         )}
 
-                        {player?.user_id === room.host_id && (
+                        {gameUi(player?.user_id === room.host_id && (
                           <span className="rounded-full bg-violet-400/15 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-violet-300">
-                            {l("Gastgeber", "Host")}
+                            {gameUi(l("Gastgeber", "Host"))}
                           </span>
-                        )}
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -704,14 +704,14 @@ export default function WattenMultiplayerRoom() {
           </div>
         </section>
 
-        {isHost && (
+        {gameUi(isHost && (
           <section className="mt-4 rounded-[24px] border border-white/10 bg-zinc-950/65 p-4">
             <div className="flex items-center justify-between gap-3">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300">
-                {l("Siegpunkte", "Target score")}
+                {gameUi(l("Siegpunkte", "Target score"))}
               </p>
               <span className="text-sm font-black text-amber-200">
-                {targetScore}
+                {gameUi(targetScore)}
               </span>
             </div>
 
@@ -727,11 +727,11 @@ export default function WattenMultiplayerRoom() {
                       : "border border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10"
                   }`}
                 >
-                  {score}
+                  {gameUi(score)}
                 </button>
               ))}
               <input
-                aria-label={l("Eigener Zielwert", "Custom target score")}
+                aria-label={gameUi(l("Eigener Zielwert", "Custom target score"))}
                 type="number"
                 min={2}
                 max={30}
@@ -744,50 +744,50 @@ export default function WattenMultiplayerRoom() {
               />
             </div>
             <p className="mt-1 text-[9px] font-bold text-zinc-600">
-              {l("Eigener Wert: 2–30", "Custom: 2–30")}
+              {gameUi(l("Eigener Wert: 2–30", "Custom: 2–30"))}
             </p>
           </section>
-        )}
+        ))}
 
         {/* START */}
 
         <section className="mt-4 rounded-[24px] border border-white/10 bg-zinc-950/65 p-4 text-center">
-          {players.length < 4 ? (
+          {gameUi(players.length < 4 ? (
             <>
               <p className="text-xl font-black">
-                {l("Warte auf Mitspieler", "Waiting for players")}
+                {gameUi(l("Warte auf Mitspieler", "Waiting for players"))}
               </p>
 
               <p className="mt-2 text-sm text-zinc-500">
-                {l("Noch", "Still")} {4 - players.length}{" "}
-                {l(
+                {gameUi(l("Noch", "Still"))} {gameUi(4 - players.length)}{gameUi(" ")}
+                {gameUi(l(
                   4 - players.length === 1
                     ? "Spieler erforderlich"
                     : "Spieler erforderlich",
                   4 - players.length === 1 ? "player needed" : "players needed",
-                )}
+                ))}
                 .
               </p>
             </>
           ) : (
             <>
               <p className="text-xl font-black text-emerald-300">
-                {l(
+                {gameUi(l(
                   "Alle vier Spieler sind verbunden",
                   "All four players are connected",
-                )}
+                ))}
               </p>
 
               <p className="mt-2 text-sm text-zinc-500">
-                {l(
+                {gameUi(l(
                   "Der Gastgeber kann die Partie jetzt starten.",
                   "The host can start the game now.",
-                )}
+                ))}
               </p>
             </>
-          )}
+          ))}
 
-          {isHost ? (
+          {gameUi(isHost ? (
             <button
               type="button"
               onClick={() => void startGame()}
@@ -808,24 +808,24 @@ export default function WattenMultiplayerRoom() {
                 disabled:opacity-35
               "
             >
-              {starting
+              {gameUi(starting
                 ? l("Spiel wird gestartet...", "Game is starting...")
-                : l("4-Spieler-Partie starten", "Start 4-player game")}
+                : l("4-Spieler-Partie starten", "Start 4-player game"))}
             </button>
           ) : (
             <p className="mt-5 text-xs font-bold text-zinc-600">
-              {l(
+              {gameUi(l(
                 "Der Gastgeber startet das Spiel.",
                 "The host starts the game.",
-              )}
+              ))}
             </p>
-          )}
+          ))}
 
-          {error && (
+          {gameUi(error && (
             <div className="mt-5 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm font-bold text-red-200">
-              {error}
+              {gameUi(error)}
             </div>
-          )}
+          ))}
         </section>
       </div>
     </main>

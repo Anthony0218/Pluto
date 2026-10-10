@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import type {
   Campaign,
   Command,
@@ -20,6 +21,7 @@ export function InsultAction({
   active: boolean;
   onCommand: (cmd: Command) => void;
 }) {
+  useGameLanguage();
   const sent = (state.insults ?? []).some(
     (i) =>
       i.from === house.id &&
@@ -33,24 +35,22 @@ export function InsultAction({
         disabled={!active || sent || house.id === target.id}
         onClick={() => onCommand({ type: "insult", house: target.id })}
       >
-        {sent
+        {gameUi(sent
           ? `House ${target.name} insulted this round`
-          : `Insult House ${target.name}`}
+          : `Insult House ${target.name}`)}
       </button>
-      <div className="ed-effects"><EffectBadge metric="relations" amount={-20} />{target.liege === house.id && <EffectBadge metric="opinion" amount={ruler(target)?.traits?.includes("proud") ? -20 : -15} label="vassal opinion" />}</div>
-      {target.nation !== house.nation && <p className="ed-reason">Their crown gains a justified war reason against your realm.</p>}
-      {!!received.length && target.nation !== house.nation && (
+      <div className="ed-effects"><EffectBadge metric="relations" amount={-20} />{target.liege === house.id && <EffectBadge metric="opinion" amount={ruler(target)?.traits?.includes("proud") ? -20 : -15} label={gameUi("vassal opinion")} />}</div>
+      {target.nation !== house.nation && <p className="ed-reason">{gameUi("Their crown gains a justified war reason against your realm.")}</p>}
+      {gameUi(!!received.length && target.nation !== house.nation && (
         <p className="ed-reason">
-          {Array.from(
+          {gameUi(Array.from(
             new Set(
               received.map(
                 (i) => state.houses.find((v) => v.id === i.from)?.name,
               ),
             ),
-          ).join(", ")}{" "}
-          insulted your realm. You may answer with a justified war.
-        </p>
-      )}
+          ).join(", "))}{gameUi(" ")}{gameUi(" insulted your realm. You may answer with a justified war. ")}</p>
+      ))}
     </div>
   );
 }

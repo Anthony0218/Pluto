@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
 export type SoundSettings = { music: number; announcements: number; effects: number };
+export type SoundSelection = { music: "piano" | "soft"; effects: "classic" | "soft" };
+function savedSelection(): SoundSelection {
+  try { const value = JSON.parse(localStorage.getItem("schafkopf-sound-selection") ?? "null"); return { music: value?.music === "soft" ? "soft" : "piano", effects: value?.effects === "soft" ? "soft" : "classic" }; } catch { return { music: "piano", effects: "classic" }; }
+}
 const defaults: SoundSettings = { music: 22, announcements: 0, effects: 75 };
 // The speech code stays in place for the forthcoming Bavarian voice recordings.
 const ANNOUNCEMENT_SPEECH_ENABLED = false;
@@ -30,6 +34,15 @@ function createNoise(ctx: AudioContext, duration: number, volume: number, freque
 }
 
 export function useSchafkopfAudio(round: number, announcements: string[], playedCardCount: number) {
+  const [selection, setSelection] = useState(savedSelection);
+  const selectionRef = useRef(selection);
+  useEffect(() => { selectionRef.current = selection; }, [selection]);
+  const selectSound = (key: keyof SoundSelection, value: SoundSelection[keyof SoundSelection]) => setSelection(current => {
+    const next = { ...current, [key]: value } as SoundSelection;
+    try { localStorage.setItem("schafkopf-sound-selection", JSON.stringify(next)); } catch { /* Session choice. */ }
+    return next;
+  });
+  const effectVolume = () => settingsRef.current.effects / 100 * (selectionRef.current.effects === "soft" ? .45 : 1);
   const [settings, setSettings] = useState(savedSounds);
   const [muted, setMuted] = useState(() => {
     try { return localStorage.getItem("schafkopf-sound-muted") === "true"; } catch { return false; }
@@ -79,7 +92,7 @@ export function useSchafkopfAudio(round: number, announcements: string[], played
       const now = ctx.currentTime;
       const oscillator = ctx.createOscillator();
       const gain = ctx.createGain();
-      oscillator.type = "triangle";
+      oscillator.type = selectionRef.current.music === "soft" ? "sine" : "triangle";
       oscillator.frequency.value = frequency;
       gain.gain.setValueAtTime(0, now);
       gain.gain.linearRampToValueAtTime(volume * (step % 4 === 0 ? .19 : .11), now + .012);
@@ -99,7 +112,7 @@ export function useSchafkopfAudio(round: number, announcements: string[], played
         const ctx = contextRef.current;
         if (ctx && ctx.state === "running" && canPlayEffects()) {
           const now = ctx.currentTime;
-          const volume = settingsRef.current.effects / 100;
+          const volume = effectVolume();
           createNoise(ctx, .085, volume * .24, 1450, now);
           createNoise(ctx, .13, volume * .10, 430, now + .018);
         }
@@ -111,7 +124,7 @@ export function useSchafkopfAudio(round: number, announcements: string[], played
   useEffect(() => {
     const ctx = contextRef.current;
     if (!ctx || ctx.state !== "running" || !canPlayEffects()) return;
-    const volume = settingsRef.current.effects / 100;
+    const volume = effectVolume();
     const now = ctx.currentTime;
     for (let index = 0; index < 9; index++) createNoise(ctx, .07, volume * .105, 950 + (index % 3) * 300, now + index * .042);
   }, [round]);
@@ -131,7 +144,7 @@ export function useSchafkopfAudio(round: number, announcements: string[], played
           oscillator.type = "sine";
           oscillator.frequency.setValueAtTime(650, now);
           oscillator.frequency.exponentialRampToValueAtTime(190, now + .12);
-          gain.gain.setValueAtTime(settingsRef.current.effects / 100 * .36, now);
+          gain.gain.setValueAtTime(effectVolume() * .36, now);
           gain.gain.exponentialRampToValueAtTime(.0001, now + .19);
           oscillator.connect(gain).connect(ctx.destination);
           oscillator.start(now);
@@ -145,7 +158,7 @@ export function useSchafkopfAudio(round: number, announcements: string[], played
           tap.buffer = buffer;
           wood.type = "lowpass";
           wood.frequency.value = 900;
-          tapGain.gain.setValueAtTime(settingsRef.current.effects / 100 * .25, now);
+          tapGain.gain.setValueAtTime(effectVolume() * .25, now);
           tapGain.gain.exponentialRampToValueAtTime(.0001, now + .075);
           tap.connect(wood).connect(tapGain).connect(ctx.destination);
           tap.start(now);
@@ -161,5 +174,5 @@ export function useSchafkopfAudio(round: number, announcements: string[], played
     }
   }, [round, announcements]);
 
-  return { settings, muted, update, toggleMute };
+  return { settings, muted, update, toggleMute, selection, selectSound };
 }

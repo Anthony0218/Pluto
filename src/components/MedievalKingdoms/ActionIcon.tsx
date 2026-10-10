@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import type {
   AttackActionId,
   DefenseActionId,
@@ -18,6 +19,7 @@ export default function ActionIcon({
   id: ActionIconId;
   className?: string;
 }) {
+  useGameLanguage();
   const line = {
     fill: "none",
     stroke: "currentColor",
@@ -199,7 +201,7 @@ export default function ActionIcon({
 
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-      {content}
+      {gameUi(content)}
     </svg>
   );
 }

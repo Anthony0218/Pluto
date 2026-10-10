@@ -1,8 +1,9 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import { bolasTip, coconutFood, raidPredators, shellProtects, type ToolGame } from './toolAnimals';
 export function drawToolGame(ctx: CanvasRenderingContext2D, game: ToolGame, ai: boolean) {
   const colors = ['#f28d79', '#edcb79'];
   const text = (label: string, x: number, y: number, color = '#eee6cf', size = 14) => {
-    ctx.fillStyle = color; ctx.font = `600 ${size}px sans-serif`; ctx.textAlign = 'center'; ctx.fillText(label, x, y);
+    ctx.fillStyle = color; ctx.font = `600 ${size}px sans-serif`; ctx.textAlign = 'center'; ctx.fillText(gameUi(label), x, y);
   };
   const oval = (x: number, y: number, rx: number, ry: number, color: string) => {
     ctx.fillStyle = color; ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fill();

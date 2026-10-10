@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import GameXpReward from "@/components/games/GameXpReward";
 import { useMemo, useState, type ReactNode } from "react";
 import { SUIT_NAMES, SUIT_SYMBOLS, isSuit } from "@/games/cards/cards/card";
@@ -24,6 +25,7 @@ interface Props {
  * no game logic of its own.
  */
 export default function GameTable({ def, state, viewerId, onAction, error, revealAll = false }: Props) {
+  useGameLanguage();
   const [selected, setSelected] = useState<string | null>(null);
   const available = useMemo(() => (viewerId ? getAvailableActions(def, state, viewerId) : []), [def, state, viewerId]);
   const phase = def.phases.find((entry) => entry.id === state.currentPhase);
@@ -50,13 +52,13 @@ export default function GameTable({ def, state, viewerId, onAction, error, revea
     const visible = cards.filter((id) => ((revealAll && zone.owner === "player") || isCardVisible(def, state, key, id, viewerId)) && state.cards[id]);
     const hidden = cards.length - visible.length;
     const ownedByViewer = state.zones[key]?.owner === viewerId;
-    if (!cards.length) return <span className="flex h-14 items-center text-xs text-zinc-600">empty</span>;
+    if (!cards.length) return <span className="flex h-14 items-center text-xs text-zinc-600">{gameUi("empty")}</span>;
     return (
       <div className="flex flex-wrap items-end gap-1.5">
         {hidden > 0 && (
           <span className="relative inline-flex items-end">
-            <CardView size={size} label={`${hidden} face-down card${hidden === 1 ? "" : "s"}`} />
-            <span className="absolute -bottom-1 -right-1 rounded-full bg-zinc-800 px-1.5 text-[10px] font-bold text-zinc-200 ring-1 ring-white/20">{hidden}</span>
+            <CardView size={size} label={gameUi(`${hidden} face-down card${hidden === 1 ? "" : "s"}`)} />
+            <span className="absolute -bottom-1 -right-1 rounded-full bg-zinc-800 px-1.5 text-[10px] font-bold text-zinc-200 ring-1 ring-white/20">{gameUi(hidden)}</span>
           </span>
         )}
         {visible.map((id) => {
@@ -96,41 +98,40 @@ export default function GameTable({ def, state, viewerId, onAction, error, revea
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/[0.08] bg-black/30 px-4 py-3 text-sm">
-        <Chip tone="amber">Phase: {phase?.name ?? state.currentPhase}</Chip>
-        <Chip>Round {state.roundNumber}</Chip>
-        <Chip>Turn {state.turnNumber}</Chip>
-        {current && <Chip tone="sky">Current: {current.name}</Chip>}
+        <Chip tone="amber">{gameUi("Phase: ")}{gameUi(phase?.name ?? state.currentPhase)}</Chip>
+        <Chip>{gameUi("Round ")}{gameUi(state.roundNumber)}</Chip>
+        <Chip>{gameUi("Turn ")}{gameUi(state.turnNumber)}</Chip>
+        {current && <Chip tone="sky">{gameUi("Current: ")}{current.name}</Chip>}
         {trump && (
-          <Chip tone="violet">
-            Trump: {SUIT_SYMBOLS[trump]} {SUIT_NAMES[trump]}
+          <Chip tone="violet">{gameUi(" Trump: ")}{gameUi(SUIT_SYMBOLS[trump])} {gameUi(SUIT_NAMES[trump])}
           </Chip>
         )}
         {(def.variables ?? [])
           .filter((variable) => variable.visible)
           .map((variable) => (
             <Chip key={variable.key} tone="emerald">
-              {variable.label ?? variable.key}: {String(state.players.find((player) => player.id === state.variables[variable.key])?.name ?? state.variables[variable.key] ?? "—")}
+              {gameUi(variable.label ?? variable.key)}: {gameUi(String(state.players.find((player) => player.id === state.variables[variable.key])?.name ?? state.variables[variable.key] ?? "—"))}
             </Chip>
           ))}
-        {state.status === "finished" && <Chip tone="emerald">Game over</Chip>}
+        {state.status === "finished" && <Chip tone="emerald">{gameUi("Game over")}</Chip>}
       </div>
 
       {state.result && (
         <div role="status" className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
           <GameXpReward />
-          <p className="font-bold">{state.result.draw && !state.result.winners.length ? "Draw" : `Winner${state.result.winners.length === 1 ? "" : "s"}: ${state.result.winners.map((id) => state.players.find((player) => player.id === id)?.name).join(", ") || "—"}`}</p>
-          <p className="mt-1 text-emerald-200/80">{state.result.reason}</p>
+          <p className="font-bold">{gameUi(state.result.draw && !state.result.winners.length ? "Draw" : `Winner${state.result.winners.length === 1 ? "" : "s"}: ${state.result.winners.map((id) => state.players.find((player) => player.id === id)?.name).join(", ") || "—"}`)}</p>
+          <p className="mt-1 text-emerald-200/80">{gameUi(state.result.reason)}</p>
         </div>
       )}
 
-      <section aria-label="Table" className="rounded-3xl border border-emerald-300/10 bg-[radial-gradient(ellipse_at_center,rgba(16,80,60,.55),rgba(6,30,24,.85))] p-4 shadow-inner">
+      <section aria-label={gameUi("Table")} className="rounded-3xl border border-emerald-300/10 bg-[radial-gradient(ellipse_at_center,rgba(16,80,60,.55),rgba(6,30,24,.85))] p-4 shadow-inner">
         <div className="flex flex-wrap gap-5">
           {gameZones.map((zone) => (
             <div key={zone.id} className="min-w-[90px]">
               <p className="mb-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100/60">
-                {zone.name} <span className="font-mono text-emerald-100/40">· {state.zones[zone.id]?.cards.length ?? 0}</span>
+                {gameUi(zone.name)} <span className="font-mono text-emerald-100/40">· {gameUi(state.zones[zone.id]?.cards.length ?? 0)}</span>
               </p>
-              {zoneCards(zone.id, zone, "md")}
+              {gameUi(zoneCards(zone.id, zone, "md"))}
             </div>
           ))}
         </div>
@@ -144,9 +145,9 @@ export default function GameTable({ def, state, viewerId, onAction, error, revea
               return (
                 <div key={zone.id}>
                   <p className="mb-1 text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">
-                    {zone.name} <span className="font-mono text-zinc-600">· {state.zones[key]?.cards.length ?? 0}</span>
+                    {gameUi(zone.name)} <span className="font-mono text-zinc-600">· {gameUi(state.zones[key]?.cards.length ?? 0)}</span>
                   </p>
-                  {zoneCards(key, zone, player.id === viewerId ? "lg" : "sm")}
+                  {gameUi(zoneCards(key, zone, player.id === viewerId ? "lg" : "sm"))}
                 </div>
               );
             })}
@@ -155,30 +156,28 @@ export default function GameTable({ def, state, viewerId, onAction, error, revea
       </div>
 
       {viewerId && state.status === "playing" && (
-        <section aria-label="Your actions" className="rounded-2xl border border-amber-300/20 bg-amber-300/[0.04] p-4">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300/80">Your options</p>
-          {!available.length && <p className="mt-2 text-sm text-zinc-400">Nothing to do right now — waiting for other players.</p>}
+        <section aria-label={gameUi("Your actions")} className="rounded-2xl border border-amber-300/20 bg-amber-300/[0.04] p-4">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300/80">{gameUi("Your options")}</p>
+          {!available.length && <p className="mt-2 text-sm text-zinc-400">{gameUi("Nothing to do right now — waiting for other players.")}</p>}
           {available.length > 0 && (
             <div className="mt-2 space-y-2">
-              {cardActions.length > 0 && !selection && <p className="text-sm text-zinc-300">Choose a highlighted card ({cardActions.map((action) => action.label).join(", ")}).</p>}
+              {cardActions.length > 0 && !selection && <p className="text-sm text-zinc-300">{gameUi("Choose a highlighted card (")}{gameUi(cardActions.map((action) => action.label).join(", "))}).</p>}
               {selection && (
                 <div className="flex flex-wrap items-center gap-2">
                   {forSelected.filter(({ options }) => options.some((option) => !option.targetCardId)).map(({ action }) => (
                     <Button key={action.actionId} tone="primary" onClick={() => send({ actionId: action.actionId, cardId: selection })}>
-                      {action.label} {state.cards[selection] ? `${state.cards[selection].rank}${SUIT_SYMBOLS[state.cards[selection].suit]}` : ""}
+                      {gameUi(action.label)} {gameUi(state.cards[selection] ? `${state.cards[selection].rank}${SUIT_SYMBOLS[state.cards[selection].suit]}` : "")}
                     </Button>
                   ))}
-                  {targets.size > 0 && <span className="text-sm text-sky-200">Now click a highlighted card on the table to {forSelected.find(({ options }) => options.some((option) => option.targetCardId))?.action.label.toLowerCase()} it.</span>}
-                  <Button size="sm" onClick={() => setSelected(null)}>
-                    Cancel
-                  </Button>
+                  {targets.size > 0 && <span className="text-sm text-sky-200">{gameUi("Now click a highlighted card on the table to ")}{gameUi(forSelected.find(({ options }) => options.some((option) => option.targetCardId))?.action.label.toLowerCase())}{gameUi(" it.")}</span>}
+                  <Button size="sm" onClick={() => setSelected(null)}>{gameUi(" Cancel ")}</Button>
                 </div>
               )}
               {plainActions.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {plainActions.map((action) => (
                     <Button key={action.actionId} tone={action.type === "pass" || action.type === "takeCards" ? "ghost" : "blue"} onClick={() => send({ actionId: action.actionId })}>
-                      {action.label}
+                      {gameUi(action.label)}
                     </Button>
                   ))}
                 </div>
@@ -187,7 +186,7 @@ export default function GameTable({ def, state, viewerId, onAction, error, revea
           )}
           {error && (
             <p role="alert" className="mt-3 rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
-              {error}
+              {gameUi(error)}
             </p>
           )}
         </section>
@@ -197,40 +196,41 @@ export default function GameTable({ def, state, viewerId, onAction, error, revea
 }
 
 function PlayerPanel({ player, isViewer, isCurrent, scoreLabel, children }: { player: PlayerState; isViewer: boolean; isCurrent: boolean; scoreLabel?: string; children: ReactNode }) {
+  useGameLanguage();
   return (
     <section
-      aria-label={`${player.name}${isViewer ? " (you)" : ""}`}
+      aria-label={gameUi(`${player.name}${isViewer ? " (you)" : ""}`)}
       className={`rounded-2xl border p-3 ${isViewer ? "border-amber-300/30 bg-amber-300/[0.04] lg:col-span-2" : "border-white/[0.08] bg-[#0d1014]/85"} ${player.status !== "active" ? "opacity-70" : ""}`}
     >
       <header className="mb-2 flex flex-wrap items-center gap-2">
         <span className={`h-2 w-2 rounded-full ${isCurrent ? "bg-amber-300" : "bg-zinc-700"}`} aria-hidden />
         <h3 className="text-sm font-bold text-zinc-100">
           {player.name}
-          {isViewer && <span className="text-amber-300"> (you)</span>}
-          {player.isBot && <span className="text-zinc-500"> · bot</span>}
+          {isViewer && <span className="text-amber-300">{gameUi(" (you)")}</span>}
+          {player.isBot && <span className="text-zinc-500">{gameUi(" · bot")}</span>}
         </h3>
         {player.roles.map((role) => (
-          <Chip key={role} tone="sky">
-            {role}
+          <Chip key={gameUi(role)} tone="sky">
+            {gameUi(role)}
           </Chip>
         ))}
         {(player.score !== 0 || scoreLabel) && (
           <Chip tone="amber">
-            {scoreLabel ?? "Score"} {player.score}
+            {gameUi(scoreLabel ?? "Score")} {gameUi(player.score)}
           </Chip>
         )}
         {Object.entries(player.variables)
           .filter(([, value]) => typeof value === "string" && value)
           .map(([key, value]) => (
             <Chip key={key} tone="violet">
-              {String(value)}
+              {gameUi(String(value))}
             </Chip>
           ))}
-        {player.passed && <Chip>passed</Chip>}
-        {player.status !== "active" && <Chip tone={player.status === "finished" ? "emerald" : "red"}>{player.status === "finished" ? `finished #${player.finishPlace}` : player.status}</Chip>}
-        {player.result && <Chip tone={player.result === "winner" ? "emerald" : player.result === "loser" ? "red" : "zinc"}>{player.result}</Chip>}
+        {player.passed && <Chip>{gameUi("passed")}</Chip>}
+        {player.status !== "active" && <Chip tone={player.status === "finished" ? "emerald" : "red"}>{gameUi(player.status === "finished" ? `finished #${player.finishPlace}` : player.status)}</Chip>}
+        {player.result && <Chip tone={player.result === "winner" ? "emerald" : player.result === "loser" ? "red" : "zinc"}>{gameUi(player.result)}</Chip>}
       </header>
-      <div className="flex flex-wrap gap-4">{children}</div>
+      <div className="flex flex-wrap gap-4">{gameUi(children)}</div>
     </section>
   );
 }

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import GameXpReward from "@/components/games/GameXpReward";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -102,6 +103,7 @@ export default function Battlefield({
   backPath = "/games/medieval-kingdoms/legacy",
   onVictory,
 }: Props) {
+  useGameLanguage();
   const navigate = useNavigate();
   const battle = BATTLES[battleId] ?? BATTLES["falcon-bridge"];
   const [game, setGame] = useState(() => createInitialBattleState(battle.id));
@@ -1029,21 +1031,18 @@ export default function Battlefield({
     <div className="mx-auto w-full max-w-[1500px] text-[#f4e4c1]">
       <div className="mb-4 flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#d3a448]">
-            Medieval Kingdoms
-          </p>
-          <h1 className="text-3xl font-black text-[#ffe7ad]">{battle.name}</h1>
-          <p className="text-sm text-[#bba17a]">
-            Round {game.round} · {battle.subtitle}
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#d3a448]">{gameUi(" Medieval Kingdoms ")}</p>
+          <h1 className="text-3xl font-black text-[#ffe7ad]">{gameUi(battle.name)}</h1>
+          <p className="text-sm text-[#bba17a]">{gameUi(" Round ")}{gameUi(game.round)} · {gameUi(battle.subtitle)}
           </p>
 
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-[#c89b4f] bg-[#5d411f] px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-[#ffe2a0]">
-              {GAME_MODE_LABELS[gameMode]}
+              {gameUi(GAME_MODE_LABELS[gameMode])}
             </span>
 
             <span className="text-[11px] text-[#a9906c]">
-              {GAME_MODE_DESCRIPTIONS[gameMode]}
+              {gameUi(GAME_MODE_DESCRIPTIONS[gameMode])}
             </span>
           </div>
         </div>
@@ -1051,9 +1050,7 @@ export default function Battlefield({
           type="button"
           onClick={() => navigate(backPath)}
           className="rounded-xl border border-[#856239] bg-[#4a3521] px-5 py-3 font-bold text-[#f1d9aa] hover:bg-[#604526]"
-        >
-          ← Campaign Map
-        </button>
+        >{gameUi(" ← Campaign Map ")}</button>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_350px]">
@@ -1089,7 +1086,7 @@ export default function Battlefield({
           >
             <img
               src={battle.mapImage}
-              alt={battle.name}
+              alt={gameUi(battle.name)}
               draggable={false}
               className="block w-full select-none"
             />
@@ -1294,7 +1291,7 @@ export default function Battlefield({
                       }
                     `}
                   >
-                    {dragPreview.legal ? "Legal move" : dragPreview.reason}
+                    {gameUi(dragPreview.legal ? "Legal move" : dragPreview.reason)}
                   </div>
                 </div>
               </div>
@@ -1367,7 +1364,7 @@ export default function Battlefield({
                 position={effect.position}
                 damage={effect.damage}
                 hit={effect.hit}
-                label={effect.label}
+                label={gameUi(effect.label)}
               />
             ))}
 
@@ -1384,12 +1381,9 @@ export default function Battlefield({
             {game.winner && (
               <div className="absolute inset-0 z-[250] flex items-center justify-center bg-[#25190f]/70 backdrop-blur-sm">
                 <div className="rounded-3xl border-2 border-[#c39745] bg-[#3b2a1b] p-8 text-center">
-                  <div className="text-xs font-bold uppercase tracking-[0.3em] text-[#dcb65f]">
-                    Battle Over
-                  </div>
+                  <div className="text-xs font-bold uppercase tracking-[0.3em] text-[#dcb65f]">{gameUi(" Battle Over ")}</div>
                   <div className="mt-2 text-3xl font-black capitalize text-[#ffe4a3]">
-                    {game.winner} Victory
-                  </div>
+                    {gameUi(game.winner)}{gameUi(" Victory ")}</div>
                   <GameXpReward />
                 </div>
               </div>
@@ -1397,7 +1391,7 @@ export default function Battlefield({
           </div>
 
           <div className="mt-3 rounded-xl border border-[#755433] bg-[#3a291b] px-4 py-3 text-sm text-[#dbc49d]">
-            {message}
+            {gameUi(message)}
           </div>
           <ArmyStatusBar
             units={game.units}

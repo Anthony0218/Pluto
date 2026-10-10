@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { MAX_INVENTORY_SIZE } from "../../../games/party/config.ts";
 import { itemRegistry } from "../../../games/party/items/registry.ts";
 import { mapRegistry } from "../../../games/party/content/maps.ts";
@@ -20,30 +21,30 @@ export default function ItemPanel({
   interactive: boolean;
   onUse: (item: ItemInstance) => void;
 }) {
+  useGameLanguage();
   const timingOpen = match.phase === "ITEM_PHASE" && !match.turn.hasRolled;
   const yourTurn = match.order[match.turnIndex] === player.id;
   const lock = itemLockReason(player);
   return (
-    <section className="pp-items" aria-label="Your items">
-      <span className="pp-eyebrow">
-        ITEMS · {player.inventory.length} / {MAX_INVENTORY_SIZE}
+    <section className="pp-items" aria-label={gameUi("Your items")}>
+      <span className="pp-eyebrow">{gameUi(" ITEMS · ")}{gameUi(player.inventory.length)} / {gameUi(MAX_INVENTORY_SIZE)}
       </span>
-      {lock ? (
+      {gameUi(lock ? (
         <p role="status" className="pp-items-lock pp-items-radiation">
-          ☢ {lock}
+          ☢ {gameUi(lock)}
         </p>
       ) : (
         <p
           role="status"
           className={timingOpen && yourTurn ? "" : "pp-items-lock"}
         >
-          {!yourTurn
+          {gameUi(!yourTurn
             ? "You can use items on your own turn, before rolling."
             : timingOpen
               ? "Items can only be used before you roll."
-              : "Items are locked: you can only use them before rolling."}
+              : "Items are locked: you can only use them before rolling.")}
         </p>
-      )}
+      ))}
       <ul>
         {Array.from({ length: MAX_INVENTORY_SIZE }, (_, slot) => {
           const item = player.inventory[slot];
@@ -51,7 +52,7 @@ export default function ItemPanel({
             return (
               <li key={slot} className="pp-item-slot empty">
                 <span aria-hidden="true">·</span>
-                <small>Empty slot {slot + 1}</small>
+                <small>{gameUi("Empty slot ")}{gameUi(slot + 1)}</small>
               </li>
             );
           const definition = itemRegistry.get(item.itemId),
@@ -66,25 +67,25 @@ export default function ItemPanel({
               className={`pp-item-slot ${rare ? "rare" : ""}`}
             >
               <span className="pp-item-icon" aria-hidden="true">
-                {definition.icon}
+                {gameUi(definition.icon)}
               </span>
               <div>
-                {rare && <span className="pp-rare-badge">★ RARE</span>}
-                <strong>{definition.name}</strong>
-                {!rare && <em>{definition.rarity}</em>}
-                <small>{definition.description}</small>
-                {unlocks && <small className="pp-item-reason">Ready in round {item.usableFromRound}</small>}
-                {reason && yourTurn && timingOpen && !lock && (
-                  <small className="pp-item-reason">{reason}</small>
-                )}
+                {rare && <span className="pp-rare-badge">{gameUi("★ RARE")}</span>}
+                <strong>{gameUi(definition.name)}</strong>
+                {!rare && <em>{gameUi(definition.rarity)}</em>}
+                <small>{gameUi(definition.description)}</small>
+                {unlocks && <small className="pp-item-reason">{gameUi("Ready in round ")}{gameUi(item.usableFromRound)}</small>}
+                {gameUi(reason && yourTurn && timingOpen && !lock && (
+                  <small className="pp-item-reason">{gameUi(reason)}</small>
+                ))}
               </div>
               <button
                 className="pp-primary"
                 disabled={!enabled}
                 onClick={() => onUse(item)}
-                aria-label={`Use ${definition.name}`}
+                aria-label={gameUi(`Use ${definition.name}`)}
               >
-                {lock ? "☢ Locked" : yourTurn && timingOpen && !legal ? "Not now" : "Use"}
+                {gameUi(lock ? "☢ Locked" : yourTurn && timingOpen && !legal ? "Not now" : "Use")}
               </button>
             </li>
           );

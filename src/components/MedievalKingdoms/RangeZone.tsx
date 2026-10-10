@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 type Props = {
   x: number;
   y: number;
@@ -6,6 +7,7 @@ type Props = {
 };
 
 export default function RangeZone({ x, y, range, type }: Props) {
+  useGameLanguage();
   const isMove = type === "move";
 
   return (
@@ -52,7 +54,7 @@ export default function RangeZone({ x, y, range, type }: Props) {
           }
         `}
       >
-        {isMove ? "Can Move" : "Can Attack"}
+        {gameUi(isMove ? "Can Move" : "Can Attack")}
       </div>
     </div>
   );

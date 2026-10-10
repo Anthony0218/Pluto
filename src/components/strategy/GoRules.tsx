@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, ChevronLeft, ChevronRight, Pause, Play, RotateCcw } from "lucide-react";
@@ -7,6 +8,7 @@ import { goCoordinate } from "../../games/go/analysis";
 import GoBoard from "./GoBoard";
 
 export default function GoRules() {
+  useGameLanguage();
   const [topic, setTopic] = useState(0), [step, setStep] = useState(0), [playing, setPlaying] = useState(false);
   const [feedback, setFeedback] = useState("");
   const lesson = goLessons[topic];
@@ -30,23 +32,23 @@ export default function GoRules() {
   }
   const target = lesson.blocked?.type === "place" ? lesson.blocked.row * 9 + lesson.blocked.col : lesson.target;
   return <main className="go-page">
-    <header className="go-page-header"><Link to="/games/go"><ArrowLeft size={16} /> Go</Link><h1>Go rules</h1><span>Chinese area rules</span></header>
-    <div className="go-rules-intro"><strong>Goal: control more area than your opponent.</strong> Take turns placing stones on intersections. Surround empty points, protect your groups, and capture opposing stones by removing all their liberties. You may pass instead of placing a stone; two consecutive passes end the game. White receives 6.5 komi to offset Black’s first move.</div>
+    <header className="go-page-header"><Link to="/games/go"><ArrowLeft size={16} />{gameUi(" Go")}</Link><h1>{gameUi("Go rules")}</h1><span>{gameUi("Chinese area rules")}</span></header>
+    <div className="go-rules-intro"><strong>{gameUi("Goal: control more area than your opponent.")}</strong>{gameUi(" Take turns placing stones on intersections. Surround empty points, protect your groups, and capture opposing stones by removing all their liberties. You may pass instead of placing a stone; two consecutive passes end the game. White receives 6.5 komi to offset Black’s first move.")}</div>
     <div className="go-lessons">
       <section>
-        <nav className="go-tabs" aria-label="Rule topics">{goLessons.map((item, index) => <button key={item.id} aria-current={topic === index ? "page" : undefined} onClick={() => { setTopic(index); setStep(0); setPlaying(false); setFeedback(""); }}>{item.label}</button>)}</nav>
-        <h2>{lesson.title}</h2><p>{lesson.body}</p>
-        <p className="go-caption" aria-live="polite">{lesson.captions[step]}</p>
+        <nav className="go-tabs" aria-label={gameUi("Rule topics")}>{goLessons.map((item, index) => <button key={item.id} aria-current={topic === index ? "page" : undefined} onClick={() => { setTopic(index); setStep(0); setPlaying(false); setFeedback(""); }}>{gameUi(item.label)}</button>)}</nav>
+        <h2>{gameUi(lesson.title)}</h2><p>{gameUi(lesson.body)}</p>
+        <p className="go-caption" aria-live="polite">{gameUi(lesson.captions[step])}</p>
         <div className="go-controls">
-          <button title="Reset lesson" aria-label="Reset lesson" onClick={() => { setStep(0); setPlaying(false); setFeedback(""); }}><RotateCcw size={18} /></button>
-          <button title="Previous step" aria-label="Previous step" disabled={step === 0} onClick={() => { setPlaying(false); setStep(step - 1); }}><ChevronLeft size={18} /></button>
-          <button title={playing ? "Pause animation" : "Play animation"} aria-label={playing ? "Pause animation" : "Play animation"} disabled={!lesson.moves.length} onClick={() => { if (step === frames.length - 1) setStep(0); setPlaying(!playing); }}>{playing ? <Pause size={18} /> : <Play size={18} />}</button>
-          <button title="Next step" aria-label="Next step" disabled={step === frames.length - 1} onClick={() => { setPlaying(false); setStep(step + 1); }}><ChevronRight size={18} /></button>
-          <span>{step + 1} / {frames.length}</span>
-          {lesson.moves[step]?.type === "pass" && <button onClick={() => attempt({ type: "pass" })}>Pass</button>}
+          <button title={gameUi("Reset lesson")} aria-label={gameUi("Reset lesson")} onClick={() => { setStep(0); setPlaying(false); setFeedback(""); }}><RotateCcw size={18} /></button>
+          <button title={gameUi("Previous step")} aria-label={gameUi("Previous step")} disabled={step === 0} onClick={() => { setPlaying(false); setStep(step - 1); }}><ChevronLeft size={18} /></button>
+          <button title={gameUi(playing ? "Pause animation" : "Play animation")} aria-label={gameUi(playing ? "Pause animation" : "Play animation")} disabled={!lesson.moves.length} onClick={() => { if (step === frames.length - 1) setStep(0); setPlaying(!playing); }}>{playing ? <Pause size={18} /> : <Play size={18} />}</button>
+          <button title={gameUi("Next step")} aria-label={gameUi("Next step")} disabled={step === frames.length - 1} onClick={() => { setPlaying(false); setStep(step + 1); }}><ChevronRight size={18} /></button>
+          <span>{gameUi(step + 1)} / {gameUi(frames.length)}</span>
+          {lesson.moves[step]?.type === "pass" && <button onClick={() => attempt({ type: "pass" })}>{gameUi("Pass")}</button>}
         </div>
-        <p role="status">{feedback}</p>
-        <Link className="go-action" to="/games/go/ai">Play Go</Link>
+        <p role="status">{gameUi(feedback)}</p>
+        <Link className="go-action" to="/games/go/ai">{gameUi("Play Go")}</Link>
       </section>
       <GoBoard key={lesson.id} state={state} onMove={attempt} onAttempt={attempt} help marked={step === 0 ? target : undefined} hint={lesson.moves[step]} />
     </div>

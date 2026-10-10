@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useAppLanguage } from "@/i18n/languageStore";
@@ -1879,25 +1880,25 @@ function MiniChessBoard({
                     justify-center
                     ${isLight ? "bg-[#ddc6a0]" : "bg-[#8a5b3c]"}
                   `}
-                  title={square}
+                  title={gameUi(square)}
                 >
-                  {isMoveSquare && (
+                  {gameUi(isMoveSquare && (
                     <span className="pointer-events-none absolute inset-0 bg-emerald-300/50 ring-2 ring-inset ring-emerald-100/85 shadow-[inset_0_0_0_1px_rgba(209,250,229,0.5)]" />
-                  )}
+                  ))}
 
-                  {isCaptureSquare && (
+                  {gameUi(isCaptureSquare && (
                     <span className="pointer-events-none absolute inset-0 bg-amber-400/70 ring-2 ring-inset ring-amber-100/90 shadow-[inset_0_0_0_1px_rgba(254,243,199,0.55)]" />
-                  )}
+                  ))}
 
-                  {isDanger && (
+                  {gameUi(isDanger && (
                     <span className="pointer-events-none absolute inset-0 bg-red-500/38 ring-2 ring-inset ring-red-200/70" />
-                  )}
+                  ))}
 
-                  {isSelected && (
+                  {gameUi(isSelected && (
                     <span className="pointer-events-none absolute inset-0 ring-2 ring-inset ring-sky-300" />
-                  )}
+                  ))}
 
-                  {piece && (
+                  {gameUi(piece && (
                     <span
                       className={`
                         relative
@@ -1910,11 +1911,11 @@ function MiniChessBoard({
                         ${piece.startsWith("w") ? "text-[#fff3d5]" : "text-[#17120f]"}
                       `}
                     >
-                      {miniPieceSymbols[piece]}
+                      {gameUi(miniPieceSymbols[piece])}
                     </span>
-                  )}
+                  ))}
 
-                  {(fileIndex === 0 || rank === 1) && (
+                  {gameUi((fileIndex === 0 || rank === 1) && (
                     <span
                       className={`
                         pointer-events-none
@@ -1925,9 +1926,9 @@ function MiniChessBoard({
                         ${fileIndex === 0 ? "left-0.5 top-0.5" : "bottom-0.5 right-0.5"}
                       `}
                     >
-                      {fileIndex === 0 ? rank : file}
+                      {gameUi(fileIndex === 0 ? rank : file)}
                     </span>
-                  )}
+                  ))}
                 </div>
               );
             }),
@@ -1935,11 +1936,11 @@ function MiniChessBoard({
         </div>
       </div>
 
-      {example.label && (
+      {gameUi(example.label && (
         <p className="mx-auto mt-2 max-w-[240px] text-center text-[10px] leading-4 text-zinc-500">
           {t(example.label)}
         </p>
-      )}
+      ))}
     </div>
   );
 }
@@ -2030,11 +2031,11 @@ function MiniBoardPair({
         <MiniChessBoard example={left} compact />
       </div>
 
-      {showArrow && (
+      {gameUi(showArrow && (
         <div className="flex items-center justify-center pt-6">
           <span className="text-2xl font-black text-amber-300">→</span>
         </div>
-      )}
+      ))}
 
       <div>
         <p className="mb-2 text-center text-[9px] font-black uppercase tracking-wider text-zinc-600">
@@ -2141,11 +2142,11 @@ function OpeningSequenceBoards({ moves }: { moves: string }) {
         >
           <div className="mb-2 flex items-center justify-between gap-2">
             <span className="rounded-lg bg-amber-400/10 px-2 py-1 text-[10px] font-black text-amber-300">
-              {t("Step")} {step.ply}
+              {t("Step")} {gameUi(step.ply)}
             </span>
 
             <span className="font-mono text-[11px] font-bold text-zinc-300">
-              {step.color === "w" ? `${step.moveNumber}. ${step.move}` : `${step.moveNumber}... ${step.move}`}
+              {gameUi(step.color === "w" ? `${step.moveNumber}. ${step.move}` : `${step.moveNumber}... ${step.move}`)}
             </span>
           </div>
 
@@ -2714,7 +2715,7 @@ function InfoCard({
       `}
     >
       <h3 className="text-base font-black text-zinc-100">{t(title)}</h3>
-      <div className="mt-3 text-sm leading-6 text-zinc-400">{children}</div>
+      <div className="mt-3 text-sm leading-6 text-zinc-400">{gameUi(children)}</div>
     </section>
   );
 }
@@ -2794,7 +2795,7 @@ function RulesTab() {
                       text-[#fff3d5]
                     "
                   >
-                    {piece.symbol}
+                    {gameUi(piece.symbol)}
                   </div>
 
                   <div>
@@ -2818,7 +2819,7 @@ function RulesTab() {
                     text-amber-200
                   "
                 >
-                  {piece.value}
+                  {gameUi(piece.value)}
                 </span>
               </div>
 
@@ -2827,7 +2828,7 @@ function RulesTab() {
               </p>
 
               <div className="mt-4">
-                {piece.secondaryExample ? (
+                {gameUi(piece.secondaryExample ? (
                   <MiniBoardPair
                     left={piece.example}
                     right={piece.secondaryExample}
@@ -2837,7 +2838,7 @@ function RulesTab() {
                   />
                 ) : (
                   <MiniChessBoard example={piece.example} />
-                )}
+                ))}
               </div>
 
               <div
@@ -2853,7 +2854,7 @@ function RulesTab() {
                   text-zinc-500
                 "
               >
-                <span className="font-black text-amber-300">{t("Tip:")}</span>{" "}
+                <span className="font-black text-amber-300">{t("Tip:")}</span>{gameUi(" ")}
                 {t(piece.tip)}
               </div>
             </article>
@@ -3055,7 +3056,7 @@ function RulesTab() {
             >
               <div className="flex items-center gap-3">
                 <span className="w-8 text-center font-serif text-2xl text-[#fff3d5]">
-                  {piece.symbol}
+                  {gameUi(piece.symbol)}
                 </span>
                 <span className="text-sm font-bold text-zinc-200">
                   {t(piece.name)}
@@ -3063,7 +3064,7 @@ function RulesTab() {
               </div>
 
               <span className="text-sm font-black text-amber-200">
-                {piece.value}
+                {gameUi(piece.value)}
               </span>
             </div>
           ))}
@@ -3113,7 +3114,7 @@ function RulesTab() {
                   text-amber-300
                 "
               >
-                {index + 1}
+                {gameUi(index + 1)}
               </span>
 
               <p className="text-sm leading-6 text-zinc-400">{t(tip)}</p>
@@ -3150,7 +3151,7 @@ function OpeningsTab() {
           text-zinc-400
         "
       >
-        <strong className="text-amber-200">{t("Beginner advice:")}</strong>{" "}
+        <strong className="text-amber-200">{t("Beginner advice:")}</strong>{gameUi(" ")}
         {t(
           "Learn the opening principles first. Opening names become useful because they help you recognize familiar positions, not because you must memorize long sequences.",
         )}
@@ -3195,7 +3196,7 @@ function OpeningsTab() {
                     text-amber-300
                   "
                 >
-                  {index + 1}
+                  {gameUi(index + 1)}
                 </span>
 
                 <div className="min-w-0">
@@ -3241,7 +3242,7 @@ function OpeningsTab() {
                 text-amber-100
               "
             >
-              {opening.moves}
+              {gameUi(opening.moves)}
             </div>
 
             <OpeningSequenceBoards moves={opening.moves} />
@@ -3275,7 +3276,7 @@ function OpeningsTab() {
               text: "After developing and castling, move the queen so your rooks can support each other.",
             },
           ].map((item) => (
-            <InfoCard key={item.title} title={item.title}>
+            <InfoCard key={item.title} title={gameUi(item.title)}>
               <p>{t(item.text)}</p>
             </InfoCard>
           ))}
@@ -3367,7 +3368,7 @@ function SituationsTab() {
                   text-amber-200
                 "
               >
-                {situation.symbol}
+                {gameUi(situation.symbol)}
               </div>
 
               <span
@@ -3420,7 +3421,7 @@ function SituationsTab() {
             >
               <span className="font-black text-amber-300">
                 {t("Remember:")}
-              </span>{" "}
+              </span>{gameUi(" ")}
               {t(situation.tip)}
             </div>
           </article>
@@ -5095,13 +5096,13 @@ function InteractivePuzzleBoard({
                     ${isLight ? "bg-[#ddc6a0]" : "bg-[#8a5b3c]"}
                     ${disabled ? "cursor-default" : "cursor-pointer"}
                   `}
-                  title={square}
+                  title={gameUi(square)}
                 >
-                  {isLastMove && (
+                  {gameUi(isLastMove && (
                     <span className="pointer-events-none absolute inset-0 bg-amber-300/28" />
-                  )}
+                  ))}
 
-                  {isCandidateFrom && candidatePreview && (
+                  {gameUi(isCandidateFrom && candidatePreview && (
                     <span
                       className={`
                         pointer-events-none
@@ -5111,9 +5112,9 @@ function InteractivePuzzleBoard({
                         ${candidateFromClass(candidatePreview.rank)}
                       `}
                     />
-                  )}
+                  ))}
 
-                  {isCandidateTo && candidatePreview && (
+                  {gameUi(isCandidateTo && candidatePreview && (
                     <>
                       <span
                         className={`
@@ -5148,28 +5149,28 @@ function InteractivePuzzleBoard({
                           shadow
                         "
                       >
-                        {candidatePreviewMarker(candidatePreview.rank)}
+                        {gameUi(candidatePreviewMarker(candidatePreview.rank))}
                       </span>
                     </>
-                  )}
+                  ))}
 
-                  {isSelected && (
+                  {gameUi(isSelected && (
                     <span className="pointer-events-none absolute inset-0 ring-4 ring-inset ring-sky-300/90" />
-                  )}
+                  ))}
 
-                  {isChecked && (
+                  {gameUi(isChecked && (
                     <span className="pointer-events-none absolute inset-0 bg-red-500/40 ring-4 ring-inset ring-red-200/80" />
-                  )}
+                  ))}
 
-                  {isLegal && !isCapture && (
+                  {gameUi(isLegal && !isCapture && (
                     <span className="pointer-events-none absolute h-[28%] w-[28%] rounded-full bg-emerald-950/45 ring-2 ring-emerald-100/60" />
-                  )}
+                  ))}
 
-                  {isCapture && (
+                  {gameUi(isCapture && (
                     <span className="pointer-events-none absolute inset-[7%] rounded-full border-[4px] border-amber-200/75" />
-                  )}
+                  ))}
 
-                  {pieceCode && (
+                  {gameUi(pieceCode && (
                     <span
                       className={`
                         relative
@@ -5184,11 +5185,11 @@ function InteractivePuzzleBoard({
                         ${piece?.color === "w" ? "text-[#fff3d5]" : "text-[#17120f]"}
                       `}
                     >
-                      {miniPieceSymbols[pieceCode]}
+                      {gameUi(miniPieceSymbols[pieceCode])}
                     </span>
-                  )}
+                  ))}
 
-                  {(fileIndex === 0 || rankIndex === ranks.length - 1) && (
+                  {gameUi((fileIndex === 0 || rankIndex === ranks.length - 1) && (
                     <span
                       className={`
                         pointer-events-none
@@ -5199,9 +5200,9 @@ function InteractivePuzzleBoard({
                         ${fileIndex === 0 ? "left-1 top-1" : "bottom-1 right-1"}
                       `}
                     >
-                      {fileIndex === 0 ? rank : file}
+                      {gameUi(fileIndex === 0 ? rank : file)}
                     </span>
-                  )}
+                  ))}
                 </button>
               );
             }),
@@ -5602,7 +5603,7 @@ function PuzzlesTab() {
               </p>
 
               <span className="rounded-full border border-white/8 bg-white/[0.04] px-2 py-1 text-[9px] font-black text-zinc-500">
-                {visiblePuzzleIndexes.length} / {interactivePuzzles.length}
+                {gameUi(visiblePuzzleIndexes.length)} / {gameUi(interactivePuzzles.length)}
               </span>
             </div>
 
@@ -5685,7 +5686,7 @@ function PuzzlesTab() {
                       </span>
 
                       <span className="rounded-full border border-white/8 bg-white/[0.04] px-2 py-1 text-[9px] font-black text-zinc-500">
-                        {index + 1}
+                        {gameUi(index + 1)}
                       </span>
                     </div>
 
@@ -5712,7 +5713,7 @@ function PuzzlesTab() {
                           ${isActive ? "text-amber-300" : "text-zinc-600 group-hover:text-zinc-400"}
                         `}
                       >
-                        {isActive ? t("Selected") : "→"}
+                        {gameUi(isActive ? t("Selected") : "→")}
                       </span>
                     </div>
                   </button>
@@ -5726,8 +5727,8 @@ function PuzzlesTab() {
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-400">
-                {t("Puzzle")} {displayedPuzzleNumber} /{" "}
-                {interactivePuzzles.length}
+                {t("Puzzle")} {gameUi(displayedPuzzleNumber)} /{gameUi(" ")}
+                {gameUi(interactivePuzzles.length)}
               </p>
 
               <h3 className="mt-1 text-xl font-black text-white">
@@ -5735,7 +5736,7 @@ function PuzzlesTab() {
               </h3>
 
               <p className="mt-1 text-xs text-zinc-500">
-                <span className="font-black text-zinc-400">{t("Goal")}:</span>{" "}
+                <span className="font-black text-zinc-400">{t("Goal")}:</span>{gameUi(" ")}
                 {t(puzzle.goal)}
               </p>
             </div>
@@ -5765,14 +5766,14 @@ function PuzzlesTab() {
           <div className="mt-4 rounded-2xl border border-white/8 bg-black/20 p-3">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-bold text-zinc-400">
-                {autoReplying ? t("Opponent reply") : solved ? t("Solved!") : lineStep > 0 ? t("Your move again") : t("Select a piece and make your move.")}
+                {gameUi(autoReplying ? t("Opponent reply") : solved ? t("Solved!") : lineStep > 0 ? t("Your move again") : t("Select a piece and make your move."))}
               </p>
 
-              {puzzle.line.length > 1 && (
+              {gameUi(puzzle.line.length > 1 && (
                 <span className="text-[10px] font-bold text-zinc-600">
                   {t("The opponent reply is played automatically.")}
                 </span>
-              )}
+              ))}
             </div>
           </div>
 
@@ -5798,7 +5799,7 @@ function PuzzlesTab() {
               onClick={() => setShowAnalysis((value) => !value)}
               className="rounded-xl border border-sky-400/15 bg-sky-400/[0.06] px-3 py-2 text-xs font-black text-sky-300 transition hover:bg-sky-400/10"
             >
-              {showAnalysis ? t("Hide move analysis") : t("Show move analysis")}
+              {gameUi(showAnalysis ? t("Hide move analysis") : t("Show move analysis"))}
             </button>
           </div>
         </section>
@@ -5809,16 +5810,16 @@ function PuzzlesTab() {
               {t("Feedback")}
             </p>
 
-            {feedback ? (
+            {gameUi(feedback ? (
               <>
                 <div className="mt-2 flex items-center justify-between gap-3">
                   <h3 className="font-black text-white">{t(feedback.title)}</h3>
 
-                  {feedback.moveLabel && (
+                  {gameUi(feedback.moveLabel && (
                     <span className="rounded-lg border border-white/10 bg-black/20 px-2 py-1 font-mono text-xs font-black text-zinc-200">
-                      {feedback.moveLabel}
+                      {gameUi(feedback.moveLabel)}
                     </span>
-                  )}
+                  ))}
                 </div>
 
                 <p className="mt-2 text-xs leading-5 text-zinc-400">
@@ -5829,10 +5830,10 @@ function PuzzlesTab() {
               <p className="mt-2 text-xs leading-5 text-zinc-500">
                 {t("Select a piece and make your move.")}
               </p>
-            )}
+            ))}
           </section>
 
-          {showAnalysis && (
+          {gameUi(showAnalysis && (
             <section className="rounded-3xl border border-white/10 bg-zinc-900/65 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -5903,11 +5904,11 @@ function PuzzlesTab() {
                         </span>
 
                         <span className="flex items-center gap-2">
-                          {selected && (
+                          {gameUi(selected && (
                             <span className="text-[9px] font-black uppercase tracking-wider text-white/70">
                               {t("Highlighted")}
                             </span>
-                          )}
+                          ))}
 
                           <span className="font-mono text-sm font-black text-white">
                             {ui(candidate.label)}
@@ -5929,11 +5930,11 @@ function PuzzlesTab() {
                 </p>
 
                 <p className="mt-1 font-mono text-xs font-black text-zinc-300">
-                  {puzzle.line.map((move) => move.label).join("  ")}
+                  {gameUi(puzzle.line.map((move) => move.label).join("  "))}
                 </p>
               </div>
             </section>
-          )}
+          ))}
         </aside>
       </div>
     </div>
@@ -6140,7 +6141,7 @@ export default function ChessRulesAndTips() {
                     }
                   `}
                   >
-                    {tab.icon}
+                    {gameUi(tab.icon)}
                   </span>
 
                   <span className="min-w-0">

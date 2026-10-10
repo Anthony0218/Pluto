@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import type { GameResult, PlayMode } from "../../games/natura/naturaData";
@@ -30,6 +31,7 @@ export default function FlyingFishGame({
   onComplete,
   rulesOpen = false,
 }: Props) {
+  useGameLanguage();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameRef = useRef(initialFlyingFishGame(mode));
   const keysRef = useRef(new Set<string>());
@@ -221,28 +223,18 @@ export default function FlyingFishGame({
         <header className="flex min-h-16 items-center justify-between border-b border-[#26434633] py-3 text-[10px] font-extrabold tracking-[0.16em]">
           <div className="flex items-center gap-3">
             <span className="text-xl text-[#d26a3f]">◈</span>
-            <span>WILD / PLAY</span>
-            <span className="hidden border-l border-[#19383b44] pl-5 text-[#698080] sm:inline">
-              FIELD NOTES 006
-            </span>
+            <span>{gameUi("WILD / PLAY")}</span>
+            <span className="hidden border-l border-[#19383b44] pl-5 text-[#698080] sm:inline">{gameUi(" FIELD NOTES 006 ")}</span>
           </div>
-          <span className="hidden text-[#788b88] md:inline">
-            FLYING FISH / AIR + WATER ARCADE
-          </span>
+          <span className="hidden text-[#788b88] md:inline">{gameUi(" FLYING FISH / AIR + WATER ARCADE ")}</span>
         </header>
 
         <div className="flex items-end justify-between gap-6 py-8 sm:py-10">
           <div>
-            <p className="text-[11px] font-extrabold tracking-[0.19em] text-[#c26138]">
-              THE OPEN OCEAN
-            </p>
-            <h1 className="mt-1 font-serif text-5xl font-normal tracking-[-0.055em] sm:text-7xl">
-              Surface &amp; Sprint<span className="text-[#d27042]">.</span>
+            <p className="text-[11px] font-extrabold tracking-[0.19em] text-[#c26138]">{gameUi(" THE OPEN OCEAN ")}</p>
+            <h1 className="mt-1 font-serif text-5xl font-normal tracking-[-0.055em] sm:text-7xl">{gameUi(" Surface & Sprint")}<span className="text-[#d27042]">.</span>
             </h1>
-            <p className="mt-2 max-w-2xl text-sm text-[#5c7371]">
-              Glide above the waves, dive below them, and survive predators on
-              both sides of the surface.
-            </p>
+            <p className="mt-2 max-w-2xl text-sm text-[#5c7371]">{gameUi(" Glide above the waves, dive below them, and survive predators on both sides of the surface. ")}</p>
           </div>
           <div
             className="hidden text-6xl text-[#d4966e] md:block"
@@ -255,47 +247,43 @@ export default function FlyingFishGame({
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
           <section
             className="min-w-0 overflow-hidden bg-[#18393a] shadow-[0_18px_55px_#1537351b]"
-            aria-label="Flying Fish Escape game"
+            aria-label={gameUi("Flying Fish Escape game")}
           >
             <div className="grid min-h-20 grid-cols-3 items-center px-4 text-[#f8eeda] sm:px-6">
               <div>
-                <small className="block text-[9px] font-bold tracking-[0.15em] text-[#a5bbb4]">
-                  PLAYER 1 / DODGES
-                </small>
+                <small className="block text-[9px] font-bold tracking-[0.15em] text-[#a5bbb4]">{gameUi(" PLAYER 1 / DODGES ")}</small>
                 <b className="text-xl font-semibold sm:text-2xl">
-                  {snap.players[0].score}
+                  {gameUi(snap.players[0].score)}
                 </b>
                 <span className="ml-2 text-sm text-[#e8c785]">
-                  {hearts(snap.players[0].lives)}
+                  {gameUi(hearts(snap.players[0].lives))}
                 </span>
               </div>
               <div className="text-center">
-                <small className="block text-[9px] font-bold tracking-[0.15em] text-[#a5bbb4]">
-                  ROUND LEFT
-                </small>
+                <small className="block text-[9px] font-bold tracking-[0.15em] text-[#a5bbb4]">{gameUi(" ROUND LEFT ")}</small>
                 <b className="text-xl font-semibold sm:text-2xl">
-                  {remaining}
+                  {gameUi(remaining)}
                   <span className="text-sm text-[#9ab1a9]">s</span>
                 </b>
               </div>
               <div className="text-right">
                 <small className="block text-[9px] font-bold tracking-[0.15em] text-[#a5bbb4]">
-                  {isDuo ? "PLAYER 2 / DODGES" : "CURRENT PHASE"}
+                  {gameUi(isDuo ? "PLAYER 2 / DODGES" : "CURRENT PHASE")}
                 </small>
-                {isDuo ? (
+                {gameUi(isDuo ? (
                   <>
                     <b className="text-xl font-semibold sm:text-2xl">
-                      {snap.players[1].score}
+                      {gameUi(snap.players[1].score)}
                     </b>
                     <span className="ml-2 text-sm text-[#e8c785]">
-                      {hearts(snap.players[1].lives)}
+                      {gameUi(hearts(snap.players[1].lives))}
                     </span>
                   </>
                 ) : (
                   <b className="text-sm font-semibold tracking-[0.12em]">
-                    {snap.phase === "water" ? "WATER" : "SKY"}
+                    {gameUi(snap.phase === "water" ? "WATER" : "SKY")}
                   </b>
-                )}
+                ))}
               </div>
             </div>
 
@@ -306,78 +294,60 @@ export default function FlyingFishGame({
                 height={FLYING_FISH_H}
                 tabIndex={0}
                 className="block aspect-video h-auto w-full outline-none"
-                aria-label="Flying fish dodge predators above the waves and underwater"
+                aria-label={gameUi("Flying fish dodge predators above the waves and underwater")}
               />
 
-              {snap.phase === "ready" && (
+              {gameUi(snap.phase === "ready" && (
                 <div className="absolute inset-0 flex items-center justify-center bg-[#0a292b91] p-4">
                   <div className="w-full max-w-md bg-[#f1ebdbf5] p-5 text-center leading-normal shadow-[0_24px_70px_#06222388] sm:p-7">
-                    <span className="text-[10px] font-extrabold tracking-[0.19em] text-[#c26138]">
-                      THE MIGRATION STARTS HERE
-                    </span>
-                    <h2 className="mt-1 font-serif text-3xl tracking-[-0.04em]">
-                      Two worlds. One escape.
-                    </h2>
-                    <p className="mx-auto mt-2 max-w-sm text-xs leading-5 text-[#55716e]">
-                      Every {FLYING_FISH_PHASE_SECONDS} seconds you switch
-                      between sky and water. Dodge seabirds above, tuna below,
-                      and keep your three hearts alive for{" "}
-                      {FLYING_FISH_ROUND_SECONDS} seconds.
-                    </p>
+                    <span className="text-[10px] font-extrabold tracking-[0.19em] text-[#c26138]">{gameUi(" THE MIGRATION STARTS HERE ")}</span>
+                    <h2 className="mt-1 font-serif text-3xl tracking-[-0.04em]">{gameUi(" Two worlds. One escape. ")}</h2>
+                    <p className="mx-auto mt-2 max-w-sm text-xs leading-5 text-[#55716e]">{gameUi(" Every ")}{gameUi(FLYING_FISH_PHASE_SECONDS)}{gameUi(" seconds you switch between sky and water. Dodge seabirds above, tuna below, and keep your three hearts alive for")}{gameUi(" ")}
+                      {gameUi(FLYING_FISH_ROUND_SECONDS)}{gameUi(" seconds. ")}</p>
                     <button
                       className="mt-4 flex w-full items-center justify-between bg-[#cb7146] px-4 py-3 text-left text-[11px] font-extrabold tracking-[0.12em] text-white hover:bg-[#a95030]"
                       onClick={start}
-                    >
-                      ENTER THE OPEN OCEAN <span>→</span>
+                    >{gameUi(" ENTER THE OPEN OCEAN ")}<span>→</span>
                     </button>
                   </div>
                 </div>
-              )}
+              ))}
 
-              {paused && snap.phase !== "ready" && snap.phase !== "end" && (
+              {gameUi(paused && snap.phase !== "ready" && snap.phase !== "end" && (
                 <div className="absolute inset-0 flex items-center justify-center bg-[#0a292b9e] p-4">
                   <div className="bg-[#f1ebdbf5] px-8 py-6 text-center leading-normal">
-                    <p className="text-[10px] font-extrabold tracking-[0.18em] text-[#c26138]">
-                      PAUSED
-                    </p>
-                    <h2 className="mt-1 font-serif text-3xl">Hold position.</h2>
+                    <p className="text-[10px] font-extrabold tracking-[0.18em] text-[#c26138]">{gameUi(" PAUSED ")}</p>
+                    <h2 className="mt-1 font-serif text-3xl">{gameUi("Hold position.")}</h2>
                     <button
                       className="mt-4 bg-[#19383b] px-5 py-3 text-xs font-bold tracking-[0.12em] text-[#f8eeda]"
                       onClick={() => setPaused(false)}
-                    >
-                      RESUME
-                    </button>
+                    >{gameUi(" RESUME ")}</button>
                   </div>
                 </div>
-              )}
+              ))}
 
-              {snap.phase === "end" && (
+              {gameUi(snap.phase === "end" && (
                 <div className="absolute inset-0 flex items-center justify-center bg-[#0a292b99] p-4">
                   <div className="w-full max-w-md bg-[#f1ebdbf5] p-6 text-center leading-normal shadow-[0_24px_70px_#06222388]">
-                    <span className="text-[10px] font-extrabold tracking-[0.19em] text-[#c26138]">
-                      ROUND COMPLETE
-                    </span>
+                    <span className="text-[10px] font-extrabold tracking-[0.19em] text-[#c26138]">{gameUi(" ROUND COMPLETE ")}</span>
                     <h2 className="mt-1 font-serif text-3xl tracking-[-0.04em]">
-                      {flyingFishWinnerLabel(snap.winner, mode)}.
+                      {gameUi(flyingFishWinnerLabel(snap.winner, mode))}.
                     </h2>
                     <p className="mx-auto mt-2 max-w-sm text-xs leading-5 text-[#55716e]">
-                      {snap.reason}
+                      {gameUi(snap.reason)}
                     </p>
                     <button
                       className="mt-4 flex w-full items-center justify-between bg-[#cb7146] px-4 py-3 text-left text-[11px] font-extrabold tracking-[0.12em] text-white hover:bg-[#a95030]"
                       onClick={continueResult}
-                    >
-                      CONTINUE TO ANIMAL QUIZ <span>→</span>
+                    >{gameUi(" CONTINUE TO ANIMAL QUIZ ")}<span>→</span>
                     </button>
                     <button
                       className="mt-3 text-xs text-[#416361] underline"
                       onClick={start}
-                    >
-                      Play this mode again
-                    </button>
+                    >{gameUi(" Play this mode again ")}</button>
                   </div>
                 </div>
-              )}
+              ))}
             </div>
 
             <div className="h-1 bg-[#2b5150]">
@@ -389,25 +359,25 @@ export default function FlyingFishGame({
 
             <div className="flex min-h-12 flex-wrap items-center justify-between gap-2 px-4 py-2 text-[9px] font-extrabold tracking-[0.11em] text-[#aec6b8] sm:px-6">
               <span>
-                {phaseLabel} ·{" "}
-                {snap.phase === "water"
+                {gameUi(phaseLabel)} ·{gameUi(" ")}
+                {gameUi(snap.phase === "water"
                   ? "TUNA RISING FROM BELOW"
-                  : "SEABIRDS SWOOPING FROM ABOVE"}
+                  : "SEABIRDS SWOOPING FROM ABOVE")}
               </span>
               <div className="flex gap-3">
-                {snap.phase !== "ready" && snap.phase !== "end" && (
+                {gameUi(snap.phase !== "ready" && snap.phase !== "end" && (
                   <button
                     className="border-0 bg-transparent text-[#d8e4d6]"
                     onClick={() => setPaused((value) => !value)}
                   >
-                    {paused ? "RESUME" : "PAUSE"}
+                    {gameUi(paused ? "RESUME" : "PAUSE")}
                   </button>
-                )}
+                ))}
                 <button
                   className="border-0 bg-transparent text-[#d8e4d6]"
                   onClick={() => setMuted((value) => !value)}
                 >
-                  {muted ? "SOUND OFF" : "SOUND ON"}
+                  {gameUi(muted ? "SOUND OFF" : "SOUND ON")}
                 </button>
               </div>
             </div>
@@ -415,35 +385,21 @@ export default function FlyingFishGame({
 
           <aside className="border border-[#bbc6b5] bg-[#e3e4d7] p-5">
             <div className="flex justify-between border-b border-[#b6c3b5] pb-4 text-[10px] font-extrabold tracking-[0.17em]">
-              <span>FIELD GUIDE</span>
+              <span>{gameUi("FIELD GUIDE")}</span>
               <span>↗</span>
             </div>
-            <h3 className="mt-5 font-serif text-3xl font-normal tracking-[-0.04em]">
-              How to play
-            </h3>
+            <h3 className="mt-5 font-serif text-3xl font-normal tracking-[-0.04em]">{gameUi(" How to play ")}</h3>
 
             <div className="mt-4 space-y-0">
-              <Rule n="01" title="Sky phase">
-                Move left and right to avoid the gull-like seabirds diving
-                through your glide path.
-              </Rule>
-              <Rule n="02" title="Water phase">
-                The fish dives beneath the surface automatically. Tuna rush
-                upward from the deep.
-              </Rule>
-              <Rule n="03" title="Caught">
-                A hit costs one heart and triggers a short invulnerability flash
-                so you can recover.
-              </Rule>
-              <Rule n="04" title="Scoring">
-                Every predator that cleanly passes you counts as one dodge. In
-                two-player mode, score breaks ties before remaining hearts.
-              </Rule>
+              <Rule n="01" title={gameUi("Sky phase")}>{gameUi(" Move left and right to avoid the gull-like seabirds diving through your glide path. ")}</Rule>
+              <Rule n="02" title={gameUi("Water phase")}>{gameUi(" The fish dives beneath the surface automatically. Tuna rush upward from the deep. ")}</Rule>
+              <Rule n="03" title={gameUi("Caught")}>{gameUi(" A hit costs one heart and triggers a short invulnerability flash so you can recover. ")}</Rule>
+              <Rule n="04" title={gameUi("Scoring")}>{gameUi(" Every predator that cleanly passes you counts as one dodge. In two-player mode, score breaks ties before remaining hearts. ")}</Rule>
             </div>
 
             <div className="mt-4 bg-[#d3ddce] p-4">
               <div className="mb-3 flex justify-between text-[10px] font-extrabold tracking-[0.16em]">
-                <span>CONTROLS</span>
+                <span>{gameUi("CONTROLS")}</span>
                 <span>⌨</span>
               </div>
               {controlRows.map(([label, keys, fish]) => (
@@ -451,38 +407,30 @@ export default function FlyingFishGame({
                   key={label}
                   className="mb-2 grid grid-cols-[62px_auto_1fr] items-center gap-2 text-[10px]"
                 >
-                  <b>{label}</b>
+                  <b>{gameUi(label)}</b>
                   <span className="rounded border border-[#b6c6b5] bg-[#f4f0e2] px-2 py-1 font-extrabold">
-                    {keys}
+                    {gameUi(keys)}
                   </span>
-                  <span className="text-[#627872]">{fish}</span>
+                  <span className="text-[#627872]">{gameUi(fish)}</span>
                 </div>
               ))}
-              <p className="mt-3 text-[10px] leading-4 text-[#6b8079]">
-                Space pauses the round. Touch controls are below the game on
-                phones and tablets.
-              </p>
+              <p className="mt-3 text-[10px] leading-4 text-[#6b8079]">{gameUi(" Space pauses the round. Touch controls are below the game on phones and tablets. ")}</p>
             </div>
 
-            {rulesOpen && (
-              <p className="mt-4 border-t border-[#b6c3b5] pt-4 text-[10px] leading-4 text-[#6b8079]">
-                Rules panel is open, so the ocean is paused. Sky and water
-                controls stay identical; only the predator direction changes.
-              </p>
-            )}
+            {gameUi(rulesOpen && (
+              <p className="mt-4 border-t border-[#b6c3b5] pt-4 text-[10px] leading-4 text-[#6b8079]">{gameUi(" Rules panel is open, so the ocean is paused. Sky and water controls stay identical; only the predator direction changes. ")}</p>
+            ))}
 
             <div className="mt-4 border-t border-[#b6c3b5] pt-4">
-              <div className="text-[10px] font-extrabold tracking-[0.16em] text-[#c26138]">
-                DID YOU KNOW?
-              </div>
+              <div className="text-[10px] font-extrabold tracking-[0.16em] text-[#c26138]">{gameUi(" DID YOU KNOW? ")}</div>
               <div className="mt-2 text-[9px] font-extrabold tracking-[0.13em] text-[#768a84]">
-                {fact.animal}
+                {gameUi(fact.animal)}
               </div>
               <h4 className="mt-1 font-serif text-xl tracking-[-0.03em]">
-                {fact.title}
+                {gameUi(fact.title)}
               </h4>
               <p className="mt-2 text-xs leading-5 text-[#617773]">
-                {fact.text}
+                {gameUi(fact.text)}
               </p>
               <div className="mt-3 flex items-center justify-between gap-2">
                 <a
@@ -491,7 +439,7 @@ export default function FlyingFishGame({
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {fact.label} ↗
+                  {gameUi(fact.label)} ↗
                 </a>
                 <button
                   className="text-[10px] font-bold text-[#416361] underline"
@@ -500,9 +448,7 @@ export default function FlyingFishGame({
                       (index) => (index + 1) % FLYING_FISH_FACTS.length,
                     )
                   }
-                >
-                  Next fact
-                </button>
+                >{gameUi(" Next fact ")}</button>
               </div>
             </div>
           </aside>
@@ -510,32 +456,28 @@ export default function FlyingFishGame({
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <TouchCard
-            title="PLAYER 1 / CORAL FISH"
+            title={gameUi("PLAYER 1 / CORAL FISH")}
             score={snap.players[0].score}
             lives={snap.players[0].lives}
             onLeft={(pressed) => hold("KeyA", pressed)}
             onRight={(pressed) => hold("KeyD", pressed)}
           />
-          {isDuo && (
+          {gameUi(isDuo && (
             <TouchCard
-              title="PLAYER 2 / GOLD FISH"
+              title={gameUi("PLAYER 2 / GOLD FISH")}
               score={snap.players[1].score}
               lives={snap.players[1].lives}
               onLeft={(pressed) => hold("ArrowLeft", pressed)}
               onRight={(pressed) => hold("ArrowRight", pressed)}
             />
-          )}
+          ))}
         </div>
 
         <section className="py-12">
           <div className="mb-5 flex items-end justify-between border-b border-[#b9c3b7] pb-5">
             <div>
-              <span className="text-[11px] font-extrabold tracking-[0.19em] text-[#c26138]">
-                BEYOND THE GAME
-              </span>
-              <h2 className="mt-1 font-serif text-4xl font-normal tracking-[-0.04em]">
-                Real animals. Wild escapes.
-              </h2>
+              <span className="text-[11px] font-extrabold tracking-[0.19em] text-[#c26138]">{gameUi(" BEYOND THE GAME ")}</span>
+              <h2 className="mt-1 font-serif text-4xl font-normal tracking-[-0.04em]">{gameUi(" Real animals. Wild escapes. ")}</h2>
             </div>
             <span className="hidden text-[10px] tracking-[0.17em] text-[#82928d] sm:block">
               01 — 03
@@ -548,13 +490,13 @@ export default function FlyingFishGame({
                 className="flex min-h-48 flex-col border-t-2 border-[#275052] bg-[#f0ede2] p-5"
               >
                 <span className="text-[10px] font-extrabold tracking-[0.15em] text-[#bb6a46]">
-                  0{index + 1} / {item.animal}
+                  0{gameUi(index + 1)} / {gameUi(item.animal)}
                 </span>
                 <h3 className="mt-4 font-serif text-2xl font-normal">
-                  {item.title}
+                  {gameUi(item.title)}
                 </h3>
                 <p className="mt-2 text-xs leading-5 text-[#637773]">
-                  {item.text}
+                  {gameUi(item.text)}
                 </p>
                 <a
                   className="mt-auto pt-4 text-[10px] font-extrabold tracking-[0.08em] text-[#2f6462] hover:underline"
@@ -562,7 +504,7 @@ export default function FlyingFishGame({
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {item.label} ↗
+                  {gameUi(item.label)} ↗
                 </a>
               </article>
             ))}
@@ -582,12 +524,13 @@ function Rule({
   title: string;
   children: string;
 }) {
+  useGameLanguage();
   return (
     <div className="flex gap-3 border-t border-[#c0cabe] py-3">
-      <span className="text-[11px] font-extrabold text-[#c06b43]">{n}</span>
+      <span className="text-[11px] font-extrabold text-[#c06b43]">{gameUi(n)}</span>
       <p className="m-0 text-xs leading-5 text-[#617773]">
-        <strong className="mb-0.5 block text-[#193c3d]">{title}</strong>
-        {children}
+        <strong className="mb-0.5 block text-[#193c3d]">{gameUi(title)}</strong>
+        {gameUi(children)}
       </p>
     </div>
   );
@@ -606,6 +549,7 @@ function TouchCard({
   onLeft: (pressed: boolean) => void;
   onRight: (pressed: boolean) => void;
 }) {
+  useGameLanguage();
   const bind = (callback: (pressed: boolean) => void) => ({
     onPointerDown: (event: ReactPointerEvent<HTMLButtonElement>) => {
       event.currentTarget.setPointerCapture?.(event.pointerId);
@@ -619,9 +563,9 @@ function TouchCard({
   return (
     <div className="border border-[#bbc6b5] bg-[#f0ede2] p-3">
       <div className="flex items-center justify-between gap-3 text-[10px] font-extrabold tracking-[0.11em]">
-        <span>{title}</span>
+        <span>{gameUi(title)}</span>
         <span>
-          {score} DODGES · {hearts(lives)}
+          {gameUi(score)}{gameUi(" DODGES · ")}{gameUi(hearts(lives))}
         </span>
       </div>
       <div className="mt-2 grid grid-cols-2 gap-2">
@@ -629,16 +573,12 @@ function TouchCard({
           className="min-h-12 border border-[#b6c6b5] bg-[#e3e4d7] text-sm font-bold active:bg-[#d3ddce]"
           type="button"
           {...bind(onLeft)}
-        >
-          ◀ LEFT
-        </button>
+        >{gameUi(" ◀ LEFT ")}</button>
         <button
           className="min-h-12 border border-[#b6c6b5] bg-[#e3e4d7] text-sm font-bold active:bg-[#d3ddce]"
           type="button"
           {...bind(onRight)}
-        >
-          RIGHT ▶
-        </button>
+        >{gameUi(" RIGHT ▶ ")}</button>
       </div>
     </div>
   );

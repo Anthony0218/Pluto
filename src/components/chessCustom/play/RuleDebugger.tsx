@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { Bug } from "lucide-react";
 import { useState } from "react";
 import { getCell, squareName } from "@/games/chess/custom/engine/board";
@@ -18,6 +19,7 @@ const ROYAL_MODE_TEXT = {
 
 /** Explains every square the selected piece's rules touch, plus the rules in play. */
 export default function RuleDebugger({ variant, state, piece, explanations, dark = false }: { variant: GameVariant; state: GameState; piece: PieceInstance | null; explanations: MoveExplanation[]; dark?: boolean }) {
+  useGameLanguage();
   const [filter, setFilter] = useState<Filter>("all");
   if (!piece) {
     return (
@@ -49,11 +51,11 @@ export default function RuleDebugger({ variant, state, piece, explanations, dark
     <div className="space-y-3 text-xs">
       <div>
         <p className="font-semibold text-zinc-100">
-          {variant.teams.find((team) => team.id === piece.team)?.name} {def?.name} · {squareName(piece)}
+          {gameUi(variant.teams.find((team) => team.id === piece.team)?.name)} {gameUi(def?.name)} · {gameUi(squareName(piece))}
         </p>
         <p className="mt-0.5 text-zinc-500">
-          {piece.team !== state.turn ? ui("Not this team's turn — showing what it could do on its move.") : ui("Moves shown are fully legal right now.")}
-          {override && ` ${ui("Moves like a")} ${variant.pieces.find((entry) => entry.id === override)?.name} (event).`}
+          {gameUi(piece.team !== state.turn ? ui("Not this team's turn — showing what it could do on its move.") : ui("Moves shown are fully legal right now."))}
+          {gameUi(override && ` ${ui("Moves like a")} ${variant.pieces.find((entry) => entry.id === override)?.name} (event).`)}
         </p>
       </div>
       <div className="flex flex-wrap gap-1">
@@ -72,7 +74,7 @@ export default function RuleDebugger({ variant, state, piece, explanations, dark
             onClick={() => setFilter(id)}
             className={`rounded-md px-2 py-0.5 font-semibold transition ${filter === id ? "bg-sky-400/20 text-sky-100" : "text-zinc-400 hover:bg-white/[0.06]"}`}
           >
-            {label}
+            {gameUi(label)}
           </button>
         ))}
       </div>
@@ -80,37 +82,37 @@ export default function RuleDebugger({ variant, state, piece, explanations, dark
         {visible.length === 0 && <li className="px-1 py-1 text-zinc-500">{ui("Nothing here.")}</li>}
         {visible.map((entry) => (
           <li key={`${entry.to.x},${entry.to.y}`} className="flex gap-2 px-1 py-0.5 leading-4">
-            <span className="w-7 shrink-0 font-bold text-zinc-200">{squareName(entry.to)}</span>
+            <span className="w-7 shrink-0 font-bold text-zinc-200">{gameUi(squareName(entry.to))}</span>
             <span className={`w-14 shrink-0 ${colorOf(entry)}`}>{ui(entry.legal ? (entry.kind === "capture" ? "Capture" : entry.kind === "special" ? "Special" : "Legal") : "Illegal")}</span>
-            <span className="text-zinc-400">{entry.reason}</span>
+            <span className="text-zinc-400">{gameUi(entry.reason)}</span>
           </li>
         ))}
       </ul>
       <div>
         <p className="mb-1 text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">{ui("Active abilities")}</p>
-        <p className="text-zinc-300">{def?.abilities.length ? def.abilities.map((ability) => ui(ABILITY_NAMES[ability])).join(", ") : ui("None")}{def?.royal ? ` · ${ui("royal")}` : ""}</p>
+        <p className="text-zinc-300">{gameUi(def?.abilities.length ? def.abilities.map((ability) => ui(ABILITY_NAMES[ability])).join(", ") : ui("None"))}{gameUi(def?.royal ? ` · ${ui("royal")}` : "")}</p>
       </div>
       <div>
         <p className="mb-1 text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">{ui("Relevant rules")}</p>
         <ul className="list-disc space-y-0.5 pl-4 text-zinc-400">
           {relevant.map((line) => (
-            <li key={line}>{line}</li>
+            <li key={line}>{gameUi(line)}</li>
           ))}
         </ul>
       </div>
       <div>
         <p className="mb-1 text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">{ui("Triggered by the last move")}</p>
-        {state.fired.length ? (
+        {gameUi(state.fired.length ? (
           <ul className="space-y-0.5 text-zinc-300">
             {state.fired.map((entry, index) => (
               <li key={`${entry.eventId}-${index}`}>
-                ⚡ {entry.name} <span className="text-zinc-500">({ui(entry.branch === "scheduled" ? "scheduled" : entry.branch === "then" ? "conditions met" : "else branch")})</span>
+                ⚡ {gameUi(entry.name)} <span className="text-zinc-500">({ui(entry.branch === "scheduled" ? "scheduled" : entry.branch === "then" ? "conditions met" : "else branch")})</span>
               </li>
             ))}
           </ul>
         ) : (
           <p className="text-zinc-500">{ui("No events fired.")}</p>
-        )}
+        ))}
       </div>
     </div>
   );

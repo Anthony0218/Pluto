@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import RoomSlots from "@/components/social/RoomSlots";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -282,7 +283,7 @@ function Panel({
         <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
         {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}
       </div>
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -292,7 +293,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-3 border-b border-white/5 py-2 text-xs last:border-0">
       <span className="text-zinc-500">{ui(label)}</span>
-      <span className="font-black text-zinc-200">{value}</span>
+      <span className="font-black text-zinc-200">{gameUi(value)}</span>
     </div>
   );
 }
@@ -304,7 +305,7 @@ function MiniStat({ label, value }: { label: string; value: number | string }) {
       <p className="text-[9px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
       </p>
-      <p className="mt-2 text-xl font-black text-zinc-200">{value}</p>
+      <p className="mt-2 text-xl font-black text-zinc-200">{gameUi(value)}</p>
     </div>
   );
 }
@@ -317,7 +318,7 @@ function Lineup({ title, value }: { title: string; value: string }) {
         {ui(title)}
       </p>
       <p className="mt-2 break-words font-mono text-sm font-black tracking-[0.12em] text-zinc-300">
-        {value}
+        {gameUi(value)}
       </p>
     </div>
   );
@@ -328,7 +329,7 @@ function RuleLine({ icon, text }: { icon: string; text: string }) {
   return (
     <div className="flex gap-3 rounded-xl border border-white/5 bg-black/20 p-3">
       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/5 text-xs font-black text-zinc-300">
-        {icon}
+        {gameUi(icon)}
       </span>
       <p className="text-xs leading-5 text-zinc-500">{ui(text)}</p>
     </div>
@@ -1029,7 +1030,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
       <ChessPageHeader className="mb-4" />
         <div className="mx-auto max-w-2xl rounded-3xl border border-red-400/20 bg-red-400/[0.06] p-6">
           <p className="font-black text-red-200">
-            {error ?? "Room could not be loaded."}
+            {gameUi(error ?? "Room could not be loaded.")}
           </p>
           <Link
             to={page.lobby}
@@ -1086,7 +1087,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
               <div
                 className={`flex h-12 w-12 items-center justify-center rounded-2xl border ${page.accentBorder} ${page.accentSoft} text-3xl`}
               >
-                {page.icon}
+                {gameUi(page.icon)}
               </div>
 
               <div>
@@ -1106,7 +1107,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                 onClick={() => void copyRoomCode()}
                 className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-zinc-300 transition hover:bg-white/10"
               >
-                {copied ? ui("Copied") : `Room ${room.code}`}
+                {gameUi(copied ? ui("Copied") : `Room ${room.code}`)}
               </button>
 
               <span
@@ -1118,7 +1119,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                       : `${page.accentBorder} ${page.accentSoft} ${page.accentText}`
                 }`}
               >
-                {statusText}
+                {gameUi(statusText)}
               </span>
             </div>
           </div>
@@ -1143,14 +1144,14 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                         <div className="min-w-0">
                           <p className="truncate text-sm font-black text-zinc-200">
                             {player.display_name}
-                            {mine ? ui(" · You") : ""}
+                            {gameUi(mine ? ui(" · You") : "")}
                           </p>
                           <p className="mt-0.5 text-[10px] font-black uppercase tracking-wider text-zinc-600">
-                            {player.chosen_color ?? "Waiting"}
+                            {gameUi(player.chosen_color ?? "Waiting")}
                           </p>
                         </div>
                         <span className="text-2xl">
-                          {player.chosen_color === "black" ? "♚" : "♔"}
+                          {gameUi(player.chosen_color === "black" ? "♚" : "♔")}
                         </span>
                       </div>
                     );
@@ -1180,18 +1181,18 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                   >{ui("Resign")}</button>
                 </div>
 
-                {alreadyRequestedUndoForThisMove && !undoPending && (
+                {gameUi(alreadyRequestedUndoForThisMove && !undoPending && (
                   <p className="mt-2 text-[10px] leading-4 text-zinc-600">{ui("You already requested undo for this move.")}</p>
-                )}
+                ))}
 
-                {myUndoRequest && (
+                {gameUi(myUndoRequest && (
                   <div className="mt-3 rounded-xl border border-amber-400/15 bg-amber-400/[0.06] p-3">
                     <p className="text-xs font-black text-amber-200">{ui("Undo request sent")}</p>
                     <p className="mt-1 text-[10px] text-zinc-500">{ui("Waiting for opponent response...")}</p>
                   </div>
-                )}
+                ))}
 
-                {opponentUndoRequest && (
+                {gameUi(opponentUndoRequest && (
                   <div className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/[0.07] p-3">
                     <p className="text-xs font-black text-amber-200">{ui("Opponent requests to undo the last move.")}</p>
                     <div className="mt-3 grid grid-cols-2 gap-2">
@@ -1209,7 +1210,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                       >{ui("Decline")}</button>
                     </div>
                   </div>
-                )}
+                ))}
 
                 <Link
                   to={page.lobby}
@@ -1217,7 +1218,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                 >{ui("Leave room")}</Link>
               </Panel>
 
-              {variant === "randomstart" ? (
+              {gameUi(variant === "randomstart" ? (
                 <Panel
                   title={ui("Starting Position")}
                   subtitle={ui("This game's independent shuffle")}
@@ -1252,7 +1253,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                     />
                   </div>
                 </Panel>
-              )}
+              ))}
             </div>
           </aside>
 
@@ -1266,11 +1267,11 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                     className={`text-[9px] font-black uppercase tracking-widest ${page.accentText}`}
                   >{ui("History Preview · Frontend only")}</p>
                   <p className="mt-1 text-sm font-bold text-white">
-                    {historyPreviewPly === 0 ? ui("Starting position") : `${historyRows[historyPreviewPly - 1]?.moveNumber}${
+                    {gameUi(historyPreviewPly === 0 ? ui("Starting position") : `${historyRows[historyPreviewPly - 1]?.moveNumber}${
                           historyRows[historyPreviewPly - 1]?.color === "w"
                             ? "."
                             : "..."
-                        } ${historyRows[historyPreviewPly - 1]?.san ?? ""}`}
+                        } ${historyRows[historyPreviewPly - 1]?.san ?? ""}`)}
                   </p>
                 </div>
 
@@ -1282,7 +1283,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
               </div>
             )}
 
-            {finished && historyPreviewPly === null && (
+            {gameUi(finished && historyPreviewPly === null && (
               <VisibleGameResult
                 winner={gameState.winner}
                 playerColor={myColor}
@@ -1295,7 +1296,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                       onClick={() => void requestRematch()}
                       className={`mt-5 w-full rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${page.accentButton}`}
                     >
-                      {myRematchReady ? ui("Rematch requested") : ui("Rematch")}
+                      {gameUi(myRematchReady ? ui("Rematch requested") : ui("Rematch"))}
                     </button>
                     <Link
                       to={page.lobby}
@@ -1304,7 +1305,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                   </>
                 }
               />
-            )}
+            ))}
 
             <div className="relative">
               <Board
@@ -1317,9 +1318,9 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                 orientation={orientation}
               />
 
-              {pendingPromotion && historyPreviewPly === null && (
+              {gameUi(pendingPromotion && historyPreviewPly === null && (
                 <PromotionBar onPromote={promotePawn} />
-              )}
+              ))}
 
               {players.length < 2 && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[28px] bg-zinc-950/70 p-4 backdrop-blur-[3px]">
@@ -1334,7 +1335,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                     <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                     <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}{ui("/2 players connected")}</h2>
+                      {gameUi(players.length)}{ui("/2 players connected")}</h2>
 
                     <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
@@ -1347,7 +1348,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                     </div>
 
                     <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
+                      {gameUi(copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code"))}
                     </p>
                   </button>
                     <RoomSlots total={2} names={players.map((player) => player.display_name)} overlay />
@@ -1362,7 +1363,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
             <div className="space-y-4 xl:sticky xl:top-6">
               <Panel
                 title={ui("Move History")}
-                subtitle={`${historyRows.length} plies · click to preview`}
+                subtitle={gameUi(`${historyRows.length} plies · click to preview`)}
               >
                 <ChessMoveHistoryList
                   listClassName="max-h-[380px] rounded-xl border border-white/5 bg-black/20"
@@ -1389,7 +1390,7 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                     ply: row.ply,
                     side: row.color,
                     moveNumber: row.moveNumber,
-                    content: <span className="truncate font-mono text-xs font-black text-zinc-200">{row.san}</span>,
+                    content: <span className="truncate font-mono text-xs font-black text-zinc-200">{gameUi(row.san)}</span>,
                   }))}
                   onSelect={(ply) => {
                     setHistoryPreviewPly(ply);
@@ -1397,12 +1398,12 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                   }}
                 />
 
-                {historyPreviewPly !== null && (
+                {gameUi(historyPreviewPly !== null && (
                   <p className="mt-2 text-[10px] leading-4 text-zinc-600">{ui("Preview is local only. It never changes the multiplayer game state.")}</p>
-                )}
+                ))}
               </Panel>
 
-              {variant === "randomstart" ? (
+              {gameUi(variant === "randomstart" ? (
                 <Panel title={ui("Random Start")} subtitle={ui("Random setup only")}>
                   <div className="space-y-2">
                     <RuleLine
@@ -1446,13 +1447,13 @@ export default function SeededVariantMultiplayerGame({ variant }: Props) {
                     />
                   </div>
                 </Panel>
-              )}
+              ))}
 
-              {error && (
+              {gameUi(error && (
                 <section className="rounded-2xl border border-red-400/20 bg-red-400/[0.06] px-4 py-3 text-sm font-semibold text-red-200">
                   {ui(error)}
                 </section>
-              )}
+              ))}
             </div>
           </aside>
         </div>

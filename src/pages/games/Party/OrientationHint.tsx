@@ -1,9 +1,11 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useState } from "react";
 import { X } from "lucide-react";
 
 // Non-blocking tip for realtime screens on small portrait phones. Pure CSS decides visibility (no
 // orientation API needed); dismissing it lasts for this tab.
 export default function OrientationHint() {
+  useGameLanguage();
   const [dismissed, setDismissed] = useState(() => {
     try {
       return sessionStorage.getItem("pluto-party-rotate-hint") === "1";
@@ -14,10 +16,9 @@ export default function OrientationHint() {
   if (dismissed) return null;
   return (
     <div className="pp-rotate-hint" role="note">
-      <span aria-hidden="true">📱↻</span> Rotate your phone for the best experience.
-      <button
+      <span aria-hidden="true">📱↻</span>{gameUi(" Rotate your phone for the best experience. ")}<button
         className="pp-icon-button"
-        aria-label="Dismiss rotate tip"
+        aria-label={gameUi("Dismiss rotate tip")}
         onClick={() => {
           setDismissed(true);
           try {

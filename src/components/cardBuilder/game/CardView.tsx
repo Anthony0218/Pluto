@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { SUIT_SYMBOLS, cardName, type Card } from "@/games/cards/cards/card";
 
 /** Generic, original card artwork: corner index + large suit pip. No external art. */
@@ -23,6 +24,7 @@ export default function CardView({
   onClick?: () => void;
   label?: string;
 }) {
+  useGameLanguage();
   const dims = { sm: "h-14 w-10 text-[11px]", md: "h-20 w-14 text-sm", lg: "h-24 w-[68px] text-base" }[size];
   const red = card && (card.suit === "hearts" || card.suit === "diamonds");
   const interactive = Boolean(onClick);
@@ -40,12 +42,12 @@ export default function CardView({
       <span className="absolute inset-[3px] rounded-md border border-white/10 bg-[repeating-linear-gradient(45deg,rgba(255,255,255,.07)_0_4px,transparent_4px_9px)]" />
     );
     return interactive ? (
-      <button type="button" aria-label={label ?? "Face-down card"} onClick={onClick} className={`${className} border-indigo-300/30 bg-indigo-950`}>
-        {back}
+      <button type="button" aria-label={gameUi(label ?? "Face-down card")} onClick={onClick} className={`${className} border-indigo-300/30 bg-indigo-950`}>
+        {gameUi(back)}
       </button>
     ) : (
-      <span role="img" aria-label={label ?? "Face-down card"} className={`${className} block border-indigo-300/30 bg-indigo-950`}>
-        {back}
+      <span role="img" aria-label={gameUi(label ?? "Face-down card")} className={`${className} block border-indigo-300/30 bg-indigo-950`}>
+        {gameUi(back)}
       </span>
     );
   }
@@ -53,22 +55,22 @@ export default function CardView({
   const face = (
     <>
       <span className={`absolute left-1 top-0.5 flex flex-col items-center font-black leading-none ${red ? "text-rose-600" : "text-zinc-900"}`}>
-        <span>{card.rank}</span>
-        <span className="text-[0.85em]">{SUIT_SYMBOLS[card.suit]}</span>
+        <span>{gameUi(card.rank)}</span>
+        <span className="text-[0.85em]">{gameUi(SUIT_SYMBOLS[card.suit])}</span>
       </span>
-      <span className={`absolute inset-0 flex items-center justify-center text-[2.1em] ${red ? "text-rose-600" : "text-zinc-900"}`}>{SUIT_SYMBOLS[card.suit]}</span>
-      <span className={`absolute bottom-0.5 right-1 rotate-180 text-[0.85em] font-black leading-none ${red ? "text-rose-600" : "text-zinc-900"}`}>{card.rank}</span>
-      {marked && <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border border-white bg-emerald-400" title="Covered" />}
+      <span className={`absolute inset-0 flex items-center justify-center text-[2.1em] ${red ? "text-rose-600" : "text-zinc-900"}`}>{gameUi(SUIT_SYMBOLS[card.suit])}</span>
+      <span className={`absolute bottom-0.5 right-1 rotate-180 text-[0.85em] font-black leading-none ${red ? "text-rose-600" : "text-zinc-900"}`}>{gameUi(card.rank)}</span>
+      {marked && <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border border-white bg-emerald-400" title={gameUi("Covered")} />}
     </>
   );
   const title = label ?? cardName(card);
   return interactive ? (
-    <button type="button" aria-label={title} aria-pressed={selected} title={title} onClick={onClick} className={`${className} border-zinc-300 bg-[#fbf8f1]`}>
-      {face}
+    <button type="button" aria-label={gameUi(title)} aria-pressed={selected} title={gameUi(title)} onClick={onClick} className={`${className} border-zinc-300 bg-[#fbf8f1]`}>
+      {gameUi(face)}
     </button>
   ) : (
-    <span role="img" aria-label={title} title={title} className={`${className} block border-zinc-300 bg-[#fbf8f1]`}>
-      {face}
+    <span role="img" aria-label={gameUi(title)} title={gameUi(title)} className={`${className} block border-zinc-300 bg-[#fbf8f1]`}>
+      {gameUi(face)}
     </span>
   );
 }

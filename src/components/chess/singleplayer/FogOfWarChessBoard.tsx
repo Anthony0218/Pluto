@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -661,7 +662,7 @@ export default function FogOfWarChessBoard({
           <div className="flex flex-wrap items-center gap-2">
             {!gameOver && (
               <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
-                {game.turn() === "w" ? t("White to move") : t("Black to move")}
+                {gameUi(game.turn() === "w" ? t("White to move") : t("Black to move"))}
               </div>
             )}
           </div>
@@ -711,11 +712,11 @@ export default function FogOfWarChessBoard({
                     compact
                   />
                   <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-bold text-zinc-400">
-                    {materialDifference > 0 &&
-                      `${t("White")} +${materialDifference}`}
-                    {materialDifference < 0 &&
-                      `${t("Black")} +${Math.abs(materialDifference)}`}
-                    {materialDifference === 0 && t("Equal")}
+                    {gameUi(materialDifference > 0 &&
+                      `${t("White")} +${materialDifference}`)}
+                    {gameUi(materialDifference < 0 &&
+                      `${t("Black")} +${Math.abs(materialDifference)}`)}
+                    {gameUi(materialDifference === 0 && t("Equal"))}
                   </span>
                 </div>
                 <CapturedPiecesGrid
@@ -732,7 +733,7 @@ export default function FogOfWarChessBoard({
                     compact
                   />
                   <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs text-zinc-400">
-                    {records.length}
+                    {gameUi(records.length)}
                   </span>
                 </div>
                 <ChessMoveHistoryList
@@ -747,9 +748,9 @@ export default function FogOfWarChessBoard({
                     content: (
                       <>
                         <span className="text-base leading-none">
-                          {gameOver || record.color === liveSide ? historyPieceSymbol(record.color, record.piece) : "?"}
+                          {gameUi(gameOver || record.color === liveSide ? historyPieceSymbol(record.color, record.piece) : "?")}
                         </span>
-                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{displayRecordSan(record)}</span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(displayRecordSan(record))}</span>
                       </>
                     ),
                   }))}
@@ -780,9 +781,9 @@ export default function FogOfWarChessBoard({
                       {t("History Preview")}
                     </p>
                     <p className="mt-1 text-sm font-bold text-white">
-                      {historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
+                      {gameUi(historyPreview.moveNumber)}
+                      {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                      {gameUi(historyPreview.san)}
                     </p>
                   </div>
                   <button
@@ -842,10 +843,10 @@ export default function FogOfWarChessBoard({
                     {t("Starting Position")}
                   </p>
                   <p className="mt-1 text-xs text-zinc-500">
-                    {randomStart ? t("Same formation for both sides") : t("Standard Start")}
+                    {gameUi(randomStart ? t("Same formation for both sides") : t("Standard Start"))}
                   </p>
                   {randomStart && (
-                    <p className="mt-2 font-mono text-[10px] text-zinc-700">{ui("Seed")}{fogSeed}
+                    <p className="mt-2 font-mono text-[10px] text-zinc-700">{ui("Seed")}{gameUi(fogSeed)}
                     </p>
                   )}
                 </div>
@@ -907,7 +908,7 @@ export default function FogOfWarChessBoard({
                     >
                       <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">{ui("Latest capture")}</p>
                       <p className="mt-2 font-mono text-sm font-black text-zinc-200">
-                        {fogStats.latestCapture.san}
+                        {gameUi(fogStats.latestCapture.san)}
                       </p>
                     </button>
                   ) : (
@@ -945,7 +946,7 @@ function Panel({ gameControls = false, children }: { gameControls?: boolean; chi
   useUiLanguage();
   return (
     <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20">
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -1058,7 +1059,7 @@ function CapturedPiecesGrid({
             key={`${color}-${piece}-${index}`}
             className="flex h-7 w-7 items-center justify-center text-2xl"
           >
-            {color === "w" ? whiteSymbols[piece] : blackSymbols[piece]}
+            {gameUi(color === "w" ? whiteSymbols[piece] : blackSymbols[piece])}
           </span>
         ))
       )}
@@ -1069,12 +1070,12 @@ function CapturedPiecesGrid({
       <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
         {t("Black")}
       </p>
-      {render(capturedBlack, "b")}
+      {gameUi(render(capturedBlack, "b"))}
       <div className="mt-3 border-t border-white/5 pt-3">
         <p className="text-[10px] font-black uppercase tracking-wider text-zinc-600">
           {t("White")}
         </p>
-        {render(capturedWhite, "w")}
+        {gameUi(render(capturedWhite, "w"))}
       </div>
     </div>
   );
@@ -1092,11 +1093,11 @@ function RuleStrip({
   return (
     <div className="flex items-center gap-3">
       <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-400/10 text-lg font-black text-sky-200">
-        {icon}
+        {gameUi(icon)}
       </span>
       <div>
         <p className="text-xs font-black text-zinc-200">{ui(title)}</p>
-        <p className="mt-1 text-[10px] leading-4 text-zinc-600">{detail}</p>
+        <p className="mt-1 text-[10px] leading-4 text-zinc-600">{gameUi(detail)}</p>
       </div>
     </div>
   );
@@ -1119,7 +1120,7 @@ function FogStat({
           : "rounded-xl border border-white/5 bg-black/20 px-3 py-3"
       }
     >
-      <p className="text-2xl font-black text-white">{value}</p>
+      <p className="text-2xl font-black text-white">{gameUi(value)}</p>
       <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
       </p>
@@ -1130,7 +1131,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
   useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
-      <p className="text-xl font-black text-zinc-100">{value}</p>
+      <p className="text-xl font-black text-zinc-100">{gameUi(value)}</p>
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
       </p>

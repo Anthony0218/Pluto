@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import type { BattleObjective } from "../../games/MedievalKingdoms/types";
 
 export default function ObjectiveMarker({
@@ -5,6 +6,7 @@ export default function ObjectiveMarker({
 }: {
   objective: BattleObjective;
 }) {
+  useGameLanguage();
   return (
     <>
       <div
@@ -51,7 +53,7 @@ export default function ObjectiveMarker({
           top: `${objective.position.y}%`,
         }}
       >
-        {objective.name}
+        {gameUi(objective.name)}
       </div>
     </>
   );

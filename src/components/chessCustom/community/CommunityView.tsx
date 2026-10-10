@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { variants } from "@/data/chessVariants";
 import { VariantArtwork, VariantCardFrame, VariantDesignCard } from "@/components/chess/VariantDesignCard";
 import { Link, useNavigate } from "react-router-dom";
@@ -20,19 +21,21 @@ import UserLink from "@/components/social/UserLink";
 
 /** Variant author, linked to their profile. Pluto's own variants have no player account. */
 function Author({ entry, className = "" }: { entry: CommunityEntry; className?: string }) {
-  if (entry.ownerId === "pluto") return <span className={className}>{entry.authorName}</span>;
-  return <UserLink userId={entry.ownerId} username={entry.ownerId ? null : entry.authorName} className={className}>{entry.authorName}</UserLink>;
+  useGameLanguage();
+  if (entry.ownerId === "pluto") return <span className={className}>{gameUi(entry.authorName)}</span>;
+  return <UserLink userId={entry.ownerId} username={entry.ownerId ? null : entry.authorName} className={className}>{gameUi(entry.authorName)}</UserLink>;
 }
 
 const PAGE = 24;
 type Previews = Record<string, { preview: VariantPreview; layerCount: number }>;
 
 function CommunityPreview({ entry, preview, className }: { entry: CommunityEntry; preview?: VariantPreview; className: string }) {
+  useGameLanguage();
   const card = entry.official ? variants.find((card) => card.customId === entry.id || card.id === entry.builtin?.id) : undefined;
   if (card) return <div className={className}><VariantArtwork variant={card} compact /></div>;
   return entry.builtin ? (
-    <span role="img" aria-label={entry.name} className={`flex items-center justify-center text-7xl ${className}`}>{entry.builtin.icon}</span>
-  ) : <BoardThumbnail preview={preview} label={`${entry.name} ${ui("board preview")}`} className={className} />;
+    <span role="img" aria-label={gameUi(entry.name)} className={`flex items-center justify-center text-7xl ${className}`}>{gameUi(entry.builtin.icon)}</span>
+  ) : <BoardThumbnail preview={preview} label={gameUi(`${entry.name} ${ui("board preview")}`)} className={className} />;
 }
 
 function ConfigurationChip({ entry }: { entry: CommunityEntry }) {
@@ -40,6 +43,7 @@ function ConfigurationChip({ entry }: { entry: CommunityEntry }) {
 }
 
 function VoteControl({ entry, onVote, disabled, reason }: { entry: CommunityEntry; onVote: (value: -1 | 0 | 1) => void; disabled: boolean; reason?: string }) {
+  useGameLanguage();
   const button = (value: 1 | -1) => {
     const active = entry.myVote === value;
     const Icon = value === 1 ? ChevronUpIcon : ChevronDownIcon;
@@ -48,8 +52,8 @@ function VoteControl({ entry, onVote, disabled, reason }: { entry: CommunityEntr
         type="button"
         disabled={disabled}
         aria-pressed={active}
-        aria-label={value === 1 ? ui("Upvote") : ui("Downvote")}
-        title={reason ?? (active ? ui("Remove your vote") : value === 1 ? ui("Upvote") : ui("Downvote"))}
+        aria-label={gameUi(value === 1 ? ui("Upvote") : ui("Downvote"))}
+        title={gameUi(reason ?? (active ? ui("Remove your vote") : value === 1 ? ui("Upvote") : ui("Downvote")))}
         onClick={() => onVote(active ? 0 : value)}
         className={`flex h-7 w-8 items-center justify-center rounded-lg transition disabled:cursor-not-allowed disabled:opacity-40 ${
           active ? (value === 1 ? "bg-emerald-400/20 text-emerald-200" : "bg-red-400/20 text-red-200") : "text-zinc-400 hover:bg-white/[0.08] hover:text-white"
@@ -60,15 +64,16 @@ function VoteControl({ entry, onVote, disabled, reason }: { entry: CommunityEntr
     );
   };
   return (
-    <div className="flex items-center gap-0.5 rounded-xl border border-white/[0.08] bg-black/30 px-1" title={`${entry.upvotes} ${ui("up")} · ${entry.downvotes} ${ui("down")}`}>
-      {button(1)}
-      <span className={`min-w-6 text-center text-sm font-bold ${entry.score > 0 ? "text-emerald-200" : entry.score < 0 ? "text-red-200" : "text-zinc-300"}`}>{entry.score}</span>
-      {button(-1)}
+    <div className="flex items-center gap-0.5 rounded-xl border border-white/[0.08] bg-black/30 px-1" title={gameUi(`${entry.upvotes} ${ui("up")} · ${entry.downvotes} ${ui("down")}`)}>
+      {gameUi(button(1))}
+      <span className={`min-w-6 text-center text-sm font-bold ${entry.score > 0 ? "text-emerald-200" : entry.score < 0 ? "text-red-200" : "text-zinc-300"}`}>{gameUi(entry.score)}</span>
+      {gameUi(button(-1))}
     </div>
   );
 }
 
 function DetailsDialog({ entry, preview, onClose, onPlay, onRemix, busy }: { entry: CommunityEntry | null; preview?: Previews[string]; onClose: () => void; onPlay: () => void; onRemix: () => void; busy: boolean }) {
+  useGameLanguage();
   const { community } = useEditor();
   const [details, setDetails] = useState<Awaited<ReturnType<typeof community.details>> | null>(null);
   const [seen, setSeen] = useState<string | null>(null);
@@ -95,8 +100,8 @@ function DetailsDialog({ entry, preview, onClose, onPlay, onRemix, busy }: { ent
       onClose={onClose}
       size="lg"
       eyebrow={ui("Community variant")}
-      title={entry?.name ?? ""}
-      description={entry ? <>{ui("by")} <Author entry={entry} className="font-semibold text-zinc-200" /> · {ui("published")} {timeAgo(entry.publishedAt)}</> : undefined}
+      title={gameUi(entry?.name ?? "")}
+      description={gameUi(entry ? <>{ui("by")} <Author entry={entry} className="font-semibold text-zinc-200" /> · {ui("published")} {gameUi(timeAgo(entry.publishedAt))}</> : undefined)}
       footer={
         <>
           {entry?.configurable !== false && <Button onClick={onRemix} disabled={busy}>
@@ -110,23 +115,23 @@ function DetailsDialog({ entry, preview, onClose, onPlay, onRemix, busy }: { ent
         </>
       }
     >
-      {entry && (
+      {gameUi(entry && (
         <div className="grid gap-5 sm:grid-cols-[240px_minmax(0,1fr)]">
           <div className="rounded-2xl border border-white/[0.06] bg-black/30 p-4">
             <CommunityPreview entry={entry} preview={preview?.preview} className="aspect-square w-full" />
           </div>
           <div className="space-y-4 text-sm">
-            <p className="whitespace-pre-line leading-6 text-zinc-300">{entry.description || ui("No description.")}</p>
+            <p className="whitespace-pre-line leading-6 text-zinc-300">{gameUi(entry.description || ui("No description."))}</p>
             <div className="flex flex-wrap gap-1.5">
-              {entry.boardSize && <Chip>{entry.boardSize}</Chip>}
-              {(preview?.layerCount ?? 1) > 1 && <Chip tone="sky">{preview?.layerCount} {ui("Layers")}</Chip>}
-              {!entry.builtin && <Chip>{entry.pieceTypes} {ui("piece types")}</Chip>}
-              {!entry.official && <Chip>{entry.playCount} {ui("plays")}</Chip>}
+              {entry.boardSize && <Chip>{gameUi(entry.boardSize)}</Chip>}
+              {(preview?.layerCount ?? 1) > 1 && <Chip tone="sky">{gameUi(preview?.layerCount)} {ui("Layers")}</Chip>}
+              {!entry.builtin && <Chip>{gameUi(entry.pieceTypes)} {ui("piece types")}</Chip>}
+              {!entry.official && <Chip>{gameUi(entry.playCount)} {ui("plays")}</Chip>}
               <ConfigurationChip entry={entry} />
-              <Chip tone={entry.score > 0 ? "emerald" : "zinc"}>{entry.score} {ui("score")}</Chip>
-              {(details?.tags ?? entry.builtin?.tags)?.map((tag) => <Chip key={tag} tone="violet">{tag}</Chip>)}
+              <Chip tone={entry.score > 0 ? "emerald" : "zinc"}>{gameUi(entry.score)} {ui("score")}</Chip>
+              {(details?.tags ?? entry.builtin?.tags)?.map((tag) => <Chip key={tag} tone="violet">{gameUi(tag)}</Chip>)}
             </div>
-            {details ? (
+            {gameUi(details ? (
               <dl className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
                   <dt className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{ui("King rule")}</dt>
@@ -134,22 +139,22 @@ function DetailsDialog({ entry, preview, onClose, onPlay, onRemix, busy }: { ent
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
                   <dt className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{ui("Victory")}</dt>
-                  <dd className="mt-1 text-zinc-100">{victory.map((label) => ui(label)).join(" · ") || ui("Events decide")}</dd>
+                  <dd className="mt-1 text-zinc-100">{gameUi(victory.map((label) => ui(label)).join(" · ") || ui("Events decide"))}</dd>
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
                   <dt className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{ui("Players")}</dt>
-                  <dd className="mt-1 text-zinc-100">{details.teams.map((team) => `${team.name}${team.alliance ? ` (${team.alliance})` : ""}`).join(" · ")}</dd>
+                  <dd className="mt-1 text-zinc-100">{gameUi(details.teams.map((team) => `${team.name}${team.alliance ? ` (${team.alliance})` : ""}`).join(" · "))}</dd>
                 </div>
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
                   <dt className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{ui("Events")}</dt>
-                  <dd className="mt-1 text-zinc-100">{details.eventCount}</dd>
+                  <dd className="mt-1 text-zinc-100">{gameUi(details.eventCount)}</dd>
                 </div>
-                {details.pieceNames.length > 0 && (
+                {gameUi(details.pieceNames.length > 0 && (
                   <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 sm:col-span-2">
                     <dt className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{ui("Pieces")}</dt>
-                    <dd className="mt-1 text-zinc-100">{details.pieceNames.join(", ")}</dd>
+                    <dd className="mt-1 text-zinc-100">{gameUi(details.pieceNames.join(", "))}</dd>
                   </div>
-                )}
+                ))}
               </dl>
             ) : entry.builtin ? (
               <p className="text-xs leading-5 text-zinc-400">
@@ -161,17 +166,18 @@ function DetailsDialog({ entry, preview, onClose, onPlay, onRemix, busy }: { ent
               <p className="text-xs text-zinc-500" role="status">
                 {ui("Loading the rules…")}
               </p>
-            )}
+            ))}
             {entry.configurable !== false && <p className="text-xs leading-5 text-zinc-500">{ui("Remix copies this variant into My Games so you can change anything. The original stays untouched.")}</p>}
           </div>
         </div>
-      )}
+      ))}
     </Dialog>
   );
 }
 
 /** Public discovery: variants other players have shared. */
 export default function CommunityView({ scope = "players" }: { scope?: "pluto" | "players" }) {
+  useGameLanguage();
   const { community, userId, playCopy, remix, notify, refreshPublished } = useEditor();
   const navigate = useNavigate();
   const [remoteUnavailable, setRemoteUnavailable] = useState(false);
@@ -297,7 +303,7 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
     <div className="pt-6">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0 max-w-2xl">
-          <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300/80">{scope === "pluto" ? "Pluto" : ui("Community")}</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300/80">{gameUi(scope === "pluto" ? "Pluto" : ui("Community"))}</p>
           <h1 className="mt-1.5 font-serif text-[32px] leading-tight text-white sm:text-[40px]">{ui(scope === "pluto" ? "Pluto Variants" : "Community Variants")}</h1>
           <p className="mt-2 text-sm leading-6 text-zinc-400">{ui(scope === "pluto" ? "Official chess variants by Pluto. Play a game or remix a configurable variant." : "Chess variants shared publicly by players. Play them as they are, or remix your own copy.")}</p>
         </div>
@@ -315,7 +321,7 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
         {scope === "players" && <Segmented
-          label="Sort"
+          label={gameUi("Sort")}
           value={sort}
           onChange={(next) => {
             setSort(next);
@@ -335,7 +341,7 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
       </div>
 
       {scope === "players" && remoteUnavailable && <p role="status" className="mb-4 rounded-xl border border-amber-300/20 bg-amber-300/5 p-3 text-sm text-amber-100">{ui("Player-published variants are unavailable right now.")}</p>}
-      {status === "loading" && entries.length === 0 ? (
+      {gameUi(status === "loading" && entries.length === 0 ? (
         <ul className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-3" aria-busy="true" aria-label={ui("Loading community variants")}>
           {[0, 1, 2].map((index) => (
             <li key={index} className="min-h-[180px] rounded-[13px] border border-white/[0.06] bg-white/[0.02] motion-safe:animate-pulse" />
@@ -343,11 +349,11 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
         </ul>
       ) : status === "error" ? (
         <EmptyState icon={<CommunityIcon size={22} />} title={ui("The community is unavailable right now")} action={<Button onClick={refresh}>{ui("Try again")}</Button>}>
-          {error}
+          {gameUi(error)}
         </EmptyState>
       ) : entries.length === 0 ? (
-        <EmptyState icon={<CommunityIcon size={22} />} title={search ? ui("No variants match your search") : ui(scope === "pluto" ? "No Pluto variants available" : "Nothing published yet")}>
-          {scope === "players" && ui("Be the first: publish one of your variants.")}
+        <EmptyState icon={<CommunityIcon size={22} />} title={gameUi(search ? ui("No variants match your search") : ui(scope === "pluto" ? "No Pluto variants available" : "Nothing published yet"))}>
+          {gameUi(scope === "players" && ui("Be the first: publish one of your variants."))}
         </EmptyState>
       ) : (
         <ul className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-3">
@@ -375,24 +381,24 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
                     {(extra?.layerCount ?? 1) > 1 && (
                       <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[9px] font-semibold text-sky-100">
                         <LayersIcon size={12} />
-                        {extra?.layerCount}
+                        {gameUi(extra?.layerCount)}
                       </span>
                     )}
                     {own && <span className="absolute left-2 top-2 rounded-full border border-amber-300/40 bg-amber-300/15 px-2 py-1 text-[9px] font-bold text-amber-100">{ui("Yours")}</span>}
                   </button>
                 }>
                   <h3 id={`community-${entry.id}`} className="font-serif text-[20px] leading-tight text-white">
-                    {entry.name}
+                    {gameUi(entry.name)}
                   </h3>
                   <p className="mt-1 text-[10px] text-zinc-500">
-                    {ui("by")} <Author entry={entry} className="text-zinc-300" /> · {timeAgo(entry.publishedAt)}
+                    {ui("by")} <Author entry={entry} className="text-zinc-300" /> · {gameUi(timeAgo(entry.publishedAt))}
                   </p>
-                  <p className="mt-2 line-clamp-2 font-serif text-[12px] leading-[1.45rem] text-zinc-400">{entry.description || ui("No description.")}</p>
+                  <p className="mt-2 line-clamp-2 font-serif text-[12px] leading-[1.45rem] text-zinc-400">{gameUi(entry.description || ui("No description."))}</p>
                   <div className="mt-2.5 flex flex-wrap gap-1.5">
-                    {entry.boardSize && <Chip>{entry.boardSize}</Chip>}
-                    {(extra?.layerCount ?? 1) > 1 && <Chip tone="sky">{extra?.layerCount} {ui("Layers")}</Chip>}
-                    {!entry.builtin && <Chip>{entry.pieceTypes} {ui("piece types")}</Chip>}
-                    {!entry.official && <Chip>{entry.playCount} {ui("plays")}</Chip>}
+                    {entry.boardSize && <Chip>{gameUi(entry.boardSize)}</Chip>}
+                    {(extra?.layerCount ?? 1) > 1 && <Chip tone="sky">{gameUi(extra?.layerCount)} {ui("Layers")}</Chip>}
+                    {!entry.builtin && <Chip>{gameUi(entry.pieceTypes)} {ui("piece types")}</Chip>}
+                    {!entry.official && <Chip>{gameUi(entry.playCount)} {ui("plays")}</Chip>}
                     <ConfigurationChip entry={entry} />
                   </div>
                   <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-3">
@@ -412,23 +418,23 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
                       <VoteControl entry={entry} onVote={(value) => void vote(entry, value)} disabled={!userId || own || votingIds.has(entry.id)} reason={!userId ? ui("Sign in to vote") : own ? ui("You can't vote on your own variant") : undefined} />
                     </div>
                   </div>
-                  {own && (
+                  {gameUi(own && (
                     <button type="button" onClick={() => setUnpublishing(entry)} className="mt-2 inline-flex items-center gap-1.5 self-start text-xs font-semibold text-zinc-400 underline-offset-2 hover:text-red-200 hover:underline">
                       <PrivateIcon size={13} />
                       {ui("Make private")}
                     </button>
-                  )}
+                  ))}
                 </VariantCardFrame>
               </li>
             );
           })}
         </ul>
-      )}
-      {hasMore && status === "ready" && (
+      ))}
+      {gameUi(hasMore && status === "ready" && (
         <div className="mt-6 text-center">
           <Button onClick={() => void loadMore()}>{ui("Load more")}</Button>
         </div>
-      )}
+      ))}
 
       <PublishVariantDialog open={publishing} onClose={() => setPublishing(false)} onPublished={refresh} />
       <DetailsDialog
@@ -468,7 +474,7 @@ export default function CommunityView({ scope = "players" }: { scope?: "pluto" |
         size="sm"
         tone="danger"
         eyebrow={ui("Make private")}
-        title={<>{ui("Remove")} “{unpublishing?.name}” {ui("from Community?")}</>}
+        title={<>{ui("Remove")} “{gameUi(unpublishing?.name)}” {ui("from Community?")}</>}
         description={ui("Other players will no longer see it. Your copy in My Games is not affected.")}
         footer={
           <>

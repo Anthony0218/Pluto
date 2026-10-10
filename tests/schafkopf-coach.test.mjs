@@ -36,6 +36,15 @@ test("beginner advice is based on visible cards and public trick results", () =>
   assert.match(reviewSchafkopfTrick(playing, trick), /11 Punkte/);
 });
 
+test("the Legen tip explains the decision window and its doubled settlement", () => {
+  const game = createGame(undefined, 3, shuffledDeck(rng(71)), undefined, 1, { ...DEFAULT_GAME_RULES, legen: true });
+  const tip = liveSchafkopfTip(viewFor(game, game.turn));
+  assert.match(tip, /optionale Klopfrunde/);
+  assert.match(tip, /ersten vier Karten/);
+  assert.match(tip, /bevor die zweite Hand ausgeteilt wird/);
+  assert.match(tip, /verdoppelt die Abrechnung/);
+});
+
 test("beginner advice recommends a small trump when void in the led suit", () => {
   const game = createGame();
   const view = viewFor(game, 0);

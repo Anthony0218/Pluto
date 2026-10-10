@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { ArrowLeftRight, Copy, Eraser, FlipVertical2, MousePointer2, RotateCcw, Save, Trash2, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 import { boardLayers, getLayer, isPlayable, sameCoord, squareName } from "@/games/chess/custom/engine/board";
@@ -22,6 +23,7 @@ type DragPayload = { kind: "new"; type: string; team: string } | { kind: "move";
 type Target = "start" | "test";
 
 function SetupEditor() {
+  useGameLanguage();
   const { variant, testSetup, dispatch, go, setSimulationSource, notify } = useEditor();
   const [target, setTarget] = useState<Target>("start");
   const theme = getBoardTheme(variant.theme.boardTheme);
@@ -103,7 +105,7 @@ function SetupEditor() {
         </div>
         {variant.teams.map((team) => (
           <div key={team.id} className="mb-3">
-            <p className={labelClass}>{team.name}</p>
+            <p className={labelClass}>{gameUi(team.name)}</p>
             <div className="mt-1.5 grid grid-cols-4 gap-1.5">
               {variant.pieces
                 .filter((def) => !def.teams || def.teams.includes(team.id))
@@ -116,18 +118,18 @@ function SetupEditor() {
                       key={def.id}
                       type="button"
                       draggable
-                      title={`${team.name} ${def.name}${suggested ? ` — ${placed} of ${suggested} suggested placed` : ""}`}
+                      title={gameUi(`${team.name} ${def.name}${suggested ? ` — ${placed} of ${suggested} suggested placed` : ""}`)}
                       aria-pressed={active}
                       onDragStart={(event) => event.dataTransfer.setData(DRAG_MIME, JSON.stringify({ kind: "new", type: def.id, team: team.id } satisfies DragPayload))}
                       onClick={() => setBrush(active ? { kind: "select" } : { kind: "piece", type: def.id, team: team.id })}
                       className={`relative aspect-square rounded-lg border p-0.5 transition ${active ? "border-sky-400/70 bg-sky-400/15" : "border-white/[0.08] bg-black/30 hover:border-white/25"}`}
                     >
                       <PieceToken def={def} team={team} />
-                      {suggested > 0 && (
+                      {gameUi(suggested > 0 && (
                         <span className={`absolute bottom-0 right-0.5 text-[9px] font-bold ${placed === suggested ? "text-emerald-300" : placed > suggested ? "text-amber-300" : "text-zinc-500"}`}>
-                          {placed}/{suggested}
+                          {gameUi(placed)}/{gameUi(suggested)}
                         </span>
-                      )}
+                      ))}
                     </button>
                   );
                 })}
@@ -138,10 +140,10 @@ function SetupEditor() {
       </Panel>
 
       <div className="min-w-0 space-y-3">
-        {layers.length > 1 && <label className="flex items-center gap-2 text-xs text-zinc-300">Edit layer <select aria-label="Setup layer" value={activeLayer} onChange={(event) => { setActiveLayer(Number(event.target.value)); setSelectedIndex(null); }} className="rounded-lg border border-white/10 bg-zinc-900 px-2 py-1 text-white">{layers.map((entry) => <option key={entry.z} value={entry.z}>{entry.name} · {entry.width}×{entry.height}</option>)}</select></label>}
+        {layers.length > 1 && <label className="flex items-center gap-2 text-xs text-zinc-300">{gameUi("Edit layer ")}<select aria-label={gameUi("Setup layer")} value={activeLayer} onChange={(event) => { setActiveLayer(Number(event.target.value)); setSelectedIndex(null); }} className="rounded-lg border border-white/10 bg-zinc-900 px-2 py-1 text-white">{layers.map((entry) => <option key={entry.z} value={entry.z}>{gameUi(entry.name)} · {gameUi(entry.width)}×{gameUi(entry.height)}</option>)}</select></label>}
         <div className="flex flex-wrap items-center gap-2">
           <Segmented
-            label="Position to edit"
+            label={gameUi("Position to edit")}
             value={target}
             onChange={(next) => {
               setTarget(next);
@@ -162,7 +164,7 @@ function SetupEditor() {
           </Button>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {target === "start" ? (
+          {gameUi(target === "start" ? (
             <Button size="sm" onClick={() => dispatch({ type: "arrangeArmies" })} title={ui("Place each team's suggested pieces on its home ranks")}>
               <Users size={14} />
               {ui("Arrange armies")}
@@ -172,12 +174,12 @@ function SetupEditor() {
               <RotateCcw size={14} />
               {ui("Reset to starting position")}
             </Button>
-          )}
+          ))}
           <Button size="sm" onClick={() => withPieces([])}>
             <Trash2 size={14} />
             {ui("Clear board")}
           </Button>
-          {target === "test" && (
+          {gameUi(target === "test" && (
             <Button
               size="sm"
               onClick={() => {
@@ -188,7 +190,7 @@ function SetupEditor() {
               <Save size={14} />
               {ui("Use as starting position")}
             </Button>
-          )}
+          ))}
           <IconButton label={ui("Flip board")} active={flipped} onClick={() => setFlipped((value) => !value)}>
             <FlipVertical2 size={15} />
           </IconButton>
@@ -201,7 +203,7 @@ function SetupEditor() {
             pieces={boardPieces}
             highlights={highlights}
             flipped={flipped}
-            label={target === "start" ? ui("Starting position editor") : ui("Test position editor")}
+            label={gameUi(target === "start" ? ui("Starting position editor") : ui("Test position editor"))}
             onCellClick={(coord) => handleClick(onLayer(coord))}
             onCellContextMenu={(coord) => {
               const index = indexAt(onLayer(coord));
@@ -217,8 +219,8 @@ function SetupEditor() {
       </div>
 
       <div className="space-y-4">
-        <Panel title={selected ? `${variant.pieces.find((def) => def.id === selected.type)?.name ?? selected.type} · ${squareName(selected)}` : ui("Selected piece")}>
-          {selected ? (
+        <Panel title={gameUi(selected ? `${variant.pieces.find((def) => def.id === selected.type)?.name ?? selected.type} · ${squareName(selected)}` : ui("Selected piece"))}>
+          {gameUi(selected ? (
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
                 <Button
@@ -257,18 +259,18 @@ function SetupEditor() {
             </div>
           ) : (
             <p className="text-sm text-zinc-500">{ui("Click a piece to change its team, duplicate or remove it.")}</p>
-          )}
+          ))}
         </Panel>
 
         <Panel title={ui("Game state")}>
           <div className="space-y-3">
             <div>
               <p className={labelClass}>{ui("Side to move")}</p>
-              <Select label="Side to move" className="mt-1.5" value={setup.startingTeam} onChange={(startingTeam) => commit({ ...setup, startingTeam })} options={variant.teams.map((team) => ({ id: team.id, label: team.name }))} />
+              <Select label={gameUi("Side to move")} className="mt-1.5" value={setup.startingTeam} onChange={(startingTeam) => commit({ ...setup, startingTeam })} options={variant.teams.map((team) => ({ id: team.id, label: team.name }))} />
             </div>
             <div>
               <p className={labelClass}>{ui("Move counter")}</p>
-              <NumberField label="Move counter" value={setup.turnNumber} min={1} max={500} onChange={(turnNumber) => commit({ ...setup, turnNumber }, "turn-number")} />
+              <NumberField label={gameUi("Move counter")} value={setup.turnNumber} min={1} max={500} onChange={(turnNumber) => commit({ ...setup, turnNumber }, "turn-number")} />
             </div>
             <form
               onSubmit={(event) => {
@@ -281,14 +283,14 @@ function SetupEditor() {
             >
               <p className={labelClass}>{ui("Import FEN")}</p>
               <div className="mt-1.5 flex gap-2">
-                <input value={fen} onChange={(event) => setFen(event.target.value)} placeholder="rnbqkbnr/pppppppp/8/…" className={`${inputClass} py-1.5 font-mono text-xs`} />
+                <input value={fen} onChange={(event) => setFen(event.target.value)} placeholder={gameUi("rnbqkbnr/pppppppp/8/…")} className={`${inputClass} py-1.5 font-mono text-xs`} />
                 <Button size="sm" type="submit" disabled={!fen.trim()}>
                   {ui("Load")}
                 </Button>
               </div>
             </form>
             <p className="text-xs text-zinc-500">
-              {pieces.length} {ui("pieces placed")} · {variant.teams.map((team) => `${team.name} ${pieces.filter((piece) => piece.team === team.id).length}`).join(" · ")}
+              {gameUi(pieces.length)} {ui("pieces placed")} · {gameUi(variant.teams.map((team) => `${team.name} ${pieces.filter((piece) => piece.team === team.id).length}`).join(" · "))}
             </p>
           </div>
         </Panel>
@@ -298,12 +300,13 @@ function SetupEditor() {
 }
 
 export default function PositionSection() {
+  useGameLanguage();
   return (
     <div>
       <SectionHeading
         step="position"
         eyebrow="Position"
-        title="Set the starting position"
+        title={gameUi("Set the starting position")}
         description={ui("Place, move, duplicate and remove pieces on every layer to define how your variant begins. Switch to Test position to try a rule from any layout without changing the start.")}
       />
       <SetupEditor />

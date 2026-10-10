@@ -1,0 +1,289 @@
+/* Layout and accessibility shared by the scene and simple interfaces. */
+.sk-page { overflow: visible; overflow-wrap: anywhere; }
+.sk-page *, .sk-rulebook-backdrop * { box-sizing: border-box; }
+.sk-page :focus-visible, .sk-rulebook-backdrop :focus-visible {
+  outline: 3px solid #6ee7b7;
+  outline-offset: 3px;
+}
+.sk-page .sk-header { flex-wrap: wrap; }
+.app-viewport:has(.sk-game-page) { overflow: auto; overscroll-behavior-y: auto; }
+.sk-page.sk-game-page:is(.sk-interface-simple, [class*="sk-ambience-"]) {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  left: auto;
+  width: 100%;
+  max-width: none;
+  min-height: var(--app-height, 100dvh);
+  height: auto;
+  margin: 0;
+  padding: 12px max(12px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  transform: none;
+  overflow: visible;
+}
+.sk-page.sk-game-page.sk-immersive {
+  height: 100dvh;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.sk-page.sk-game-page.sk-app-fullscreen { position: fixed; inset: 0; z-index: 1000; margin: 0; border-radius: 0; }
+.sk-page.sk-game-page > .sk-game-menu {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: auto;
+  min-height: 48px;
+  margin: 0;
+  padding: 5px 8px;
+  background: #101e20ed;
+  border: 1px solid #f2ddad55;
+  border-radius: 12px;
+}
+.sk-page.sk-game-page .sk-game-menu-title { display: flex; flex-direction: column; align-items: flex-start; gap: 0; width: auto; min-width: 0; flex: 1 1 160px; }
+.sk-page.sk-game-page .sk-game-menu-title strong { font-size: 18px; }
+.sk-page.sk-game-page .sk-game-menu-title span { display: block; white-space: normal; font-size: 12px; }
+.sk-page.sk-game-page .sk-header-actions { display: flex; flex: 0 1 auto; flex-wrap: wrap; gap: 4px; width: auto; min-width: 0; }
+.sk-page.sk-game-page .sk-header-actions .sk-button { min-width: 44px; min-height: 44px; padding: 8px 10px; font-size: 12px; }
+.sk-game-page .sk-menu-tooltip { display: none; }
+.sk-game-page > .sk-fullscreen-hint { position: static; margin: 0; flex-wrap: wrap; }
+.sk-game-page > .sk-learning-banner {
+  position: relative;
+  flex: none;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+.sk-learning-banner summary { cursor: pointer; line-height: 1.5; }
+.sk-learning-banner summary strong { font-size: inherit; }
+.sk-game-page > .sk-game-stage {
+  flex: 1 0 clamp(240px, 42dvh, 500px);
+  width: min(1400px, 100%);
+  height: clamp(240px, 42dvh, 500px) !important;
+  min-height: 240px !important;
+  margin: 0 auto;
+  overflow: visible;
+}
+.sk-game-page .sk-game-stage > .sk-table { height: 100%; min-height: 0; padding: 0; }
+.sk-page.sk-game-page > .sk-hand-area,
+.sk-page.sk-game-page .sk-hand-area:has(.sk-hand-toolbar) {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: min(900px, 100%);
+  min-width: 0;
+  max-width: 100%;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 10px;
+  overflow: visible;
+  border-radius: 16px;
+  background: #101e20e8;
+  container-type: inline-size;
+}
+.sk-page.sk-game-page .sk-hand-area > .sk-hand {
+  /* The scale preference changes card size, never the width of the viewport.
+     An oversized spread is scrollable; overlapping hands fit their container. */
+  --fan-card-width: min(calc(70px * var(--sk-own-card-scale, 1)), 19cqw);
+  position: relative;
+  top: auto;
+  order: 0;
+  display: flex;
+  justify-content: safe center;
+  align-items: flex-start;
+  flex: none;
+  gap: 0;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 14px 10px 26px;
+  overflow: auto;
+  zoom: 1;
+}
+.sk-game-page .sk-hand-slot { flex: 0 0 var(--fan-card-width); width: var(--fan-card-width); padding: 0; margin-left: calc(var(--fan-card-width) * -.48); }
+.sk-game-page .sk-hand-slot:first-child { margin-left: 0; }
+.sk-game-page .sk-hand-slot { --fan-rise: 0px !important; }
+.sk-game-page .sk-hand-slot .sk-card > img { width: 100%; height: auto; max-height: none; aspect-ratio: 340 / 512; }
+.sk-game-page .sk-hand-area > .sk-hand-spread { --fan-card-width: calc(66px * var(--sk-own-card-scale, 1)); gap: 6px; }
+.sk-game-page .sk-hand-spread .sk-hand-slot { flex: 0 0 var(--fan-card-width); margin: 0; transform: none; }
+.sk-game-page .sk-card[aria-disabled="true"] { cursor: default; }
+.sk-game-page .sk-card[aria-disabled="true"]:hover { transform: none; }
+.sk-game-page .sk-card:focus-visible { outline-offset: 2px; }
+.sk-game-page .sk-hand-feedback { order: 1; width: 100%; margin: 0; color: #d6e5e3; text-align: center; font-size: 12px; line-height: 1.45; }
+.sk-page.sk-game-page .sk-hand-area .sk-hand-toolbar { order: 2; flex: none; width: auto; min-height: 0; margin: 0; padding: 0; }
+.sk-game-page .sk-hand-toolbar .sk-button { min-height: 40px; min-width: 40px; }
+.sk-page.sk-game-page .sk-hand-area .sk-table-sidebar {
+  position: static;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 6px;
+  order: 3;
+  contain: none;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  padding: 10px;
+  overflow: visible;
+  transform: none;
+}
+.sk-page.sk-game-page .sk-hand-area .sk-table-actions {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  padding: 0;
+  overflow: visible;
+  transform: none;
+}
+.sk-game-page .sk-table-actions:empty { display: none !important; }
+.sk-game-page .sk-table-actions h2 { margin: 0; font-size: 15px; line-height: 1.4; }
+.sk-game-page .sk-table-actions .sk-actions { width: 100%; margin: 0; flex-wrap: wrap; }
+.sk-game-page .sk-table-sidebar .sk-button { min-height: 44px; padding: 8px 12px; font-size: 13px; }
+.sk-game-page .sk-table-sidebar p { margin: 0; }
+.sk-page.sk-game-page .sk-hand-area .sk-contract-kinds { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; margin: 0; overflow: visible; }
+.sk-game-page .sk-contract-kind { flex: 1 1 90px; min-width: 0; min-height: 44px; padding: 8px; font-size: 13px; }
+.sk-page.sk-game-page .sk-table-sidebar-detail .sk-suit-picker { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; min-height: 0; padding: 0; }
+.sk-game-page .sk-suit-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; min-width: 0; }
+.sk-page.sk-game-page .sk-table-sidebar-detail .sk-suit-card { width: 58px; min-height: 44px; }
+.sk-page.sk-game-page .sk-table-sidebar-detail .sk-suit-card img { width: 38px; }
+.sk-page.sk-game-page .sk-table-sidebar-detail .sk-suit-card > span { display: block; font-size: 10px; }
+.sk-page.sk-game-page .sk-hand-area .sk-contract-confirm { position: static; display: flex; flex-wrap: wrap; width: 100%; margin: 0; transform: none; }
+.sk-game-page .sk-contract-confirm .sk-button { flex: 1; width: auto; }
+.sk-game-page .sk-handoff { padding: 8px; }
+.sk-game-page .sk-handoff .sk-button { white-space: normal; }
+.sk-game-page .sk-trick-stack-hand { position: relative; top: auto; right: auto; flex: 0 0 32px; margin: 10px 16px 24px; transform: none; scale: 1; }
+.sk-game-page .sk-simple-announcement { display: block; max-height: 60px; overflow: auto; }
+
+/* All dialogs fit the viewport, including safe areas and short landscape displays. */
+.sk-rulebook-backdrop { z-index: 10000; overflow: auto; overscroll-behavior: contain; padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); }
+.sk-rulebook-backdrop > :is(.sk-rulebook, .sk-score-dialog, .sk-sort-dialog) {
+  position: relative;
+  inset: auto;
+  width: min(760px, 100%);
+  max-width: 100%;
+  max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom)));
+  min-height: 0;
+  margin: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  transform: none;
+  overflow-wrap: anywhere;
+  scrollbar-width: thin;
+  scroll-padding-block: 65px 16px;
+}
+.sk-rulebook-backdrop :is(.sk-rulebook, .sk-score-dialog) > header { position: sticky; top: -1px; z-index: 5; padding: 8px 0; background: #102218; }
+.sk-rulebook-backdrop .sk-ledger-header-actions { flex-wrap: wrap; justify-content: flex-end; }
+.sk-close-button { flex: none; min-width: 44px; min-height: 44px; }
+.sk-rulebook-backdrop .sk-bavarian-ledger-page > header { flex-wrap: wrap; }
+.sk-rulebook-backdrop .sk-rulebook fieldset { min-width: 0; }
+.sk-rulebook-backdrop .sk-rulebook :is(input, select, textarea) { max-width: 100%; min-width: 0; }
+.sk-rulebook-backdrop .sk-card-tabs { display: flex; flex-wrap: nowrap; justify-content: safe center; max-width: 100%; overflow: auto; padding: 6px; scroll-padding-inline: 8px; }
+.sk-card-tabs .sk-card-tab { flex: 0 0 105px; min-width: 0; }
+.sk-ledger-actions { flex-wrap: wrap; }
+.sk-review-cards { flex-wrap: wrap; }
+.sk-sort-dialog { padding: 18px; background: #102218; border: 1px solid #f3d686; border-radius: 16px; }
+.sk-sort-dialog .sk-close-button { width: 44px; height: 44px; }
+.sk-sort-dialog > * + * { margin-top: 12px; }
+.sk-sort-dialog .sk-sort-confirm { min-height: 44px; }
+.sk-source-table, .sk-ledger-scroll { scrollbar-width: thin; }
+@media (max-width: 700px), (max-height: 500px) {
+  .sk-page.sk-game-page .sk-header-actions .sk-icon-button > span,
+  .sk-page.sk-game-page .sk-header-actions .sk-fullscreen-button > span { display: none; }
+  .sk-page.sk-game-page .sk-header-actions svg { width: 19px; height: 19px; }
+  .sk-page.sk-game-page .sk-game-menu-title { flex: 1 1 100px; }
+  .sk-page.sk-game-page .sk-header-actions { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; }
+  .sk-page.sk-game-page .sk-header-actions .sk-button { flex: none; }
+  .sk-page.sk-game-page > .sk-game-stage { flex-basis: 230px; height: 230px !important; min-height: 230px !important; }
+  .sk-game-page .sk-avatar { width: 68px; scale: 1; transform: none; }
+  .sk-game-page .sk-avatar-north { top: 0; }
+  .sk-game-page .sk-avatar-west { top: 30%; left: 3%; }
+  .sk-game-page .sk-avatar-east { top: 30%; right: 3%; }
+  .sk-game-page .sk-avatar .sk-held-cards { transform: translateY(12px); }
+  .sk-game-page .sk-avatar .sk-card-back { width: 18px; height: 28px; border-width: 1px; }
+  .sk-game-page .sk-avatar .sk-player-speech { max-width: 105px; padding: 4px 6px; font-size: 10px; }
+  .sk-page.sk-game-page .sk-game-stage .sk-table .sk-trick { top: 54%; bottom: auto; left: 50%; width: 130px; height: 96px; min-height: 0; zoom: 1; transform: translate(-50%, -50%) scale(min(var(--sk-trick-card-scale, 1), 1.5)); }
+  .sk-page.sk-game-page .sk-game-stage .sk-table .sk-trick .sk-played { width: 42px; }
+  .sk-page.sk-game-page .sk-game-stage .sk-table .sk-trick .sk-played img { width: 100%; height: auto; }
+  .sk-game-page .sk-simple-seat { width: 94px; padding: 5px; gap: 2px; }
+  .sk-game-page .sk-simple-seat-north, .sk-game-page .sk-simple-seat-south { width: 150px; }
+  .sk-game-page .sk-simple-seat-west { left: 5px; top: 50%; }
+  .sk-game-page .sk-simple-seat-east { right: 5px; top: 50%; }
+  .sk-game-page .sk-simple-seat > strong { font-size: 12px; }
+  .sk-game-page .sk-simple-seat-details { font-size: 11px; }
+  .sk-game-page .sk-simple-seat-details button { min-height: 30px; }
+  .sk-game-page .sk-simple-announcement { max-height: 30px; font-size: 10px; }
+  .sk-game-page .sk-simple-seat-south { bottom: 5px; }
+  .sk-game-page .sk-simple-seat-north { top: 5px; }
+  .sk-game-page .sk-table-mark { font-size: 54px; }
+  .sk-game-page .sk-hand-slot .sk-card { border-radius: 5px; }
+  .sk-game-page .sk-bottom-fullscreen-button, .sk-game-page .sk-fullscreen-hint { display: none; }
+  .sk-rulebook-backdrop :is(input, select, textarea) { font-size: 16px; }
+  .sk-rulebook-backdrop .sk-rulebook { padding: 12px; }
+  .sk-rulebook-backdrop .sk-player-settings { grid-template-columns: 1fr; }
+  .sk-rulebook-backdrop .sk-rulebook label { flex-wrap: wrap; }
+}
+/* Landscape uses the width of a phone instead of stacking two tall panels. */
+@media (orientation: landscape) and (max-height: 600px) and (min-width: 540px) {
+  .sk-page.sk-game-page:is(.sk-interface-simple, [class*="sk-ambience-"]) {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(280px, 1fr);
+    grid-template-rows: auto minmax(230px, 1fr) auto;
+    align-content: start;
+    gap: 6px;
+    padding: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+  .sk-page.sk-game-page.sk-immersive { grid-template-rows: auto minmax(0, 1fr) auto; }
+  .sk-page.sk-game-page > .sk-game-menu { grid-column: 1 / -1; grid-row: 1; flex-wrap: nowrap; min-height: 44px; padding: 0 6px; }
+  .sk-page.sk-game-page .sk-game-menu-title strong { font-size: 14px; }
+  .sk-page.sk-game-page .sk-game-menu-title span { font-size: 11px; }
+  .sk-page.sk-game-page:is(.sk-interface-simple, [class*="sk-ambience-"]) > .sk-game-stage { grid-column: 1; grid-row: 2; width: 100%; height: 100% !important; min-height: 200px !important; margin: 0; }
+  .sk-page.sk-game-page > .sk-hand-area,
+  .sk-page.sk-game-page .sk-hand-area:has(.sk-hand-toolbar) { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto; align-self: stretch; align-content: safe center; gap: 4px; width: 100%; padding: 6px; overflow: auto; overscroll-behavior: contain; }
+  .sk-page.sk-game-page .sk-hand-area > .sk-hand { grid-column: 1 / -1; grid-row: 1; --fan-card-width: min(calc(42px * var(--sk-own-card-scale, 1)), 18cqw, 17dvh); padding: 6px 6px 8px; }
+  .sk-page.sk-game-page .sk-hand-area > .sk-hand-spread { --fan-card-width: calc(42px * var(--sk-own-card-scale, 1)); }
+  .sk-page.sk-game-page .sk-hand-area:has(.sk-table-sidebar-detail) > .sk-hand:not(.sk-hand-spread) { --fan-card-width: min(calc(42px * var(--sk-own-card-scale, 1)), 18cqw, 12dvh); }
+  .sk-game-page .sk-hand-feedback { grid-column: 1; grid-row: 2; font-size: 11px; }
+  .sk-page.sk-game-page .sk-hand-area .sk-hand-toolbar { grid-column: 2; grid-row: 2; gap: 3px; }
+  .sk-game-page .sk-hand-toolbar .sk-button { min-width: 36px; min-height: 36px; padding: 6px !important; }
+  .sk-game-page .sk-sort-trigger span { display: none; }
+  .sk-page.sk-game-page .sk-hand-area .sk-table-sidebar { grid-column: 1 / -1; grid-row: 3; padding: 5px; gap: 4px; }
+  .sk-page.sk-game-page .sk-table-sidebar-detail .sk-suit-card { width: 46px; padding: 2px; }
+  .sk-page.sk-game-page .sk-table-sidebar-detail .sk-suit-card img { width: 28px; }
+  .sk-game-page .sk-table-actions .sk-toggle { font-size: 12px; }
+  .sk-game-page .sk-table-actions h2 { font-size: 13px; }
+  .sk-game-page .sk-table-sidebar .sk-button { min-height: 38px; padding: 6px 8px; font-size: 12px; }
+  .sk-game-page .sk-contract-kind { min-height: 38px; flex-basis: 76px; }
+  .sk-game-page > .sk-learning-banner { grid-column: 1 / -1; grid-row: 3; padding: 4px 10px; font-size: 12px; }
+  .sk-game-page > .sk-error { grid-column: 1 / -1; margin: 0; }
+  .sk-game-page .sk-simple-seat-north, .sk-game-page .sk-simple-seat-south { width: min(145px, 46%); }
+  .sk-game-page .sk-simple-seat-west, .sk-game-page .sk-simple-seat-east { width: min(90px, 28%); }
+  .sk-game-page .sk-simple-seat > strong { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk-game-page *, .sk-game-page *::before, .sk-game-page *::after,
+  .sk-rulebook-backdrop * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media (max-width: 700px) and (orientation: portrait) {
+  .sk-page.sk-game-page .sk-header-actions { flex-wrap: wrap; overflow: visible; }
+  .sk-page.sk-game-page.sk-interface-simple.sk-immersive > .sk-game-stage { flex: none; height: clamp(280px, 38dvh, 420px) !important; min-height: 280px !important; }
+}

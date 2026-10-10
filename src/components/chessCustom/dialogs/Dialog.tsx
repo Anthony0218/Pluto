@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useId, useRef, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { ui } from "@/i18n/ui";
@@ -32,6 +33,7 @@ export default function Dialog({
   initialFocus?: RefObject<HTMLElement | null>;
   tone?: "default" | "danger";
 }) {
+  useGameLanguage();
   const panel = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const descriptionId = useId();
@@ -95,26 +97,26 @@ export default function Dialog({
         <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(ellipse_at_50%_0%,rgba(252,211,77,.10),transparent_70%)]" />
         <header className="relative flex items-start gap-3 px-5 pb-3 pt-5">
           <div className="min-w-0 flex-1">
-            {eyebrow && <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300/80">{eyebrow}</p>}
+            {eyebrow && <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300/80">{gameUi(eyebrow)}</p>}
             <h2 id={titleId} className="mt-1 font-serif text-2xl leading-tight text-white">
-              {title}
+              {gameUi(title)}
             </h2>
-            {description && (
+            {gameUi(description && (
               <p id={descriptionId} className="mt-1.5 text-sm leading-6 text-zinc-400">
-                {description}
+                {gameUi(description)}
               </p>
-            )}
+            ))}
           </div>
           <button type="button" onClick={onClose} aria-label={ui("Close")} className="-mr-1 rounded-xl p-2 text-zinc-500 transition hover:bg-white/[0.06] hover:text-white focus-visible:outline-2 focus-visible:outline-amber-300">
             <CloseIcon size={18} />
           </button>
         </header>
-        {children && (
+        {gameUi(children && (
           <div data-dialog-body className="relative min-h-0 flex-1 overflow-y-auto px-5 pb-5">
-            {children}
+            {gameUi(children)}
           </div>
-        )}
-        {footer && <footer data-dialog-footer className="relative flex flex-wrap justify-end gap-2 border-t border-white/[0.06] bg-black/20 px-5 py-3">{footer}</footer>}
+        ))}
+        {footer && <footer data-dialog-footer className="relative flex flex-wrap justify-end gap-2 border-t border-white/[0.06] bg-black/20 px-5 py-3">{gameUi(footer)}</footer>}
       </div>
     </div>,
     document.body,

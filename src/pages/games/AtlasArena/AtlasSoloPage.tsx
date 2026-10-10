@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useRandomSeries } from "./useRandomSeries";
 import { AtlasRandomSeriesProgress, AtlasRandomSeriesResults } from "../../../components/atlas/AtlasRandomSeriesResults";
 import { TrialSessionContext } from "../../../components/atlas/trials/trialSession";
@@ -15,8 +16,10 @@ import { useArenaStore } from "./useArenaStore";
 import "./atlas-arena.css";
 import "../../../components/atlas/trials/atlas-trials.css";
 
-export function AtlasLoading() { return <main className="atlas-page atlas-center"><div className="atlas-orbit is-loading"><Globe2 /></div><h1>Preparing the world…</h1><p>Loading the versioned Atlas snapshot.</p></main>; }
-export function AtlasUnavailable({ error }: { error?: string | null }) { return <main className="atlas-page atlas-center"><Globe2 size={44} /><h1>Atlas data unavailable</h1><p>{error}</p><Link to="/games/atlas-arena">Back to Atlas Arena</Link></main>; }
+export function AtlasLoading() {
+  useGameLanguage(); return <main className="atlas-page atlas-center"><div className="atlas-orbit is-loading"><Globe2 /></div><h1>{gameUi("Preparing the world…")}</h1><p>{gameUi("Loading the versioned Atlas snapshot.")}</p></main>; }
+export function AtlasUnavailable({ error }: { error?: string | null }) {
+  useGameLanguage(); return <main className="atlas-page atlas-center"><Globe2 size={44} /><h1>{gameUi("Atlas data unavailable")}</h1><p>{gameUi(error)}</p><Link to="/games/atlas-arena">{gameUi("Back to Atlas Arena")}</Link></main>; }
 
 /** Singleplayer for every mode: the stat modes start straight away, the map modes ask for their settings first. */
 export default function AtlasSoloPage() {
@@ -27,6 +30,7 @@ export default function AtlasSoloPage() {
 }
 
 function SoloSession({ modeId }: { modeId?: string }) {
+  useGameLanguage();
   const series = useRandomSeries(modeId, true);
   const mode = series.mode;
   const { data, loading, error } = useAtlasData();
@@ -36,7 +40,7 @@ function SoloSession({ modeId }: { modeId?: string }) {
   if (series.enabled && series.reviewing) return <AtlasRandomSeriesResults key={series.results.length} {...series} solo players={[{ id: "you", name: "You" }]} onNext={series.next} onAgain={series.reset} />;
   const onComplete = series.enabled ? (score: number) => series.finish({ you: score }) : undefined;
   const game = mode.solo.kind === "trial" ? <TrialSolo key={`${mode.id}:${series.results.length}`} mode={mode} data={data} onComplete={onComplete} /> : <ArenaSolo key={`${mode.id}:${series.results.length}`} mode={mode} data={data} onComplete={onComplete} />;
-  return series.enabled ? <div className="atlas-series-session"><AtlasRandomSeriesProgress length={series.length} index={series.results.length} />{game}</div> : game;
+  return series.enabled ? <div className="atlas-series-session"><AtlasRandomSeriesProgress length={series.length} index={series.results.length} />{gameUi(game)}</div> : game;
 }
 
 function TrialSolo({ mode, data, onComplete }: { mode: ArenaModeDef; data: AtlasDataset; onComplete?: (score: number) => void }) {
@@ -54,6 +58,7 @@ function TrialSolo({ mode, data, onComplete }: { mode: ArenaModeDef; data: Atlas
 }
 
 function ArenaSolo({ mode, data, onComplete }: { mode: ArenaModeDef; data: AtlasDataset; onComplete?: (score: number) => void }) {
+  useGameLanguage();
   const navigate = useNavigate();
   const { stored, update, recordBest } = useArenaStore();
   const [phase, setPhase] = useState<"setup" | "playing" | "result">(mode.options.length ? "setup" : "playing");
@@ -71,13 +76,13 @@ function ArenaSolo({ mode, data, onComplete }: { mode: ArenaModeDef; data: Atlas
 
   if (phase === "setup") return (
     <main className="atlas-page atlas-setup">
-      <Link className="atlas-back" to="/games/atlas-arena"><ArrowLeft /> Atlas Arena</Link>
+      <Link className="atlas-back" to="/games/atlas-arena"><ArrowLeft />{gameUi(" Atlas Arena")}</Link>
       <div className="atlas-setup-card">
-        <span className="atlas-eyebrow">Singleplayer · configure</span>
-        <h1>{mode.title}</h1>
-        <p>{mode.description}</p>
+        <span className="atlas-eyebrow">{gameUi("Singleplayer · configure")}</span>
+        <h1>{gameUi(mode.title)}</h1>
+        <p>{gameUi(mode.description)}</p>
         <SoloSettingsForm mode={mode} settings={settings} onChange={(next) => update({ settings: next })} />
-        <button type="button" className="atlas-start" disabled={!settingsReady(mode, settings)} onClick={start}>Start <ChevronRight /></button>
+        <button type="button" className="atlas-start" disabled={!settingsReady(mode, settings)} onClick={start}>{gameUi("Start ")}<ChevronRight /></button>
       </div>
     </main>
   );
@@ -86,5 +91,5 @@ function ArenaSolo({ mode, data, onComplete }: { mode: ArenaModeDef; data: Atlas
     {mode.options.length > 0 && <button type="button" className="atlas-secondary" onClick={() => setPhase("setup")}><SlidersHorizontal /> Settings</button>}
     <button type="button" className="atlas-secondary" onClick={toHub}>Back to menu</button>
   </>} />;
-  return <AtlasSoloGame key={seed} data={data} mode={mode.solo.mode} settings={settings} seed={seed} title={mode.title} onFinish={finish} onExit={() => mode.options.length ? setPhase("setup") : toHub()} />;
+  return <AtlasSoloGame key={seed} data={data} mode={mode.solo.mode} settings={settings} seed={seed} title={gameUi(mode.title)} onFinish={finish} onExit={() => mode.options.length ? setPhase("setup") : toHub()} />;
 }

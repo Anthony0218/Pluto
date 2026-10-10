@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import VariantRulesPage, { Flow, VisualCard } from "./VariantRulesPage";
 import {
@@ -223,7 +224,7 @@ function ExplosionPatternCard({
   return (
     <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
       <h3 className="text-sm font-black text-white">{ui(title)}</h3>
-      <p className="mt-1 text-xs leading-5 text-zinc-400">{detail}</p>
+      <p className="mt-1 text-xs leading-5 text-zinc-400">{gameUi(detail)}</p>
 
       <div className="mt-4 inline-block rounded-xl border border-white/10 bg-zinc-950 p-2">
         <div className="grid grid-cols-5 gap-1">
@@ -247,7 +248,7 @@ function ExplosionPatternCard({
                           : "border-zinc-800 bg-zinc-800/70 text-zinc-700",
                   ].join(" ")}
                 >
-                  {isCenter ? "💣" : active ? "✦" : ""}
+                  {gameUi(isCenter ? "💣" : active ? "✦" : "")}
                 </div>
               );
             }),

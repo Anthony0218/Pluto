@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useSyncExternalStore } from "react";
 import { Link } from "react-router-dom";
 import { Volume2, VolumeX } from "lucide-react";
@@ -18,7 +19,7 @@ function ChessAudioControls({ compact = false }: { compact?: boolean }) {
   useUiLanguage();
   const { settings, update } = useChessAudio();
   return <div className={compact ? "space-y-3" : "space-y-6"}>
-    {sliders.map(([field, label]) => <label key={field} className={`block font-semibold ${compact ? "text-xs" : "text-sm"}`}><span className="flex justify-between"><span>{ui(label)}</span><span>{Math.round(settings[field] * 100)}%</span></span><input className={`w-full accent-indigo-400 ${compact ? "mt-1.5" : "mt-3"}`} type="range" min="0" max="1" step="0.05" value={settings[field]} onChange={event => update({ [field]: Number(event.target.value) })} /></label>)}
+    {sliders.map(([field, label]) => <label key={field} className={`block font-semibold ${compact ? "text-xs" : "text-sm"}`}><span className="flex justify-between"><span>{ui(label)}</span><span>{gameUi(Math.round(settings[field] * 100))}%</span></span><input className={`w-full accent-indigo-400 ${compact ? "mt-1.5" : "mt-3"}`} type="range" min="0" max="1" step="0.05" value={settings[field]} onChange={event => update({ [field]: Number(event.target.value) })} /></label>)}
     {toggles.map(([field, label]) => <label key={field} className={`flex items-center justify-between gap-4 border-t border-white/10 font-semibold ${compact ? "min-h-8 pt-2 text-xs" : "min-h-11 pt-4 text-sm"}`}><span>{ui(label)}</span><input type="checkbox" className={compact ? "h-4 w-4 accent-indigo-400" : "h-5 w-5 accent-indigo-400"} checked={settings[field]} onChange={event => update({ [field]: event.target.checked })} /></label>)}
   </div>;
 }
@@ -36,10 +37,11 @@ export function ChessAudioMenu() {
 }
 
 export default function ChessAudioSettings() {
+  useGameLanguage();
   return <main className="mx-auto min-h-[var(--app-height)] max-w-3xl px-5 py-10 text-zinc-100">
-    <Link to="/games/chess" className="text-sm text-indigo-300 hover:underline">← Chess</Link>
-    <h1 className="mt-6 text-3xl font-bold">Chess audio settings</h1>
-    <p className="mt-2 text-sm text-zinc-400">Your choices are saved in this browser.</p>
+    <Link to="/games/chess" className="text-sm text-indigo-300 hover:underline">{gameUi("← Chess")}</Link>
+    <h1 className="mt-6 text-3xl font-bold">{gameUi("Chess audio settings")}</h1>
+    <p className="mt-2 text-sm text-zinc-400">{gameUi("Your choices are saved in this browser.")}</p>
     <div className="mt-7 rounded-3xl border border-white/10 bg-zinc-900/70 p-6"><ChessAudioControls /></div>
   </main>;
 }

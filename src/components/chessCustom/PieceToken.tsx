@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { luminance } from "@/games/chess/custom/engine/teams";
 import type { PieceDefinition, TeamDefinition } from "@/games/chess/custom/engine/types";
 import { ChaosPieceArtwork } from "./ChaosPieceArtwork";
@@ -9,6 +10,7 @@ const CHESS_GLYPH = /^[♔-♟]$/u;
  * Chess glyphs are filled with the team colour; emoji and other icons sit on a team-coloured disc.
  */
 export default function PieceToken({ def, team, title }: { def?: PieceDefinition; team?: TeamDefinition; title?: string }) {
+  useGameLanguage();
   const icon = def?.icon || "?";
   const color = team?.color ?? "#f5efe1";
   const light = luminance(color) > 0.5;
@@ -16,8 +18,8 @@ export default function PieceToken({ def, team, title }: { def?: PieceDefinition
   const glyph = CHESS_GLYPH.test(icon);
   const gradientId = `token-${color.replace("#", "")}`;
   return (
-    <svg viewBox="0 0 100 100" role={title ? "img" : undefined} aria-label={title} aria-hidden={!title} className="pointer-events-none block h-full w-full select-none overflow-visible">
-      {["🧙", "🐉", "💣", "💥"].includes(icon) ? <ChaosPieceArtwork icon={icon} color={color} outline={outline} /> : glyph ? (
+    <svg viewBox="0 0 100 100" role={title ? "img" : undefined} aria-label={gameUi(title)} aria-hidden={!title} className="pointer-events-none block h-full w-full select-none overflow-visible">
+      {gameUi(["🧙", "🐉", "💣", "💥"].includes(icon) ? <ChaosPieceArtwork icon={icon} color={color} outline={outline} /> : glyph ? (
         <text
           x="50"
           y="54"
@@ -31,7 +33,7 @@ export default function PieceToken({ def, team, title }: { def?: PieceDefinition
           paintOrder="stroke"
           style={{ filter: "drop-shadow(0 3px 2px rgba(0,0,0,.55))" }}
         >
-          {icon}
+          {gameUi(icon)}
         </text>
       ) : (
         <>
@@ -44,10 +46,10 @@ export default function PieceToken({ def, team, title }: { def?: PieceDefinition
           <circle cx="50" cy="52" r="40" fill={color} />
           <circle cx="50" cy="52" r="40" fill={`url(#${gradientId})`} stroke={outline} strokeOpacity={0.6} strokeWidth="4" style={{ filter: "drop-shadow(0 3px 3px rgba(0,0,0,.45))" }} />
           <text x="50" y="54" textAnchor="middle" dominantBaseline="central" fontSize="46">
-            {icon}
+            {gameUi(icon)}
           </text>
         </>
-      )}
+      ))}
     </svg>
   );
 }

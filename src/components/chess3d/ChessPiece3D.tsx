@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
@@ -145,6 +146,7 @@ const ACCENT_GEOMETRY = {
 };
 
 function PieceAccent({ accent, tint = "#fbbf24", height, reducedMotion }: { accent: PieceModelAccent; tint?: string; height: number; reducedMotion?: boolean }) {
+  useGameLanguage();
   const groupRef = useRef<THREE.Group>(null);
   const material = useMemo(() => new THREE.MeshStandardMaterial({ color: tint, emissive: tint, emissiveIntensity: accent === "shield" ? 0.25 : 1.4, roughness: 0.25, metalness: 0.6, toneMapped: accent === "shield" }), [tint, accent]);
   useEffect(() => () => material.dispose(), [material]);
@@ -208,6 +210,7 @@ function PieceAccent({ accent, tint = "#fbbf24", height, reducedMotion }: { acce
 
 /** A standalone model with its accent — for previews such as the piece inspector. */
 export function PieceModelView({ base, set, skin, accent = "none", tint, scale = 1 }: { base: PieceModelBase; set: PieceSet; skin: Chess3DPieceSkin; accent?: PieceModelAccent; tint?: string; scale?: number }) {
+  useGameLanguage();
   return (
     <group>
       <LoadedModel base={base} set={set} skin={skin} scale={scale} />
@@ -231,6 +234,7 @@ const FRAGMENTS = Array.from({ length: 11 }, (_, index) => {
 
 /** Mounted only while a piece is being captured. */
 function ShatterFragments({ set, skin }: { set: PieceSet; skin: Chess3DPieceSkin }) {
+  useGameLanguage();
   const groupRef = useRef<THREE.Group>(null);
   const progress = useRef(0);
   const color = skin === "neon" ? (set === "light" ? "#38bdf8" : "#a855f7") : set === "light" ? "#e5e7eb" : "#2b2d31";
@@ -282,6 +286,7 @@ function ChessPiece3D({
   reducedMotion = false,
   onClick,
 }: Props) {
+  useGameLanguage();
   const [hovered, setHovered] = useState(false);
   const groupRef = useRef<THREE.Group>(null);
   const bodyRef = useRef<THREE.Group>(null);
@@ -405,7 +410,7 @@ function ChessPiece3D({
         document.body.style.cursor = "default";
       }}
     >
-      {(inCheck || checkmated) && (
+      {gameUi((inCheck || checkmated) && (
         <>
           <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <ringGeometry args={[0.34, 0.5, 48]} />
@@ -413,13 +418,13 @@ function ChessPiece3D({
           </mesh>
           <pointLight position={[0, 0.65, 0]} color={checkmated ? "#fb7185" : "#ef4444"} intensity={checkmated ? 3.2 : 2.1} distance={2.2} />
         </>
-      )}
-      {teamColor && (
+      ))}
+      {gameUi(teamColor && (
         <mesh position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[0.3, 0.4, 40]} />
           <meshBasicMaterial color={teamColor} transparent opacity={0.9} depthWrite={false} toneMapped={false} />
         </mesh>
-      )}
+      ))}
       {selected && <pointLight position={[0.3, height + 0.5, 0.3]} color="#fbbf24" intensity={2.4} distance={2.4} />}
       <group ref={bodyRef}>
         <LoadedModel base={base} set={set} skin={skin} scale={scale} />

@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import { Check, ChevronDown, Palette } from "lucide-react";
 import { useState } from "react";
 
@@ -85,7 +86,7 @@ export default function CardThemeSelector() {
         />
       </button>
 
-      {open && (
+      {gameUi(open && (
         <div
           className="
             absolute
@@ -175,7 +176,7 @@ export default function CardThemeSelector() {
             })}
           </div>
         </div>
-      )}
+      ))}
     </div>
   );
 }

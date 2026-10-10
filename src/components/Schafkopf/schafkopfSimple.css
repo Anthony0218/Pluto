@@ -1,0 +1,139 @@
+.sk-interface-selector { display: inline-flex; flex: none; gap: 14px; padding: 8px 12px; border: 1px solid #ffffff26; border-radius: 12px; background: #0c191e; font-size: 13px; font-weight: 750; }
+.sk-header-actions > .sk-interface-selector { width: max-content; min-width: max-content; flex: none; }
+.sk-interface-setting { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-block: 24px; padding: 20px; border: 1px solid #ffffff20; border-radius: 18px; background: #102218; }
+.sk-interface-setting h2 { margin: 0 0 6px; font-size: 18px; }
+.sk-interface-setting p { margin: 0; color: #c6d4d1; font-size: 14px; }
+.sk-background-options .sk-background-simple-preview { position: relative; display: block; box-sizing: border-box; height: 82px; padding: 0; background: #101a20; }
+.sk-background-simple-preview::before { content: ""; position: absolute; inset: 12px; border: 2px solid #bdab7b; border-radius: 12px; background: #245b63; }
+.sk-background-options .sk-background-table-preview { object-position: center top; }
+
+/* The simple interface has its own geometry; photo-scene coordinates do not apply. */
+.sk-page.sk-interface-simple:is(:fullscreen, :not(:fullscreen)) {
+  box-sizing: border-box; display: flex; flex-direction: column; gap: 16px;
+  width: min(1180px, 100%); max-width: none; min-height: var(--app-height, 100dvh);
+  height: auto; margin: 0 auto; padding: 20px; overflow: visible;
+  background: #101a20; color: #f4f3e9;
+}
+.sk-page.sk-interface-simple::before, .sk-page.sk-interface-simple::after { display: none; }
+.sk-page.sk-interface-simple:is(:fullscreen, :not(:fullscreen)) > .sk-game-menu.sk-header { position: relative; inset: auto; width: 100%; min-height: 0; margin: 0; padding: 0; transform: none; flex: none; background: transparent; box-shadow: none; }
+.sk-page.sk-interface-simple .sk-header-actions { flex-wrap: wrap; gap: 6px; }
+.sk-page.sk-interface-simple .sk-header-actions > .sk-button { width: auto; flex: none; }
+.sk-page.sk-interface-simple .sk-game-menu-title { min-width: 130px; }
+.sk-page.sk-interface-simple .sk-game-menu-title strong { font-size: 22px; }
+.sk-page.sk-interface-simple > .sk-learning-banner { position: static; width: 100%; box-sizing: border-box; margin: 0; flex: none; }
+.sk-page.sk-interface-simple > .sk-game-stage {
+  position: relative; flex: none; width: 100%; max-width: none;
+  height: clamp(360px, 48dvh, 500px) !important; min-height: 360px !important;
+  margin: 0; padding: 0; transform: none;
+}
+.sk-page.sk-interface-simple .sk-game-stage > .sk-table {
+  box-sizing: border-box; position: relative; isolation: isolate;
+  width: 100%; height: 100%; min-height: 0; margin: 0; padding: 0;
+  border: 4px solid #bdab7b; border-radius: 28px;
+  background: #245b63; box-shadow: none; overflow: hidden;
+}
+.sk-page.sk-interface-simple .sk-table::before, .sk-page.sk-interface-simple .sk-table::after { display: none; }
+.sk-page.sk-interface-simple.sk-simple-background-table .sk-game-stage > .sk-table { border-color: #806044; background: #b34339 url("/images/schafkopf-table-topdown.png") center top / cover no-repeat; }
+.sk-page.sk-simple-background-table .sk-simple-table-status { inset: auto; top: 50%; left: 50%; width: max-content; max-width: 90%; padding: 8px 12px; border-radius: 10px; background: #101a20e8; transform: translate(-50%, -50%); }
+.sk-page.sk-interface-simple .sk-trick-progress { top: 14px; right: 16px; left: auto; transform: none; color: #e2ece9; background: #153d44; }
+.sk-page.sk-interface-simple .sk-game-stage .sk-table .sk-trick {
+  top: 50%; bottom: auto; left: 50%; width: 200px; height: 170px;
+  min-height: 0; padding: 0; zoom: 1;
+  transform: translate(-50%, -50%) scale(var(--sk-trick-card-scale, 1));
+  border: 0; border-radius: 0; background: transparent; box-shadow: none;
+}
+.sk-page.sk-interface-simple .sk-game-stage .sk-table .sk-trick .sk-played { width: 66px; }
+.sk-page.sk-interface-simple .sk-game-stage .sk-table .sk-trick .sk-played img { width: 100%; height: auto; }
+.sk-simple-table-status { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 8px; text-align: center; color: #f4e2b8; font-size: 16px; font-weight: 750; }
+.sk-simple-table-status small { color: #d0e1df; font-size: 12px; font-weight: 500; }
+.sk-simple-seat { position: absolute; z-index: 4; box-sizing: border-box; display: grid; gap: 5px; width: 172px; padding: 12px; border: 1px solid #ffffff30; border-radius: 14px; background: #153d44; text-align: center; }
+.sk-simple-seat.is-active { border-color: #f3d686; background: #203f3f; }
+.sk-simple-seat > strong { display: flex; justify-content: center; flex-wrap: wrap; align-items: center; gap: 6px; overflow-wrap: anywhere; font-size: 14px; }
+.sk-simple-seat > strong small { padding: 2px 5px; border-radius: 4px; background: #ffffff14; color: #ceddd9; font-size: 9px; }
+.sk-simple-seat > span { color: #bfd6d5; font-size: 11px; }
+.sk-simple-seat.is-active > span:first-of-type { color: #f3d686; font-weight: 750; }
+.sk-simple-seat-details { display: flex; justify-content: center; flex-wrap: wrap; align-items: center; gap: 5px 10px; font-size: 11px; color: #f0e3c4; }
+.sk-simple-seat-details button { padding: 2px 0; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.sk-simple-seat-details button:disabled { opacity: 1; cursor: default; text-decoration: none; }
+.sk-simple-seat-details button:focus-visible { outline: 2px solid #6ee7b7; outline-offset: 3px; }
+.sk-simple-seat .sk-simple-seat-badges { color: #f3d686; font-size: 10px; }
+.sk-simple-announcement { max-height: 32px; overflow: hidden; color: #d6e3df; font-size: 10px; line-height: 1.5; }
+.sk-simple-seat-north { top: 14px; left: 50%; transform: translateX(-50%); }
+.sk-simple-seat-south { bottom: 14px; left: 50%; transform: translateX(-50%); }
+.sk-simple-seat-west { top: 50%; left: 20px; transform: translateY(-50%); }
+.sk-simple-seat-east { top: 50%; right: 20px; transform: translateY(-50%); }
+.sk-page.sk-interface-simple .sk-held-trick { max-width: calc(100% - 24px); min-width: 0; box-sizing: border-box; }
+.sk-page.sk-interface-simple > .sk-hand-area,
+.sk-page.sk-interface-simple .sk-hand-area:has(.sk-hand-toolbar) {
+  box-sizing: border-box; position: relative; display: flex; flex-direction: column; align-items: center;
+  flex: none; width: 100%; min-width: 0; max-width: none; min-height: 0;
+  margin: 0; padding: 16px; gap: 10px; transform: none;
+  border: 1px solid #ffffff20; border-radius: 20px; background: #14232b; overflow: visible;
+}
+.sk-page.sk-interface-simple .sk-hand-area .sk-table-sidebar {
+  position: relative; inset: auto; contain: none; width: min(720px, 100%); max-width: 100%;
+  height: auto; min-height: 0; max-height: none; margin: 0; padding: 12px;
+  border: 1px solid #ffffff20; border-radius: 14px; background: #101e25;
+  transform: none; overflow: visible;
+}
+.sk-page.sk-interface-simple .sk-hand-area .sk-table-actions { position: static; display: block; width: 100%; height: auto; max-height: none; padding: 0; transform: none; overflow: visible; }
+.sk-page.sk-interface-simple .sk-table-actions:empty { display: none; }
+.sk-page.sk-interface-simple .sk-table-actions > div { background: transparent; }
+.sk-page.sk-interface-simple .sk-hand-area .sk-table-sidebar .sk-button { min-height: 40px; padding: 8px 12px; font-size: 13px; }
+.sk-page.sk-interface-simple .sk-hand-area .sk-contract-kinds { display: flex; flex-wrap: wrap; overflow: visible; }
+.sk-page.sk-interface-simple .sk-contract-kind { flex: 1 1 100px; min-height: 40px; }
+.sk-page.sk-interface-simple .sk-hand-area .sk-hand-toolbar { width: auto; min-height: 0; margin: 0; padding: 0; }
+.sk-page.sk-interface-simple .sk-hand-area > .sk-hand { --fan-card-width: clamp(54px, 6vw, 82px); min-height: 140px; padding-bottom: 32px; }
+.sk-page.sk-interface-simple .sk-hand-area .sk-sort-trigger { min-height: 36px; }
+.sk-page.sk-interface-simple .sk-hand-deck { inset: 0; z-index: 45; width: 100%; height: 100%; padding: 16px; background: #14232bf2; border-radius: 20px; }
+.sk-page.sk-interface-simple:fullscreen { width: 100%; height: 100dvh; min-height: 0; overflow-y: auto; }
+.sk-page.sk-interface-simple:fullscreen > .sk-game-stage { flex: 1 0 320px; }
+
+@media (max-width: 700px) {
+  .sk-page.sk-interface-simple.sk-simple-background-table .sk-game-stage > .sk-table { background-size: 100% 100%; }
+  .sk-background-options .sk-background-simple-preview { height: 55px; }
+  .sk-page.sk-interface-simple:is(:fullscreen, :not(:fullscreen)) { padding: 10px; gap: 12px; }
+  .sk-page.sk-interface-simple > .sk-game-menu { flex-wrap: wrap; gap: 10px; }
+  .sk-page.sk-interface-simple .sk-game-menu-title { width: 100%; }
+  .sk-page.sk-interface-simple .sk-game-menu-title > span { display: block; }
+  .sk-page.sk-interface-simple .sk-header-actions { width: 100%; justify-content: flex-start; overflow: visible; }
+  .sk-page.sk-interface-simple > .sk-game-stage { height: 420px !important; min-height: 420px !important; }
+  .sk-page.sk-interface-simple .sk-game-stage > .sk-table { border-width: 2px; border-radius: 20px; }
+  .sk-simple-seat { width: 100px; padding: 8px 5px; gap: 4px; }
+  .sk-simple-seat > strong { font-size: 11px; }
+  .sk-simple-seat-north, .sk-simple-seat-south { width: 160px; }
+  .sk-simple-seat-west { left: 8px; top: 28%; }
+  .sk-simple-seat-east { right: 8px; top: 28%; }
+  .sk-simple-announcement { display: none; }
+  .sk-page.sk-interface-simple .sk-game-stage .sk-table .sk-trick { top: 59%; width: 140px; height: 100px; }
+  .sk-page.sk-interface-simple .sk-game-stage .sk-table .sk-trick .sk-played { width: 40px; }
+  .sk-simple-table-status { font-size: 12px; gap: 4px; }
+  .sk-simple-table-status small { font-size: 10px; }
+  .sk-page.sk-interface-simple > .sk-hand-area { padding: 12px 6px; }
+  .sk-page.sk-interface-simple .sk-hand-area > .sk-hand { --fan-card-width: 34px; min-height: 84px; padding-bottom: 12px; }
+  .sk-page.sk-interface-simple .sk-hand-area .sk-table-sidebar { width: 100%; padding: 10px; }
+  .sk-page.sk-interface-simple .sk-hand-area .sk-table-sidebar-detail .sk-suit-picker { grid-template-columns: 1fr; }
+  .sk-page.sk-interface-simple .sk-hand-area .sk-contract-confirm { position: static; width: 100%; flex-direction: row; }
+  .sk-page.sk-interface-simple .sk-sort-popover { position: absolute; top: auto; bottom: calc(100% + 8px); left: 50%; right: auto; transform: translateX(-50%); }
+}
+
+/* Text seats need more room than the illustrated scene's mobile overlays. */
+@media (max-width: 700px) and (orientation: portrait) {
+  .sk-page.sk-game-page.sk-interface-simple > .sk-game-stage { flex: none; height: 420px !important; min-height: 420px !important; }
+  .sk-page.sk-interface-simple .sk-simple-seat-north,
+  .sk-page.sk-interface-simple .sk-simple-seat-south { width: 150px; }
+  .sk-page.sk-interface-simple .sk-simple-seat-west { top: 28%; }
+  .sk-page.sk-interface-simple .sk-simple-seat-east { top: 28%; }
+  .sk-page.sk-interface-simple .sk-simple-announcement { display: none; }
+  .sk-page.sk-game-page.sk-interface-simple .sk-game-stage .sk-table .sk-trick { top: 59%; }
+}
+@media (orientation: landscape) and (max-height: 600px) and (min-width: 540px) {
+  .sk-page.sk-game-page.sk-interface-simple > .sk-game-stage { min-height: 300px !important; }
+  .sk-page.sk-interface-simple .sk-simple-seat { gap: 2px; padding: 5px; }
+  .sk-page.sk-interface-simple .sk-simple-seat-north,
+  .sk-page.sk-interface-simple .sk-simple-seat-south { width: 42%; }
+  .sk-page.sk-interface-simple .sk-simple-seat-west,
+  .sk-page.sk-interface-simple .sk-simple-seat-east { top: 28%; width: 26%; }
+  .sk-page.sk-interface-simple .sk-simple-announcement { display: none; }
+  .sk-page.sk-game-page.sk-interface-simple .sk-game-stage .sk-table .sk-trick { top: 59%; transform: translate(-50%, -50%); }
+}

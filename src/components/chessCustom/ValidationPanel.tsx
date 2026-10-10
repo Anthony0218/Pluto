@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { CircleAlert, CircleCheck, Info, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import { issueCounts, type IssueSeverity } from "@/games/chess/custom/engine/validation";
@@ -12,6 +13,7 @@ const severityStyle: Record<IssueSeverity, { icon: typeof Info; className: strin
 
 /** Non-blocking validation: explains problems, links to where they can be fixed. */
 export default function ValidationPanel({ compact = false }: { compact?: boolean }) {
+  useGameLanguage();
   const { issues, focusIssue } = useEditor();
   const [filter, setFilter] = useState<IssueSeverity | "all">("all");
   const counts = issueCounts(issues);
@@ -28,23 +30,23 @@ export default function ValidationPanel({ compact = false }: { compact?: boolean
               <button
                 key={severity}
                 type="button"
-                title={`${severityStyle[severity].label}s`}
+                title={gameUi(`${severityStyle[severity].label}s`)}
                 aria-pressed={filter === severity}
                 onClick={() => setFilter(filter === severity ? "all" : severity)}
                 className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-bold transition ${filter === severity ? "bg-white/10" : "hover:bg-white/[0.06]"} ${severityStyle[severity].className}`}
               >
                 <Icon size={12} />
-                {counts[severity]}
+                {gameUi(counts[severity])}
               </button>
             );
           })}
         </div>
       </header>
       <div className={`space-y-1 overflow-y-auto p-2 ${compact ? "max-h-56" : "max-h-[40vh]"}`}>
-        {visible.length === 0 ? (
+        {gameUi(visible.length === 0 ? (
           <p className="flex items-center gap-2 px-2 py-3 text-xs text-emerald-300/90">
             <CircleCheck size={14} />
-            {issues.length ? ui("Nothing in this category.") : ui("No problems found. Ready to test.")}
+            {gameUi(issues.length ? ui("Nothing in this category.") : ui("No problems found. Ready to test."))}
           </p>
         ) : (
           visible.map((issue) => {
@@ -56,12 +58,12 @@ export default function ValidationPanel({ compact = false }: { compact?: boolean
                 onClick={() => focusIssue(issue)}
                 className="flex w-full items-start gap-2 rounded-lg px-2 py-1.5 text-left text-xs leading-5 text-zinc-300 transition hover:bg-white/[0.05]"
               >
-                <Icon size={13} className={`mt-1 shrink-0 ${severityStyle[issue.severity].className}`} aria-label={severityStyle[issue.severity].label} />
-                <span>{issue.message}</span>
+                <Icon size={13} className={`mt-1 shrink-0 ${severityStyle[issue.severity].className}`} aria-label={gameUi(severityStyle[issue.severity].label)} />
+                <span>{gameUi(issue.message)}</span>
               </button>
             );
           })
-        )}
+        ))}
       </div>
     </section>
   );

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { ChevronsRight, Pause, Play, RotateCcw, StepBack, StepForward } from "lucide-react";
 import { PLAYBACK_SPEEDS, type GameSession } from "@/games/chess/custom/editor/useGameSession";
 import { ui } from "@/i18n/ui";
@@ -7,6 +8,7 @@ const glassButton =
 
 /** Video-player style controls with a scrubbable move timeline. */
 export default function SimulationControls({ session, speed, onSpeed, canAutoplay }: { session: GameSession; speed: number; onSpeed: (speed: number) => void; canAutoplay: boolean }) {
+  useGameLanguage();
   const total = session.frames.length - 1;
   const canPlay = !session.atEnd || canAutoplay;
   return (
@@ -19,8 +21,8 @@ export default function SimulationControls({ session, speed, onSpeed, canAutopla
       </button>
       <button
         type="button"
-        aria-label={session.playing ? ui("Pause") : ui("Play")}
-        title={session.playing ? ui("Pause (space)") : ui("Play (space)")}
+        aria-label={gameUi(session.playing ? ui("Pause") : ui("Play"))}
+        title={gameUi(session.playing ? ui("Pause (space)") : ui("Play (space)"))}
         disabled={!canPlay && !session.playing}
         onClick={() => session.setPlaying(!session.playing)}
         className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-amber-300 text-zinc-950 shadow-[0_0_24px_rgba(252,211,77,.35)] transition hover:bg-amber-200 disabled:cursor-not-allowed disabled:opacity-40"
@@ -45,7 +47,7 @@ export default function SimulationControls({ session, speed, onSpeed, canAutopla
           className="h-1.5 flex-1 cursor-pointer accent-amber-300"
         />
         <span className="w-24 text-right font-mono text-[11px] text-zinc-400">
-          {ui("Move")} {session.cursor}/{total}
+          {ui("Move")} {gameUi(session.cursor)}/{gameUi(total)}
         </span>
       </div>
       <label className="flex items-center gap-1.5 text-[11px] text-zinc-400">
@@ -53,7 +55,7 @@ export default function SimulationControls({ session, speed, onSpeed, canAutopla
         <select value={speed} onChange={(event) => onSpeed(Number(event.target.value))} className="rounded-lg border border-white/10 bg-black/60 px-1.5 py-1 text-xs font-semibold text-zinc-100 outline-none">
           {PLAYBACK_SPEEDS.map((value) => (
             <option key={value} value={value} className="bg-zinc-900">
-              {value}×
+              {gameUi(value)}×
             </option>
           ))}
         </select>

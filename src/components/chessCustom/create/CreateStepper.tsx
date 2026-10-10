@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useRef } from "react";
 import { CREATE_STEPS, stepNumber, type CreateStep } from "@/games/chess/custom/library/navigation";
 import { useEditor } from "@/games/chess/custom/editor/editorContext";
@@ -10,6 +11,7 @@ import ValidationPanel from "../ValidationPanel";
  * opened directly. Desktop shows a sidebar; phones a horizontal step strip.
  */
 export default function CreateStepper() {
+  useGameLanguage();
   const { step, goToStep, issues, variant } = useEditor();
   const strip = useRef<HTMLDivElement>(null);
   const problems = (id: CreateStep) => issues.filter((issue) => issue.section === id && issue.severity !== "info").length;
@@ -28,8 +30,8 @@ export default function CreateStepper() {
 
   const badge = (id: CreateStep) => {
     const count = problems(id);
-    if (count) return <span title={`${count} ${ui("issue(s)")}`} className="rounded-full bg-amber-300/15 px-1.5 text-[10px] font-bold text-amber-200">{count}</span>;
-    return counts[id] !== undefined ? <span className="text-[10px] font-semibold text-zinc-600">{counts[id]}</span> : null;
+    if (count) return <span title={gameUi(`${count} ${ui("issue(s)")}`)} className="rounded-full bg-amber-300/15 px-1.5 text-[10px] font-bold text-amber-200">{gameUi(count)}</span>;
+    return counts[id] !== undefined ? <span className="text-[10px] font-semibold text-zinc-600">{gameUi(counts[id])}</span> : null;
   };
 
   return (
@@ -48,7 +50,7 @@ export default function CreateStepper() {
                     onClick={() => goToStep(id)}
                     className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition ${active ? "bg-amber-300/15 text-amber-100 ring-1 ring-amber-300/50" : "text-zinc-400 hover:bg-white/[0.05] hover:text-white"}`}
                   >
-                    <span className={`font-mono text-[10px] ${active ? "text-amber-300" : "text-zinc-600"}`}>{stepNumber(id)}</span>
+                    <span className={`font-mono text-[10px] ${active ? "text-amber-300" : "text-zinc-600"}`}>{gameUi(stepNumber(id))}</span>
                     <Icon size={15} />
                     {ui(label)}
                     {problems(id) > 0 && <span className="h-1.5 w-1.5 rounded-full bg-amber-300" aria-label={ui("has issues")} />}
@@ -87,12 +89,12 @@ export default function CreateStepper() {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex items-baseline gap-2">
-                        <span className={`font-mono text-[11px] font-bold ${active ? "text-amber-300" : "text-zinc-600"}`}>{stepNumber(id)}</span>
+                        <span className={`font-mono text-[11px] font-bold ${active ? "text-amber-300" : "text-zinc-600"}`}>{gameUi(stepNumber(id))}</span>
                         <span className={`truncate text-sm ${active ? "font-bold" : "font-medium"}`}>{ui(label)}</span>
                       </span>
                       <span className="block truncate text-[11px] text-zinc-600">{ui(hint)}</span>
                     </span>
-                    {badge(id)}
+                    {gameUi(badge(id))}
                   </button>
                 </li>
               );

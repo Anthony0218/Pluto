@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -863,7 +864,7 @@ export default function ChessCollapseBoard({
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <div className="rounded-full border border-red-400/15 bg-red-400/[0.06] px-3 py-1.5 text-xs font-black text-red-200">
-              ♔ {hearts(displayedLives.w)} · ♚ {hearts(displayedLives.b)}
+              ♔ {gameUi(hearts(displayedLives.w))} · ♚ {gameUi(hearts(displayedLives.b))}
             </div>
 
             <div
@@ -873,16 +874,16 @@ export default function ChessCollapseBoard({
                   : "border-white/10 bg-white/5 text-zinc-300"
               }`}
             >
-              {displayedCollapse.warningEdge ? "⚠ " : "⌛ "}
-              {collapseStatusText(displayedCollapse, t)}
+              {gameUi(displayedCollapse.warningEdge ? "⚠ " : "⌛ ")}
+              {gameUi(collapseStatusText(displayedCollapse, t))}
             </div>
 
-            {!finishedGame && !historyPreview && (
+            {gameUi(!finishedGame && !historyPreview && (
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
-                {game.turn() === "w" ? t("White to move") : t("Black to move")}
+                {gameUi(game.turn() === "w" ? t("White to move") : t("Black to move"))}
               </div>
-            )}
+            ))}
           </div>
         </ChessPageHeader>
 
@@ -962,11 +963,11 @@ export default function ChessCollapseBoard({
                   </div>
 
                   <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-bold text-zinc-400">
-                    {materialDifference > 0 &&
-                      `${t("White")} +${materialDifference}`}
-                    {materialDifference < 0 &&
-                      `${t("Black")} +${Math.abs(materialDifference)}`}
-                    {materialDifference === 0 && t("Equal")}
+                    {gameUi(materialDifference > 0 &&
+                      `${t("White")} +${materialDifference}`)}
+                    {gameUi(materialDifference < 0 &&
+                      `${t("Black")} +${Math.abs(materialDifference)}`)}
+                    {gameUi(materialDifference === 0 && t("Equal"))}
                   </span>
                 </div>
 
@@ -991,7 +992,7 @@ export default function ChessCollapseBoard({
                   </div>
 
                   <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
-                    {history.length}
+                    {gameUi(history.length)}
                   </span>
                 </div>
 
@@ -1008,11 +1009,11 @@ export default function ChessCollapseBoard({
                       moveNumber: entry.moveNumber,
                       content: (
                         <>
-                          <span className="text-base leading-none">{getHistoryPieceSymbol(entry.color, entry.piece)}</span>
-                          <span className="truncate font-mono text-xs font-bold text-zinc-200">{entry.san}</span>
+                          <span className="text-base leading-none">{gameUi(getHistoryPieceSymbol(entry.color, entry.piece))}</span>
+                          <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(entry.san)}</span>
                         </>
                       ),
-                      trailing: events ? <span className="text-xs">{events}</span> : null,
+                      trailing: events ? <span className="text-xs">{gameUi(events)}</span> : null,
                     };
                   })}
                   onSelect={setHistoryPreviewPly}
@@ -1023,11 +1024,11 @@ export default function ChessCollapseBoard({
 
           <section className="min-w-0">
             <div className="mx-auto max-w-[820px]">
-              {finishedGame && !historyPreview && (
+              {gameUi(finishedGame && !historyPreview && (
                 <VisibleGameResult />
-              )}
+              ))}
 
-              {pendingPromotion && !historyPreview && (
+              {gameUi(pendingPromotion && !historyPreview && (
                 <div className="mb-3 rounded-2xl border border-amber-500/20 bg-zinc-900/90 p-3 shadow-xl">
                   <PromotionBar
                     onPromote={(piece) =>
@@ -1039,7 +1040,7 @@ export default function ChessCollapseBoard({
                     }
                   />
                 </div>
-              )}
+              ))}
 
               {historyPreview && (
                 <div className="mb-3 flex items-center justify-between gap-4 rounded-xl border border-blue-400/20 bg-blue-400/[0.07] px-4 py-3">
@@ -1048,13 +1049,13 @@ export default function ChessCollapseBoard({
                       {t("History Preview")}
                     </p>
                     <p className="mt-1 text-sm font-bold text-white">
-                      {t("Move")} {historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
+                      {t("Move")} {gameUi(historyPreview.moveNumber)}
+                      {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                      {gameUi(historyPreview.san)}
                     </p>
                     <p className="mt-1 text-[10px] font-semibold text-zinc-500">
-                      ♔ {hearts(historyPreview.livesAfter.w)} · ♚{" "}
-                      {hearts(historyPreview.livesAfter.b)}
+                      ♔ {gameUi(hearts(historyPreview.livesAfter.w))} · ♚{gameUi(" ")}
+                      {gameUi(hearts(historyPreview.livesAfter.b))}
                     </p>
                   </div>
 
@@ -1068,36 +1069,36 @@ export default function ChessCollapseBoard({
                 </div>
               )}
 
-              {displayedLastEvent && displayedLastEvent.kingHits.length > 0 && (
+              {gameUi(displayedLastEvent && displayedLastEvent.kingHits.length > 0 && (
                 <div className="mb-3 rounded-2xl border border-orange-400/20 bg-orange-400/[0.07] px-4 py-3">
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-300">
                     {t("King hit!")}
                   </p>
                   <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-black text-white">
-                    {displayedLastEvent.kingHits.includes("w") && (
+                    {gameUi(displayedLastEvent.kingHits.includes("w") && (
                       <span>
-                        ♔ {t("White")} {hearts(displayedLastEvent.livesAfter.w)}
+                        ♔ {t("White")} {gameUi(hearts(displayedLastEvent.livesAfter.w))}
                       </span>
-                    )}
-                    {displayedLastEvent.kingHits.includes("b") && (
+                    ))}
+                    {gameUi(displayedLastEvent.kingHits.includes("b") && (
                       <span>
-                        ♚ {t("Black")} {hearts(displayedLastEvent.livesAfter.b)}
+                        ♚ {t("Black")} {gameUi(hearts(displayedLastEvent.livesAfter.b))}
                       </span>
-                    )}
+                    ))}
                   </div>
 
-                  {displayedLastEvent.relocatedKings.length > 0 && (
+                  {gameUi(displayedLastEvent.relocatedKings.length > 0 && (
                     <p className="mt-1 text-[10px] text-zinc-500">
-                      {displayedLastEvent.relocatedKings
+                      {gameUi(displayedLastEvent.relocatedKings
                         .map(
                           (king) =>
                             `${king.color === "w" ? t("White") : t("Black")}: ${king.from} → ${king.to}`,
                         )
-                        .join(" · ")}
+                        .join(" · "))}
                     </p>
-                  )}
+                  ))}
                 </div>
-              )}
+              ))}
 
               <Board
                 board={displayedBoard}
@@ -1117,7 +1118,7 @@ export default function ChessCollapseBoard({
               <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-zinc-900/75 px-4 py-3 xl:hidden">
                 <span className="text-sm text-zinc-500">{t("Collapse")}</span>
                 <span className="text-sm font-bold text-zinc-200">
-                  {collapseStatusText(displayedCollapse, t)}
+                  {gameUi(collapseStatusText(displayedCollapse, t))}
                 </span>
               </div>
             </div>
@@ -1142,14 +1143,14 @@ export default function ChessCollapseBoard({
 
                 <KingLifeCard
                   symbol="♔"
-                  label={whitePlayer || t("White")}
+                  label={gameUi(whitePlayer || t("White"))}
                   lives={displayedLives.w}
                   hits={whiteCollapseHits}
                 />
                 <div className="h-2" />
                 <KingLifeCard
                   symbol="♚"
-                  label={blackPlayer || t("Black")}
+                  label={gameUi(blackPlayer || t("Black"))}
                   lives={displayedLives.b}
                   hits={blackCollapseHits}
                 />
@@ -1172,22 +1173,22 @@ export default function ChessCollapseBoard({
                     </p>
                   </div>
                   <span className="text-2xl" aria-hidden="true">
-                    {displayedCollapse.warningEdge ? "⚠" : "⌛"}
+                    {gameUi(displayedCollapse.warningEdge ? "⚠" : "⌛")}
                   </span>
                 </div>
 
-                {displayedCollapse.mode === "squares" ? (
+                {gameUi(displayedCollapse.mode === "squares" ? (
                   <div className="rounded-2xl border border-red-300/15 bg-red-400/[0.05] p-4">
                     <p className="text-xs font-black uppercase tracking-widest text-red-300">{ui("Standard Squares")}</p>
                     <div className="mt-3 flex items-end justify-between gap-4">
                       <div>
-                        <p className="text-sm font-black text-white">{ui("Next:")}{" "}
-                          {displayedCollapse.nextSquareHalf === "lower" ? ui("ranks 1–4") : ui("ranks 5–8")}
+                        <p className="text-sm font-black text-white">{ui("Next:")}{gameUi(" ")}
+                          {gameUi(displayedCollapse.nextSquareHalf === "lower" ? ui("ranks 1–4") : ui("ranks 5–8"))}
                         </p>
                         <p className="mt-1 text-[10px] text-zinc-600">{ui("One non-king square disappears every 3 moves.")}</p>
                       </div>
                       <span className="text-4xl font-black leading-none text-red-200">
-                        {displayedCollapse.movesUntilWarning}
+                        {gameUi(displayedCollapse.movesUntilWarning)}
                       </span>
                     </div>
                     <p className="mt-3 text-[10px] text-zinc-600">{ui("Dead squares cannot be entered and kings are never selected.")}</p>
@@ -1215,11 +1216,11 @@ export default function ChessCollapseBoard({
                           {t(collapseEdgeLabel(displayedCollapse.warningEdge))}
                         </p>
                         <p className="mt-1 font-mono text-xs font-bold text-zinc-500">
-                          {displayedCollapse.warningSquares.join(" · ")}
+                          {gameUi(displayedCollapse.warningSquares.join(" · "))}
                         </p>
                       </div>
                       <span className="text-4xl font-black leading-none text-orange-200">
-                        {displayedCollapse.warningMovesRemaining}
+                        {gameUi(displayedCollapse.warningMovesRemaining)}
                       </span>
                     </div>
                     <p className="mt-3 text-[10px] text-zinc-600">
@@ -1238,14 +1239,14 @@ export default function ChessCollapseBoard({
                         {t("completed moves")}
                       </span>
                       <span className="text-4xl font-black leading-none text-white">
-                        {displayedCollapse.movesUntilWarning}
+                        {gameUi(displayedCollapse.movesUntilWarning)}
                       </span>
                     </div>
                     <p className="mt-3 text-[10px] text-zinc-600">
                       {t("Each interval is seeded randomly from 5–9 moves.")}
                     </p>
                   </div>
-                )}
+                ))}
               </section>
 
               <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
@@ -1259,7 +1260,7 @@ export default function ChessCollapseBoard({
                     </p>
                   </div>
                   <span className="rounded-full border border-red-400/15 bg-red-400/[0.07] px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-red-300">
-                    {history.length} {t("plies")}
+                    {gameUi(history.length)} {t("plies")}
                   </span>
                 </div>
 
@@ -1364,16 +1365,16 @@ function KingLifeCard({
     <div className="rounded-2xl border border-red-300/10 bg-red-400/[0.04] p-3">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">{symbol}</span>
+          <span className="text-2xl">{gameUi(symbol)}</span>
           <div>
             <p className="text-xs font-black text-white">{ui(label)}</p>
             <p className="mt-0.5 text-[9px] uppercase tracking-wider text-zinc-600">
-              {hits}{ui(" collapse hit")}{hits === 1 ? "" : "s"}
+              {gameUi(hits)}{ui(" collapse hit")}{gameUi(hits === 1 ? "" : "s")}
             </p>
           </div>
         </div>
         <span className="text-lg font-black tracking-wider text-red-300">
-          {hearts(lives)}
+          {gameUi(hearts(lives))}
         </span>
       </div>
     </div>
@@ -1394,9 +1395,9 @@ function StatCard({
     <div className="rounded-xl border border-white/5 bg-black/20 p-3">
       <div className="flex items-start justify-between gap-2">
         <span className="text-lg" aria-hidden="true">
-          {icon}
+          {gameUi(icon)}
         </span>
-        <span className="text-xl font-black text-white">{value}</span>
+        <span className="text-xl font-black text-white">{gameUi(value)}</span>
       </div>
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}
@@ -1410,7 +1411,7 @@ function RuleLine({ icon, text }: { icon: string; text: string }) {
   return (
     <div className="flex gap-2 rounded-xl border border-white/[0.04] bg-black/15 px-3 py-2">
       <span className="w-7 shrink-0 text-center font-black text-red-300">
-        {icon}
+        {gameUi(icon)}
       </span>
       <span>{ui(text)}</span>
     </div>
@@ -1452,13 +1453,13 @@ function CapturedPiecesGrid({
           {t("White")}
         </span>
         <div className="flex min-h-7 flex-wrap gap-1 text-xl leading-none text-[#fff3d5]">
-          {capturedWhite.length === 0 ? (
+          {gameUi(capturedWhite.length === 0 ? (
             <span className="text-xs text-zinc-700">—</span>
           ) : (
             capturedWhite.map((piece, index) => (
-              <span key={`${piece}-${index}`}>{whiteSymbols[piece]}</span>
+              <span key={`${piece}-${index}`}>{gameUi(whiteSymbols[piece])}</span>
             ))
-          )}
+          ))}
         </div>
       </div>
 
@@ -1467,13 +1468,13 @@ function CapturedPiecesGrid({
           {t("Black")}
         </span>
         <div className="flex min-h-7 flex-wrap gap-1 text-xl leading-none text-zinc-300">
-          {capturedBlack.length === 0 ? (
+          {gameUi(capturedBlack.length === 0 ? (
             <span className="text-xs text-zinc-700">—</span>
           ) : (
             capturedBlack.map((piece, index) => (
-              <span key={`${piece}-${index}`}>{blackSymbols[piece]}</span>
+              <span key={`${piece}-${index}`}>{gameUi(blackSymbols[piece])}</span>
             ))
-          )}
+          ))}
         </div>
       </div>
     </div>

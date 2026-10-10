@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -413,7 +414,7 @@ function Panel({
           {ui(title)}
         </h2>
 
-        {subtitle && (
+        {gameUi(subtitle && (
           <p
             className="
               mt-1
@@ -423,10 +424,10 @@ function Panel({
           >
             {ui(subtitle)}
           </p>
-        )}
+        ))}
       </div>
 
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -594,7 +595,7 @@ function PortalPromotionModal({
               text-violet-200
             "
           >
-            {stage === "choose" ? t("Choose one card") : resultTitle}
+            {gameUi(stage === "choose" ? t("Choose one card") : resultTitle)}
           </p>
 
           <p
@@ -604,7 +605,7 @@ function PortalPromotionModal({
               text-zinc-400
             "
           >
-            {stage === "choose" ? t("One card decides your Pawn's fate.") : ui(resultText)}
+            {gameUi(stage === "choose" ? t("One card decides your Pawn's fate.") : ui(resultText))}
           </p>
         </div>
 
@@ -645,7 +646,7 @@ function PortalPromotionModal({
                     text-amber-100
                   "
               >
-                {symbol}
+                {gameUi(symbol)}
               </div>
 
               <div
@@ -656,7 +657,7 @@ function PortalPromotionModal({
                     text-white
                   "
               >
-                {count}× {t(name)}
+                {gameUi(count)}× {t(name)}
               </div>
             </div>
           ))}
@@ -731,7 +732,7 @@ function PortalPromotionModal({
                     transform: revealed ? "rotateY(180deg)" : undefined,
                   }}
                 >
-                  {revealed ? (
+                  {gameUi(revealed ? (
                     <span
                       className={`
                             font-serif
@@ -745,7 +746,7 @@ function PortalPromotionModal({
                             }
                           `}
                     >
-                      {cardSymbol(card, color)}
+                      {gameUi(cardSymbol(card, color))}
                     </span>
                   ) : (
                     <span
@@ -756,14 +757,14 @@ function PortalPromotionModal({
                     >
                       ✦
                     </span>
-                  )}
+                  ))}
                 </span>
               </button>
             );
           })}
         </div>
 
-        {selectedCard && stage !== "choose" && (
+        {gameUi(selectedCard && stage !== "choose" && (
           <div
             className={`
                 mt-6
@@ -796,7 +797,7 @@ function PortalPromotionModal({
                   }
                 `}
             >
-              {selectedCard === "k" && stage === "prank" ? "💀" : cardSymbol(selectedCard, color)}
+              {gameUi(selectedCard === "k" && stage === "prank" ? "💀" : cardSymbol(selectedCard, color))}
             </div>
 
             <h3
@@ -807,7 +808,7 @@ function PortalPromotionModal({
                   text-white
                 "
             >
-              {resultTitle}
+              {gameUi(resultTitle)}
             </h3>
 
             <p
@@ -820,9 +821,9 @@ function PortalPromotionModal({
               {ui(resultText)}
             </p>
           </div>
-        )}
+        ))}
 
-        {canContinue && (
+        {gameUi(canContinue && (
           <button
             type="button"
             onClick={() => onResolve(selectedCard!)}
@@ -842,7 +843,7 @@ function PortalPromotionModal({
           >
             {t("Continue")} →
           </button>
-        )}
+        ))}
       </div>
     </div>
   );
@@ -1702,7 +1703,7 @@ export default function PortalChessBoard({
                 text-violet-200
               "
             >
-              {game.turn() === "w" ? t("White to move") : t("Black to move")}
+              {gameUi(game.turn() === "w" ? t("White to move") : t("Black to move"))}
             </span>
 
             <label
@@ -1741,9 +1742,9 @@ export default function PortalChessBoard({
 
                 <option value="bar">{ui("Boarisch")}</option>
 
-                <option value="ko">한국어</option>
+                <option value="ko">{gameUi("한국어")}</option>
 
-                <option value="ru">Русский</option>
+                <option value="ru">{gameUi("Русский")}</option>
               </select>
             </label>
           </div>
@@ -1843,9 +1844,9 @@ export default function PortalChessBoard({
                       text-2xl
                     "
                   >
-                    {capturedWhite.length ? capturedWhite
+                    {gameUi(capturedWhite.length ? capturedWhite
                           .map((piece) => whiteSymbols[piece])
-                          .join(" ") : "—"}
+                          .join(" ") : "—")}
                   </div>
                 </div>
 
@@ -1869,9 +1870,9 @@ export default function PortalChessBoard({
                       text-2xl
                     "
                   >
-                    {capturedBlack.length ? capturedBlack
+                    {gameUi(capturedBlack.length ? capturedBlack
                           .map((piece) => blackSymbols[piece])
-                          .join(" ") : "—"}
+                          .join(" ") : "—")}
                   </div>
                 </div>
 
@@ -1887,7 +1888,7 @@ export default function PortalChessBoard({
                     text-zinc-300
                   "
                 >
-                  {materialDifference === 0 ? t("Equal") : materialDifference > 0 ? `White +${materialDifference}` : `Black +${Math.abs(materialDifference)}`}
+                  {gameUi(materialDifference === 0 ? t("Equal") : materialDifference > 0 ? `White +${materialDifference}` : `Black +${Math.abs(materialDifference)}`)}
                 </div>
               </div>
             </Panel>
@@ -1901,8 +1902,8 @@ export default function PortalChessBoard({
                   ply: record.ply,
                   side: record.color,
                   moveNumber: Math.floor(index / 2) + 1,
-                  content: <span className="truncate text-xs font-bold text-zinc-200">{record.san}</span>,
-                  trailing: record.portalEvent ? <span className="text-xs">{effectIcon(record.portalEvent.effect)}</span> : null,
+                  content: <span className="truncate text-xs font-bold text-zinc-200">{gameUi(record.san)}</span>,
+                  trailing: record.portalEvent ? <span className="text-xs">{gameUi(effectIcon(record.portalEvent.effect))}</span> : null,
                 }))}
                 onSelect={setHistoryPreviewPly}
               />
@@ -1945,7 +1946,7 @@ export default function PortalChessBoard({
                       text-zinc-500
                     "
                   >
-                    {historyPreview.san}
+                    {gameUi(historyPreview.san)}
                   </p>
                 </div>
 
@@ -1969,7 +1970,7 @@ export default function PortalChessBoard({
               </div>
             )}
 
-            {promotionFrom && promotionSquare && !historyPreview && (
+            {gameUi(promotionFrom && promotionSquare && !historyPreview && (
               <div
                 className="
                     mb-3
@@ -1977,9 +1978,9 @@ export default function PortalChessBoard({
               >
                 <PromotionBar onPromote={promotePawn} />
               </div>
-            )}
+            ))}
 
-            {gameOver && !historyPreview && (
+            {gameUi(gameOver && !historyPreview && (
               <VisibleGameResult
                 actions={
                   <button
@@ -2002,7 +2003,7 @@ export default function PortalChessBoard({
                   </button>
                 }
               />
-            )}
+            ))}
 
             <div
               className="
@@ -2102,7 +2103,7 @@ export default function PortalChessBoard({
                           text-2xl
                         "
                     >
-                      {icon}
+                      {gameUi(icon)}
                     </div>
 
                     <div>
@@ -2165,7 +2166,7 @@ export default function PortalChessBoard({
                           text-amber-100
                         "
                     >
-                      {symbol}
+                      {gameUi(symbol)}
                     </div>
 
                     <p
@@ -2176,7 +2177,7 @@ export default function PortalChessBoard({
                           text-zinc-300
                         "
                     >
-                      {count}× {t(name)}
+                      {gameUi(count)}× {t(name)}
                     </p>
                   </div>
                 ))}
@@ -2231,7 +2232,7 @@ export default function PortalChessBoard({
                             text-white
                           "
                       >
-                        {effectIcon(portal.effect)} {portal.square}
+                        {gameUi(effectIcon(portal.effect))} {gameUi(portal.square)}
                       </p>
 
                       <p
@@ -2258,7 +2259,7 @@ export default function PortalChessBoard({
             </Panel>
 
             <Panel title={t("Portal Events")}>
-              {portalEvents.length === 0 ? (
+              {gameUi(portalEvents.length === 0 ? (
                 <p
                   className="
                     text-xs
@@ -2303,7 +2304,7 @@ export default function PortalChessBoard({
                                 text-white
                               "
                         >
-                          {effectIcon(event.effect)} {event.square}
+                          {gameUi(effectIcon(event.effect))} {gameUi(event.square)}
                         </span>
 
                         <span
@@ -2313,7 +2314,7 @@ export default function PortalChessBoard({
                                 text-zinc-600
                               "
                         >
-                          #{event.ply}
+                          #{gameUi(event.ply)}
                         </span>
                       </div>
 
@@ -2324,28 +2325,28 @@ export default function PortalChessBoard({
                               text-zinc-500
                             "
                       >
-                        {event.result}
-                        {event.destination ? ` → ${event.destination}` : ""}
-                        {event.swapSquare ? ` ↔ ${event.swapSquare}` : ""}
-                        {event.promotionCard ? ` · ${t(promotionCardNames[event.promotionCard])}` : ""}
+                        {gameUi(event.result)}
+                        {gameUi(event.destination ? ` → ${event.destination}` : "")}
+                        {gameUi(event.swapSquare ? ` ↔ ${event.swapSquare}` : "")}
+                        {gameUi(event.promotionCard ? ` · ${t(promotionCardNames[event.promotionCard])}` : "")}
                       </p>
                     </div>
                   ))}
                 </div>
-              )}
+              ))}
             </Panel>
           </aside>
         </div>
       </div>
 
-      {pendingPortalPromotion && (
+      {gameUi(pendingPortalPromotion && (
         <PortalPromotionModal
           pending={pendingPortalPromotion.pending}
           color={pendingPortalPromotion.move.color}
           t={t}
           onResolve={resolvePromotionCard}
         />
-      )}
+      ))}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { Link } from "react-router-dom";
@@ -121,7 +122,7 @@ export default function VariantRulesPage({
                   text-3xl
                 `}
               >
-                {icon}
+                {gameUi(icon)}
               </div>
 
               <div>
@@ -134,7 +135,7 @@ export default function VariantRulesPage({
                     ${colors.text}
                   `}
                 >
-                  {variantLabel}
+                  {gameUi(variantLabel)}
                 </p>
 
                 <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
@@ -166,7 +167,7 @@ export default function VariantRulesPage({
                 hover:brightness-125
               `}
               >
-                ← {backLabel}
+                ← {gameUi(backLabel)}
               </Link>
             </div>
           </div>
@@ -191,22 +192,22 @@ export default function VariantRulesPage({
               ${colors.text}
             `}
           >
-            {coreIdeaLabel}
+            {gameUi(coreIdeaLabel)}
           </p>
 
           <p className="mt-2 max-w-4xl text-sm leading-7 text-zinc-300">
-            {coreIdea}
+            {gameUi(coreIdea)}
           </p>
         </section>
 
-        {features.length > 0 && (
+        {gameUi(features.length > 0 && (
           <section className="mb-5 grid gap-3 md:grid-cols-3">
             {features.map((feature) => (
               <div
                 key={feature.title}
                 className="rounded-2xl border border-white/10 bg-zinc-900/65 p-4"
               >
-                <div className="text-2xl">{feature.icon}</div>
+                <div className="text-2xl">{gameUi(feature.icon)}</div>
 
                 <h2 className="mt-3 text-sm font-black text-white">
                   {ui(feature.title)}
@@ -218,9 +219,9 @@ export default function VariantRulesPage({
               </div>
             ))}
           </section>
-        )}
+        ))}
 
-        {children}
+        {gameUi(children)}
 
         <div className="space-y-4">
           {rules.map((rule, index) => (
@@ -244,7 +245,7 @@ export default function VariantRulesPage({
                     text-lg
                   `}
                 >
-                  {rule.icon}
+                  {gameUi(rule.icon)}
                 </span>
 
                 <div className="min-w-0">
@@ -257,7 +258,7 @@ export default function VariantRulesPage({
                         tracking-wider
                         ${colors.text}
                       `}
-                    >{ui("Rule")}{index + 1}
+                    >{ui("Rule")}{gameUi(index + 1)}
                     </span>
 
                     <h2 className="font-black text-white">{ui(rule.title)}</h2>
@@ -289,7 +290,7 @@ export default function VariantRulesPage({
               hover:brightness-125
             `}
           >
-            {playLabel}
+            {gameUi(playLabel)}
           </Link>
         </div>
       </div>
@@ -336,7 +337,7 @@ export function VisualCard({
 
       <h3 className="mt-2 text-lg font-black text-white">{ui(title)}</h3>
 
-      <div className="mt-4">{children}</div>
+      <div className="mt-4">{gameUi(children)}</div>
     </section>
   );
 }
@@ -358,21 +359,21 @@ export function Flow({
           key={`${index}-${step.label}`}
           className="relative rounded-2xl border border-white/10 bg-black/20 px-3 py-4 text-center"
         >
-          <div className="text-2xl">{step.icon}</div>
+          <div className="text-2xl">{gameUi(step.icon)}</div>
 
           <p className="mt-2 text-xs font-black text-zinc-200">{ui(step.label)}</p>
 
-          {step.detail && (
+          {gameUi(step.detail && (
             <p className="mt-1 text-[10px] leading-4 text-zinc-600">
-              {step.detail}
+              {gameUi(step.detail)}
             </p>
-          )}
+          ))}
 
-          {index < steps.length - 1 && (
+          {gameUi(index < steps.length - 1 && (
             <span className="absolute -right-2 top-1/2 hidden -translate-y-1/2 text-zinc-700 lg:block">
               →
             </span>
-          )}
+          ))}
         </div>
       ))}
     </div>
@@ -397,7 +398,7 @@ export function EffectGrid({
           className="rounded-2xl border border-white/10 bg-black/20 p-4"
         >
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{item.icon}</span>
+            <span className="text-2xl">{gameUi(item.icon)}</span>
 
             <p className="text-sm font-black text-white">{ui(item.title)}</p>
           </div>

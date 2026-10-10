@@ -1,3 +1,4 @@
+import { useGameLanguage } from "../../i18n/gameUi.ts";
 import { memo, useMemo, useState } from "react";
 import * as THREE from "three";
 import type { ThreeEvent } from "@react-three/fiber";
@@ -110,6 +111,7 @@ function TileDecoration({ cell }: { cell: BoardCell }) {
 
 /** One board cell. Disabled cells render as a recessed void inside the frame. */
 function ChessSquare3D({ cell, width, height, palette, mark, onClick }: Props) {
+  useGameLanguage();
   const [hovered, setHovered] = useState(false);
   const [wx, , wz] = cellToWorld(cell.x, cell.y, width, height);
   const light = (cell.x + cell.y) % 2 === 1;

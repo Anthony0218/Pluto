@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { memo } from "react";
 import { chessPieceAssetThemes } from "@/assets/chess/themes";
 import { luminance } from "@/games/chess/custom/engine/teams";
@@ -18,9 +19,10 @@ function cellFill(char: string, light: boolean, theme: { light: string; dark: st
  * an isometric stack for layered ones. Pieces retain their authored icons and team colours.
  */
 function BoardThumbnail({ preview, label, className = "" }: { preview?: VariantPreview; label: string; className?: string }) {
+  useGameLanguage();
   if (!preview || !preview.layers.length) {
     return (
-      <div role="img" aria-label={label} className={`flex items-center justify-center ${className}`}>
+      <div role="img" aria-label={gameUi(label)} className={`flex items-center justify-center ${className}`}>
         <div className="grid h-16 w-16 grid-cols-4 overflow-hidden rounded-md opacity-40">
           {Array.from({ length: 16 }, (_, index) => (
             <span key={index} className={(index + Math.floor(index / 4)) % 2 ? "bg-zinc-700" : "bg-zinc-500"} />
@@ -30,15 +32,16 @@ function BoardThumbnail({ preview, label, className = "" }: { preview?: VariantP
     );
   }
   const theme = getBoardTheme(preview.theme);
-  return preview.layers.length === 1 ? <FlatBoard preview={preview} theme={theme} label={label} className={className} /> : <StackedBoard preview={preview} theme={theme} label={label} className={className} />;
+  return preview.layers.length === 1 ? <FlatBoard preview={preview} theme={theme} label={gameUi(label)} className={className} /> : <StackedBoard preview={preview} theme={theme} label={gameUi(label)} className={className} />;
 }
 
 function FlatBoard({ preview, theme, label, className }: { preview: VariantPreview; theme: ReturnType<typeof getBoardTheme>; label: string; className: string }) {
+  useGameLanguage();
   const layer = preview.layers[0];
   const { width, height } = layer;
   const pad = 0.35;
   return (
-    <svg role="img" aria-label={label} viewBox={`${-pad} ${-pad} ${width + pad * 2} ${height + pad * 2}`} className={className} preserveAspectRatio="xMidYMid meet">
+    <svg role="img" aria-label={gameUi(label)} viewBox={`${-pad} ${-pad} ${width + pad * 2} ${height + pad * 2}`} className={className} preserveAspectRatio="xMidYMid meet">
       <rect x={-pad} y={-pad} width={width + pad * 2} height={height + pad * 2} rx={0.45} fill={theme.frame} />
       {[...layer.cells].map((char, index) => {
         if (char === ".") return null;
@@ -63,6 +66,7 @@ function FlatBoard({ preview, theme, label, className }: { preview: VariantPrevi
 }
 
 function StackedBoard({ preview, theme, label, className }: { preview: VariantPreview; theme: ReturnType<typeof getBoardTheme>; label: string; className: string }) {
+  useGameLanguage();
   const layers = [...preview.layers].sort((a, b) => a.z - b.z);
   const widest = Math.max(...layers.map((layer) => Math.max(layer.width, layer.height)));
   const gap = widest * 0.42;
@@ -78,7 +82,7 @@ function StackedBoard({ preview, theme, label, className }: { preview: VariantPr
   const bottom = widest * 2 * ISO_Y + 1;
   const half = widest * ISO_X + 1;
   return (
-    <svg role="img" aria-label={label} viewBox={`${-half} ${top} ${half * 2} ${bottom - top}`} className={className} preserveAspectRatio="xMidYMid meet">
+    <svg role="img" aria-label={gameUi(label)} viewBox={`${-half} ${top} ${half * 2} ${bottom - top}`} className={className} preserveAspectRatio="xMidYMid meet">
       {layers.map((layer, index) => {
         const corner = (x: number, row: number) => {
           const point = project(layer, index, x, row);
@@ -111,13 +115,14 @@ const STANDARD_ICONS: Record<string, string> = { pawn: "♟", knight: "♞", bis
 const GLYPH_KIND: Record<string, "P" | "N" | "B" | "R" | "Q" | "K"> = { "♙": "P", "♟": "P", "♘": "N", "♞": "N", "♗": "B", "♝": "B", "♖": "R", "♜": "R", "♕": "Q", "♛": "Q", "♔": "K", "♚": "K" };
 
 function PreviewPiece({ piece, x, y }: { piece: VariantPreview["pieces"][number]; x: number; y: number }) {
+  useGameLanguage();
   const icon = piece.icon || STANDARD_ICONS[piece.type ?? ""] || (piece.royal ? "♚" : "?");
   const kind = GLYPH_KIND[icon];
   const light = luminance(piece.color) > 0.5;
   const asset = kind ? chessPieceAssetThemes.elegant.pieces[`${light ? "w" : "b"}${kind}`] : undefined;
   return <g>
     {piece.royal && <rect x={x - 0.44} y={y - 0.44} width={0.88} height={0.88} rx={0.12} fill="#fcd34d" fillOpacity={0.14} stroke="#fcd34d" strokeWidth={0.035} />}
-    {asset ? <image href={asset} x={x - 0.45} y={y - 0.47} width={0.9} height={0.9} preserveAspectRatio="xMidYMid meet" /> : <text x={x} y={y + 0.03} textAnchor="middle" dominantBaseline="central" fontSize={0.68} fontFamily="'Segoe UI Symbol','Apple Symbols',serif" fill={piece.color} stroke={light ? "#1c1917" : "#d6d3d1"} strokeWidth={0.025} paintOrder="stroke">{icon}</text>}
+    {asset ? <image href={asset} x={x - 0.45} y={y - 0.47} width={0.9} height={0.9} preserveAspectRatio="xMidYMid meet" /> : <text x={x} y={y + 0.03} textAnchor="middle" dominantBaseline="central" fontSize={0.68} fontFamily="'Segoe UI Symbol','Apple Symbols',serif" fill={piece.color} stroke={light ? "#1c1917" : "#d6d3d1"} strokeWidth={0.025} paintOrder="stroke">{gameUi(icon)}</text>}
     <rect x={x - 0.22} y={y + 0.36} width={0.44} height={0.045} rx={0.02} fill={piece.color} />
   </g>;
 }

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { Plus, Trash2, Trophy } from "lucide-react";
 import { useState } from "react";
 import { squareName } from "@/games/chess/custom/engine/board";
@@ -24,6 +25,7 @@ const DESCRIPTIONS: Record<VictoryType, string> = {
 };
 
 function ConditionCard({ condition, onChange, onRemove }: { condition: VictoryCondition; onChange: (next: VictoryCondition, coalesceKey?: string) => void; onRemove: () => void }) {
+  useGameLanguage();
   const { variant } = useEditor();
   const set = (patch: Partial<VictoryCondition>, coalesceKey?: string) => onChange({ ...condition, ...patch }, coalesceKey);
   const pieces = variant.pieces.map((piece) => ({ id: piece.id, label: piece.name }));
@@ -49,29 +51,29 @@ function ConditionCard({ condition, onChange, onRemove }: { condition: VictoryCo
           <Trash2 size={13} />
         </IconButton>
       </div>
-      {!immediate && (
+      {gameUi(!immediate && (
         <div className="mt-3 flex flex-wrap items-end gap-3 pl-12">
           <label>
             <span className={labelClass}>{ui("Who can win this way")}</span>
-            <Select label="Team" className="mt-1 w-auto" value={condition.team ?? "any"} onChange={(team) => set({ team })} options={[{ id: "any", label: "Any team" }, ...variant.teams.map((team) => ({ id: team.id, label: team.name }))]} />
+            <Select label={gameUi("Team")} className="mt-1 w-auto" value={condition.team ?? "any"} onChange={(team) => set({ team })} options={[{ id: "any", label: "Any team" }, ...variant.teams.map((team) => ({ id: team.id, label: team.name }))]} />
           </label>
-          {["captureSpecific", "eliminateType", "reachSquare", "reachZone"].includes(condition.type) && (
+          {gameUi(["captureSpecific", "eliminateType", "reachSquare", "reachZone"].includes(condition.type) && (
             <label>
               <span className={labelClass}>{ui("Piece type")}</span>
               <Select
-                label="Piece type"
+                label={gameUi("Piece type")}
                 className="mt-1 w-auto"
                 value={condition.pieceType ?? ""}
                 onChange={(pieceType) => set({ pieceType: pieceType || undefined })}
                 options={[{ id: "", label: condition.type === "reachSquare" || condition.type === "reachZone" ? "Any piece" : "Choose…" }, ...pieces]}
               />
             </label>
-          )}
-          {condition.type === "reachSquare" && (
+          ))}
+          {gameUi(condition.type === "reachSquare" && (
             <label>
               <span className={labelClass}>{ui("Square")}</span>
               <Select
-                label="Square"
+                label={gameUi("Square")}
                 className="mt-1 w-24"
                 value={condition.square ? `${condition.square.x},${condition.square.y}` : ""}
                 onChange={(id) => {
@@ -81,30 +83,31 @@ function ConditionCard({ condition, onChange, onRemove }: { condition: VictoryCo
                 options={[{ id: "", label: "…" }, ...variant.board.cells.filter((cell) => cell.enabled).map((cell) => ({ id: `${cell.x},${cell.y}`, label: squareName(cell) }))]}
               />
             </label>
-          )}
-          {(condition.type === "controlSquares" || condition.type === "piecesRemaining") && (
+          ))}
+          {gameUi((condition.type === "controlSquares" || condition.type === "piecesRemaining") && (
             <div>
-              <span className={labelClass}>{condition.type === "controlSquares" ? ui("Goal tiles") : ui("Pieces or fewer")}</span>
+              <span className={labelClass}>{gameUi(condition.type === "controlSquares" ? ui("Goal tiles") : ui("Pieces or fewer"))}</span>
               <div className="mt-1">
-                <NumberField label="Count" value={condition.count ?? 1} min={0} max={200} onChange={(count) => set({ count }, `${condition.id}-count`)} />
+                <NumberField label={gameUi("Count")} value={condition.count ?? 1} min={0} max={200} onChange={(count) => set({ count }, `${condition.id}-count`)} />
               </div>
             </div>
-          )}
-          {condition.type === "surviveTurns" && (
+          ))}
+          {gameUi(condition.type === "surviveTurns" && (
             <div>
               <span className={labelClass}>{ui("Turns")}</span>
               <div className="mt-1">
-                <NumberField label="Turns" value={condition.turns ?? 20} min={1} max={500} onChange={(turns) => set({ turns }, `${condition.id}-turns`)} />
+                <NumberField label={gameUi("Turns")} value={condition.turns ?? 20} min={1} max={500} onChange={(turns) => set({ turns }, `${condition.id}-turns`)} />
               </div>
             </div>
-          )}
+          ))}
         </div>
-      )}
+      ))}
     </div>
   );
 }
 
 export default function VictorySection() {
+  useGameLanguage();
   const { variant, dispatch } = useEditor();
   const [menuOpen, setMenuOpen] = useState(false);
   const conditions = variant.victoryConditions;
@@ -115,7 +118,7 @@ export default function VictorySection() {
       <SectionHeading
         step="victory"
         eyebrow="Victory"
-        title="How the game is won"
+        title={gameUi("How the game is won")}
         description={ui("Combine as many conditions as you like. Checkmate and event outcomes always end the game immediately; the others follow the ANY / ALL rule below.")}
         actions={
           <div className="relative">
@@ -151,7 +154,7 @@ export default function VictorySection() {
             <p className="text-xs text-zinc-500">{ui("ANY: one condition is enough. ALL: a team must satisfy every enabled condition at once.")}</p>
           </div>
           <Segmented
-            label="Victory mode"
+            label={gameUi("Victory mode")}
             value={variant.settings.victoryMode}
             onChange={(victoryMode) => dispatch({ type: "update", recipe: (current) => ({ ...current, settings: { ...current.settings, victoryMode } }) })}
             options={[
@@ -161,7 +164,7 @@ export default function VictorySection() {
           />
         </div>
       </Panel>
-      {conditions.length === 0 ? (
+      {gameUi(conditions.length === 0 ? (
         <EmptyState icon={<Trophy size={20} />} title={ui("No victory conditions")}>
           {ui("Without one, games can only end in a draw. Add at least one condition.")}
         </EmptyState>
@@ -176,7 +179,7 @@ export default function VictorySection() {
             />
           ))}
         </div>
-      )}
+      ))}
     </div>
   );
 }

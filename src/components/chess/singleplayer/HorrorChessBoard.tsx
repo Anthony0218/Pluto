@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -1036,7 +1037,7 @@ export default function HorrorChessBoard({
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-zinc-300">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-rose-400" />
 
-                {game.turn() === "w" ? t("White to move") : t("Black to move")}
+                {gameUi(game.turn() === "w" ? t("White to move") : t("Black to move"))}
               </div>
             )}
           </div>
@@ -1138,13 +1139,13 @@ export default function HorrorChessBoard({
                   />
 
                   <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-bold text-zinc-400">
-                    {materialDifference > 0 &&
-                      `${t("White")} +${materialDifference}`}
+                    {gameUi(materialDifference > 0 &&
+                      `${t("White")} +${materialDifference}`)}
 
-                    {materialDifference < 0 &&
-                      `${t("Black")} +${Math.abs(materialDifference)}`}
+                    {gameUi(materialDifference < 0 &&
+                      `${t("Black")} +${Math.abs(materialDifference)}`)}
 
-                    {materialDifference === 0 && t("Equal")}
+                    {gameUi(materialDifference === 0 && t("Equal"))}
                   </span>
                 </div>
 
@@ -1164,7 +1165,7 @@ export default function HorrorChessBoard({
                   />
 
                   <span className="rounded-xl bg-white/5 px-2.5 py-1 text-xs font-semibold text-zinc-400">
-                    {records.length}
+                    {gameUi(records.length)}
                   </span>
                 </div>
 
@@ -1178,8 +1179,8 @@ export default function HorrorChessBoard({
                     moveNumber: record.moveNumber,
                     content: (
                       <>
-                        <span className="text-base leading-none">{historyPieceSymbol(record.color, record.piece)}</span>
-                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>
+                        <span className="text-base leading-none">{gameUi(historyPieceSymbol(record.color, record.piece))}</span>
+                        <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(record.san)}</span>
                       </>
                     ),
                     trailing: eventIcons(record),
@@ -1216,9 +1217,9 @@ export default function HorrorChessBoard({
                     </p>
 
                     <p className="mt-1 text-sm font-bold text-white">
-                      {t("Move")} {historyPreview.moveNumber}
-                      {historyPreview.color === "w" ? "." : "..."}{" "}
-                      {historyPreview.san}
+                      {t("Move")} {gameUi(historyPreview.moveNumber)}
+                      {gameUi(historyPreview.color === "w" ? "." : "...")}{gameUi(" ")}
+                      {gameUi(historyPreview.san)}
                     </p>
                   </div>
 
@@ -1327,7 +1328,7 @@ export default function HorrorChessBoard({
                     </span>
 
                     <span className="font-mono text-xs font-black text-white">
-                      {displayedState.frozen ? displayedState.frozen.square : "—"}
+                      {gameUi(displayedState.frozen ? displayedState.frozen.square : "—")}
                     </span>
                   </div>
                 </div>
@@ -1340,7 +1341,7 @@ export default function HorrorChessBoard({
                       </span>
 
                       <span className="text-sm font-black text-orange-300">
-                        {pliesUntilFire} {t("plies")}
+                        {gameUi(pliesUntilFire)} {t("plies")}
                       </span>
                     </div>
                   </div>
@@ -1470,16 +1471,16 @@ export default function HorrorChessBoard({
                             >
                               <div>
                                 <p className="font-mono text-xs font-black text-zinc-200">
-                                  {record.san}
+                                  {gameUi(record.san)}
                                 </p>
 
                                 <p className="mt-1 text-[10px] text-zinc-600">
-                                  {eventIcons(record)}
+                                  {gameUi(eventIcons(record))}
                                 </p>
                               </div>
 
                               <span className="text-[10px] text-zinc-700">
-                                #{record.ply}
+                                #{gameUi(record.ply)}
                               </span>
                             </button>
                           ))}
@@ -1772,7 +1773,7 @@ function HorrorMessageChip({
         ${toneClass}
       `}
     >
-      <span className="text-base leading-none">{icon}</span>
+      <span className="text-base leading-none">{gameUi(icon)}</span>
 
       <span>{ui(text)}</span>
     </div>
@@ -1783,7 +1784,7 @@ function Panel({ gameControls = false, children }: { gameControls?: boolean; chi
   useUiLanguage();
   return (
     <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
-      {children}
+      {gameUi(children)}
     </section>
   );
 }
@@ -1867,7 +1868,7 @@ function CapturedPiecesGrid({
               key={`${color}-${piece}-${index}`}
               className="flex h-7 w-7 items-center justify-center text-2xl leading-none"
             >
-              {color === "w" ? whiteSymbols[piece] : blackSymbols[piece]}
+              {gameUi(color === "w" ? whiteSymbols[piece] : blackSymbols[piece])}
             </span>
           ))
         )}
@@ -1882,7 +1883,7 @@ function CapturedPiecesGrid({
           {t("Black")}
         </p>
 
-        {renderPieces(capturedBlack, "b")}
+        {gameUi(renderPieces(capturedBlack, "b"))}
       </div>
 
       <div className="mt-3 border-t border-white/5 pt-3">
@@ -1890,7 +1891,7 @@ function CapturedPiecesGrid({
           {t("White")}
         </p>
 
-        {renderPieces(capturedWhite, "w")}
+        {gameUi(renderPieces(capturedWhite, "w"))}
       </div>
     </div>
   );
@@ -1922,7 +1923,7 @@ function HorrorLegendItem({
           ${className}
         `}
       >
-        {icon}
+        {gameUi(icon)}
       </span>
 
       <span className="text-[10px] font-bold text-zinc-400">{ui(label)}</span>
@@ -1943,13 +1944,13 @@ function HazardRule({
   return (
     <div className="flex items-center gap-3">
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-400/10 text-lg font-black text-rose-200">
-        {icon}
+        {gameUi(icon)}
       </span>
 
       <div>
         <p className="text-xs font-black text-zinc-200">{ui(title)}</p>
 
-        <p className="mt-1 text-[10px] leading-4 text-zinc-600">{detail}</p>
+        <p className="mt-1 text-[10px] leading-4 text-zinc-600">{gameUi(detail)}</p>
       </div>
     </div>
   );
@@ -1968,9 +1969,9 @@ function HazardStat({
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
       <div className="flex items-center justify-between gap-2">
-        <span>{icon}</span>
+        <span>{gameUi(icon)}</span>
 
-        <span className="text-xl font-black text-zinc-100">{value}</span>
+        <span className="text-xl font-black text-zinc-100">{gameUi(value)}</span>
       </div>
 
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
@@ -1984,7 +1985,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
   useUiLanguage();
   return (
     <div className="rounded-xl border border-white/5 bg-black/20 px-3 py-3">
-      <p className="text-xl font-black text-zinc-100">{value}</p>
+      <p className="text-xl font-black text-zinc-100">{gameUi(value)}</p>
 
       <p className="mt-2 text-[9px] font-black uppercase tracking-wider text-zinc-600">
         {ui(label)}

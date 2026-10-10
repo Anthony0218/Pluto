@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import ChessMatchStatus from "@/components/chess/singleplayer/ChessMatchStatus";
 import GameXpReward from "@/components/games/GameXpReward";
 import { ui, useUiLanguage } from "@/i18n/ui";
@@ -52,7 +53,7 @@ export default function VisibleGameResult({
       <div className="chess-status-row">
         <ChessMatchStatus
           event={isDraw ? "draw" : reason === "checkmate" ? "checkmate" : "variant"}
-          label="Game over"
+          label={gameUi("Game over")}
           message={<strong className="text-lg font-black text-white">{ui(result)}</strong>}
           detail={reasonLabel && reasonLabel !== result ? ui(reasonLabel) : undefined}
           className="!mt-0"
@@ -61,7 +62,7 @@ export default function VisibleGameResult({
       </div>
       {actions && (
         <div className="chess-variant-result-actions mt-2 flex flex-wrap gap-2">
-          {actions}
+          {gameUi(actions)}
         </div>
       )}
     </div>

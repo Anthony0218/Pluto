@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { Copy, Eraser, Plus, Trash2, Wand2 } from "lucide-react";
 import { useState } from "react";
 import { formatOffset } from "@/games/chess/custom/engine/movement";
@@ -25,6 +26,7 @@ export default function RuleListEditor({
   activeRuleId?: string;
   onActivate: (id: string) => void;
 }) {
+  useGameLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const entries: { side: Side; rule: MovementRule }[] = [
     ...piece.movement.map((rule) => ({ side: "movement" as const, rule })),
@@ -46,11 +48,11 @@ export default function RuleListEditor({
                 <span className="flex flex-wrap items-center gap-1.5 text-sm font-semibold text-zinc-100">
                   <Chip tone={side === "capture" ? "red" : piece.captureSameAsMove ? "violet" : "sky"}>{ui(sideLabel(side))}</Chip>
                   {rule.firstMoveOnly && <Chip tone="amber">{ui("First move")}</Chip>}
-                  {describeRule(rule, ui)}
+                  {gameUi(describeRule(rule, ui))}
                 </span>
                 <span className="block truncate text-[11px] text-zinc-500">
-                  {rule.offsets.slice(0, 8).map(formatOffset).join(" ")}
-                  {rule.offsets.length > 8 ? " …" : ""}
+                  {gameUi(rule.offsets.slice(0, 8).map(formatOffset).join(" "))}
+                  {gameUi(rule.offsets.length > 8 ? " …" : "")}
                 </span>
               </button>
               <IconButton label={ui("Duplicate pattern")} onClick={() => setSide(side, [...piece[side], { ...structuredClone(rule), id: createId("rule") }])}>
@@ -60,20 +62,20 @@ export default function RuleListEditor({
                 <Trash2 size={14} />
               </IconButton>
             </div>
-            {active && (
+            {gameUi(active && (
               <div className="space-y-3 border-t border-white/[0.06] px-3 py-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <Segmented
                     size="sm"
-                    label="Pattern type"
+                    label={gameUi("Pattern type")}
                     value={rule.kind}
                     onChange={(kind) => update(side, rule.id, { kind, canJump: kind === "leap" ? true : rule.canJump })}
                     options={(Object.keys(KIND_LABELS) as MovementKind[]).map((id) => ({ id, label: KIND_LABELS[id], title: id === "leap" ? "Jump straight to each square" : id === "slide" ? "Repeat the step any number of times" : "Jump between teleport tiles" }))}
                   />
-                  {rule.kind !== "teleport" && (
+                  {gameUi(rule.kind !== "teleport" && (
                     <Segmented
                       size="sm"
-                      label="Direction frame"
+                      label={gameUi("Direction frame")}
                       value={rule.relativeTo}
                       onChange={(relativeTo) => update(side, rule.id, { relativeTo })}
                       options={[
@@ -81,34 +83,34 @@ export default function RuleListEditor({
                         { id: "team", label: "Team-relative", title: "Up means forward for whichever team owns the piece" },
                       ]}
                     />
-                  )}
+                  ))}
                 </div>
                 {rule.kind === "leap" && <Toggle checked={rule.canJump !== false} onChange={(canJump) => update(side, rule.id, { canJump })} label={ui("Can jump over pieces")} description={ui("Off: the path (or the first step of an L-leap) must be empty.")} />}
-                {rule.kind === "slide" && (
+                {gameUi(rule.kind === "slide" && (
                   <>
                     <div className="flex flex-wrap gap-4">
                       <div>
                         <p className={labelClass}>{ui("Min distance")}</p>
-                        <NumberField label="Min distance" value={rule.minDistance ?? 1} min={1} max={15} onChange={(minDistance) => update(side, rule.id, { minDistance }, `${rule.id}-min`)} />
+                        <NumberField label={gameUi("Min distance")} value={rule.minDistance ?? 1} min={1} max={15} onChange={(minDistance) => update(side, rule.id, { minDistance }, `${rule.id}-min`)} />
                       </div>
                       <div>
                         <p className={labelClass}>{ui("Max distance (0 = ∞)")}</p>
-                        <NumberField label="Max distance" value={rule.maxDistance ?? 0} min={0} max={15} onChange={(maxDistance) => update(side, rule.id, { maxDistance }, `${rule.id}-max`)} />
+                        <NumberField label={gameUi("Max distance")} value={rule.maxDistance ?? 0} min={0} max={15} onChange={(maxDistance) => update(side, rule.id, { maxDistance }, `${rule.id}-max`)} />
                       </div>
                     </div>
                     <Toggle checked={Boolean(rule.canJump)} onChange={(canJump) => update(side, rule.id, { canJump, maxJumps: rule.maxJumps ?? 1 })} label={ui("Can hop over pieces")} description={ui("Slides past blocking pieces, like a bishop that may jump one piece.")} />
-                    {rule.canJump && (
+                    {gameUi(rule.canJump && (
                       <div>
                         <p className={labelClass}>{ui("Pieces it may hop")}</p>
-                        <NumberField label="Pieces it may hop" value={rule.maxJumps ?? 1} min={1} max={8} onChange={(maxJumps) => update(side, rule.id, { maxJumps }, `${rule.id}-hops`)} />
+                        <NumberField label={gameUi("Pieces it may hop")} value={rule.maxJumps ?? 1} min={1} max={8} onChange={(maxJumps) => update(side, rule.id, { maxJumps }, `${rule.id}-hops`)} />
                       </div>
-                    )}
-                    {(side === "capture" || piece.captureSameAsMove) && (
+                    ))}
+                    {gameUi((side === "capture" || piece.captureSameAsMove) && (
                       <Toggle checked={Boolean(rule.requiresScreen)} onChange={(requiresScreen) => update(side, rule.id, { requiresScreen })} label={ui("Capture over a screen")} description={ui("Captures only by jumping exactly one piece, like a xiangqi cannon.")} />
-                    )}
+                    ))}
                   </>
-                )}
-                {rule.kind !== "teleport" && (
+                ))}
+                {gameUi(rule.kind !== "teleport" && (
                   <div className="flex flex-wrap gap-2">
                     <Button size="sm" onClick={() => update(side, rule.id, { offsets: symmetrize(rule.offsets) })} title={ui("Mirror every offset in all 8 directions")}>
                       <Wand2 size={13} />
@@ -119,10 +121,10 @@ export default function RuleListEditor({
                       {ui("Clear squares")}
                     </Button>
                   </div>
-                )}
+                ))}
                 {rule.kind === "teleport" && <p className="text-[11px] leading-5 text-zinc-500">{ui("Place Teleport tiles on the board; this piece can jump from one to any other.")}</p>}
               </div>
-            )}
+            ))}
           </div>
         );
       })}
@@ -131,7 +133,7 @@ export default function RuleListEditor({
           <Plus size={14} />
           {ui("Add pattern")}
         </Button>
-        {menuOpen && (
+        {gameUi(menuOpen && (
           <div role="menu" className="absolute left-0 top-full z-30 mt-1 w-64 rounded-xl border border-white/10 bg-[#111418] p-1 shadow-2xl">
             {MOVEMENT_TEMPLATES.map((template) => (
               <button
@@ -151,7 +153,7 @@ export default function RuleListEditor({
               </button>
             ))}
           </div>
-        )}
+        ))}
       </div>
     </div>
   );

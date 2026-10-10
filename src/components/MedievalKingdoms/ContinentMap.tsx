@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useEffect, useRef, useState } from "react";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -28,6 +29,7 @@ type WorldMaskHit = {
 };
 
 export default function ContinentMap() {
+  useGameLanguage();
   const navigate = useNavigate();
 
   const { progress } = useCampaignProgress();
@@ -237,15 +239,11 @@ export default function ContinentMap() {
     <div className="medieval-world__content text-[#f5e4c1]">
       <div className="medieval-world__heading">
         <span className="medieval-world__crest" aria-hidden="true"><Crown size={28} /></span>
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#d3a448]">
-          Medieval Kingdoms
-        </p>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#d3a448]">{gameUi(" Medieval Kingdoms ")}</p>
 
-        <h1 className="text-3xl font-black text-[#ffe7ad]">The Kingdoms Await</h1>
+        <h1 className="text-3xl font-black text-[#ffe7ad]">{gameUi("The Kingdoms Await")}</h1>
 
-        <p className="mt-1 text-sm text-[#bda77f]">
-          Raise your banner. Choose a stronghold. Write your kingdom's story.
-        </p>
+        <p className="mt-1 text-sm text-[#bda77f]">{gameUi(" Raise your banner. Choose a stronghold. Write your kingdom's story. ")}</p>
       </div>
 
       <div className="medieval-world__map-stage">
@@ -299,7 +297,7 @@ export default function ContinentMap() {
         />
         <img
           src={CONTINENT_MAP.image}
-          alt="Medieval Kingdoms campaign continent"
+          alt={gameUi("Medieval Kingdoms campaign continent")}
           draggable={false}
           className="block w-full select-none"
         />
@@ -357,7 +355,7 @@ export default function ContinentMap() {
                 top: `${place.marker.y}%`,
               }}
             >
-              {completed ? (
+              {gameUi(completed ? (
                 "✓"
               ) : unlocked ? (
                 "⚔"
@@ -365,16 +363,16 @@ export default function ContinentMap() {
                 <span className="text-2xl opacity-0 transition-opacity duration-150 group-hover:opacity-100">
                   🔒
                 </span>
-              )}
+              ))}
             </button>
           );
         })}
 
-        {(hoveredPlace || hoveredPath) && (
+        {gameUi((hoveredPlace || hoveredPath) && (
           <>
-            {hoveredPlace && hoveredUnlocked && (
+            {gameUi(hoveredPlace && hoveredUnlocked && (
               <ContinentHoverArrow marker={hoveredPlace.marker} />
-            )}
+            ))}
 
             <div className="medieval-world__tooltip pointer-events-none absolute bottom-5 left-1/2 z-50 w-[min(90%,460px)] -translate-x-1/2 rounded-2xl border-2 border-[#b98a45]/80 bg-[#302116]/95 p-4 text-center shadow-2xl backdrop-blur-md">
               <div
@@ -394,7 +392,7 @@ export default function ContinentMap() {
                   }
                 `}
               >
-                {hoveredPlace
+                {gameUi(hoveredPlace
                   ? hoveredCompleted
                     ? "Campaign Complete"
                     : hoveredUnlocked
@@ -404,38 +402,38 @@ export default function ContinentMap() {
                     ? "Travel Route"
                     : hoveredPath?.id === "encounter-bridge"
                       ? "Bridge Encounter"
-                      : "Encounter Region"}
+                      : "Encounter Region")}
               </div>
 
               <div className="mt-1 text-xl font-black text-[#ffe4a3]">
-                {hoveredPlace?.name ?? hoveredPath?.name}
+                {gameUi(hoveredPlace?.name ?? hoveredPath?.name)}
               </div>
 
               <p className="mt-2 text-xs leading-5 text-[#c6ad83]">
-                {hoveredPlace?.lore ?? hoveredPath?.lore}
+                {gameUi(hoveredPlace?.lore ?? hoveredPath?.lore)}
               </p>
 
-              {hoveredPlace && (
+              {gameUi(hoveredPlace && (
                 <div className="mt-3 text-[10px] uppercase tracking-wider text-[#9e8969]">
-                  {hoveredUnlocked
+                  {gameUi(hoveredUnlocked
                     ? "Click to open regional campaign map"
-                    : "Complete the previous campaign to unlock"}
+                    : "Complete the previous campaign to unlock")}
                 </div>
-              )}
+              ))}
             </div>
           </>
-        )}
+        ))}
       </div>
       </div>
       <footer className="medieval-world__council">
-        <Link to="/games" className="medieval-world__back">← Games</Link>
-        <div className="medieval-world__progress"><Flag size={16} /><span>{WORLD_PLACES.filter((place) => isCampaignCompleted(place.campaignId, progress)).length} / {WORLD_PLACES.length} realms conquered</span></div>
+        <Link to="/games" className="medieval-world__back">{gameUi("← Games")}</Link>
+        <div className="medieval-world__progress"><Flag size={16} /><span>{gameUi(WORLD_PLACES.filter((place) => isCampaignCompleted(place.campaignId, progress)).length)} / {gameUi(WORLD_PLACES.length)}{gameUi(" realms conquered")}</span></div>
         <div className="medieval-world__travel">
-          <label className="sr-only" htmlFor="campaign-destination">Choose a realm</label>
+          <label className="sr-only" htmlFor="campaign-destination">{gameUi("Choose a realm")}</label>
           <select id="campaign-destination" value={selectedCampaign} onChange={(event) => setSelectedCampaign(event.target.value)}>
-            {WORLD_PLACES.map((place) => <option key={place.id} value={place.campaignId} disabled={!isPlaceUnlocked(place)}>{place.name}{!isPlaceUnlocked(place) ? " · Locked" : ""}</option>)}
+            {WORLD_PLACES.map((place) => <option key={place.id} value={place.campaignId} disabled={!isPlaceUnlocked(place)}>{place.name}{gameUi(!isPlaceUnlocked(place) ? " · Locked" : "")}</option>)}
           </select>
-          <button type="button" onClick={() => { const place = WORLD_PLACES.find((item) => item.campaignId === selectedCampaign); if (place) openCampaign(place); }}><Swords size={16} /><span>Enter realm</span></button>
+          <button type="button" onClick={() => { const place = WORLD_PLACES.find((item) => item.campaignId === selectedCampaign); if (place) openCampaign(place); }}><Swords size={16} /><span>{gameUi("Enter realm")}</span></button>
         </div>
       </footer>
     </div>

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { describeEffects } from "@/games/cards/engine/effects";
@@ -18,14 +19,15 @@ const uniqueId = (base: string, taken: string[]) => {
 
 /* 4. Zones */
 export function ZonesSection() {
+  useGameLanguage();
   const { def, edit, mode } = useCardEditor();
   const update = (index: number, patch: Partial<ZoneDefinition>) => edit((draft) => void (draft.zones[index] = { ...draft.zones[index], ...patch }));
   return (
     <SectionShell
       section="zones"
       eyebrow="4 · Zones"
-      title="Zones"
-      description="Places where cards can be: a draw pile, each player's hand, the table, captured cards… Shared zones exist once; player zones exist once per player."
+      title={gameUi("Zones")}
+      description={gameUi("Places where cards can be: a draw pile, each player's hand, the table, captured cards… Shared zones exist once; player zones exist once per player.")}
       actions={
         <Button size="sm" onClick={() => edit((draft) => void draft.zones.push({ id: uniqueId("zone", draft.zones.map((zone) => zone.id)), name: "New zone", owner: "game", visibility: "public", ordering: "ordered", kind: "other" }))}>
           <Plus size={14} /> Add zone
@@ -36,7 +38,7 @@ export function ZonesSection() {
         {def.zones.map((zone, index) => (
           <Panel
             key={index}
-            title={zone.name}
+            title={gameUi(zone.name)}
             eyebrow={describeZoneDefinition(zone)}
             actions={
               <button type="button" aria-label={`Delete zone ${zone.name}`} className="text-zinc-500 hover:text-red-300" onClick={() => edit((draft) => void draft.zones.splice(index, 1))}>
@@ -45,38 +47,38 @@ export function ZonesSection() {
             }
           >
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Name">
+              <Field label={gameUi("Name")}>
                 <input className={inputClass} value={zone.name} onChange={(event) => update(index, { name: event.target.value })} />
               </Field>
-              {mode === "advanced" && (
-                <Field label="Id (used by rules)">
+              {gameUi(mode === "advanced" && (
+                <Field label={gameUi("Id (used by rules)")}>
                   <input className={`${inputClass} font-mono`} value={zone.id} onChange={(event) => update(index, { id: ident(event.target.value) })} />
                 </Field>
-              )}
-              <Field label="Belongs to">
+              ))}
+              <Field label={gameUi("Belongs to")}>
                 <select className={inputClass} value={zone.owner} onChange={(event) => update(index, { owner: event.target.value as ZoneDefinition["owner"] })}>
-                  <option value="game">The table (shared)</option>
-                  <option value="player">Each player</option>
+                  <option value="game">{gameUi("The table (shared)")}</option>
+                  <option value="player">{gameUi("Each player")}</option>
                 </select>
               </Field>
-              <Field label="Who sees the cards">
+              <Field label={gameUi("Who sees the cards")}>
                 <select className={inputClass} value={zone.visibility} onChange={(event) => update(index, { visibility: event.target.value as ZoneDefinition["visibility"] })}>
-                  <option value="public">Everyone (face up)</option>
-                  <option value="owner">Only the owner</option>
-                  <option value="hidden">Nobody (face down)</option>
+                  <option value="public">{gameUi("Everyone (face up)")}</option>
+                  <option value="owner">{gameUi("Only the owner")}</option>
+                  <option value="hidden">{gameUi("Nobody (face down)")}</option>
                 </select>
               </Field>
-              <Field label="Order">
+              <Field label={gameUi("Order")}>
                 <select className={inputClass} value={zone.ordering} onChange={(event) => update(index, { ordering: event.target.value as ZoneDefinition["ordering"] })}>
-                  <option value="ordered">Ordered (a stack or row)</option>
-                  <option value="unordered">Unordered (a hand or heap)</option>
+                  <option value="ordered">{gameUi("Ordered (a stack or row)")}</option>
+                  <option value="unordered">{gameUi("Unordered (a hand or heap)")}</option>
                 </select>
               </Field>
-              <Field label="Kind" hint="Draw piles and hands also emit DRAW_PILE_EMPTY / HAND_EMPTY.">
+              <Field label={gameUi("Kind")} hint="Draw piles and hands also emit DRAW_PILE_EMPTY / HAND_EMPTY.">
                 <select className={inputClass} value={zone.kind ?? "other"} onChange={(event) => update(index, { kind: event.target.value as ZoneDefinition["kind"] })}>
                   {["drawPile", "hand", "discard", "table", "stack", "captured", "other"].map((kind) => (
                     <option key={kind} value={kind}>
-                      {kind}
+                      {gameUi(kind)}
                     </option>
                   ))}
                 </select>
@@ -91,60 +93,54 @@ export function ZonesSection() {
 
 /* 5. Setup */
 export function SetupSection() {
+  useGameLanguage();
   const { def, edit, mode } = useCardEditor();
   const deal = def.setup.steps.findIndex((step) => step.type === "deal");
   const dealStep = deal >= 0 ? def.setup.steps[deal] : undefined;
   return (
-    <SectionShell section="setup" eyebrow="5 · Setup" title="Setup" description="What happens before the first move: where the deck starts, whether it is shuffled, how cards are dealt and who starts.">
+    <SectionShell section="setup" eyebrow="5 · Setup" title={gameUi("Setup")} description={gameUi("What happens before the first move: where the deck starts, whether it is shuffled, how cards are dealt and who starts.")}>
       <div className="grid gap-4 lg:grid-cols-2">
-        <Panel title="Deck & deal">
+        <Panel title={gameUi("Deck & deal")}>
           <div className="space-y-3">
-            <Field label="The deck starts in">
+            <Field label={gameUi("The deck starts in")}>
               <ZoneIdSelect filter="game" value={def.setup.deckZone} onChange={(deckZone) => edit((draft) => void (draft.setup.deckZone = deckZone))} />
             </Field>
-            <Toggle checked={def.setup.shuffle} onChange={(shuffle) => edit((draft) => void (draft.setup.shuffle = shuffle))} label="Shuffle the deck first" />
-            {dealStep && (
-              <Field label="Cards dealt to each player" hint={typeof dealStep.count === "object" ? "Uses a lobby setting — change its default in Game settings." : undefined}>
-                {dealStep.count === "all" ? (
-                  <span className="text-sm text-zinc-300">
-                    All cards, evenly{" "}
-                    <button type="button" className="text-amber-300 underline" onClick={() => edit((draft) => void (draft.setup.steps[deal].count = 5))}>
-                      use a fixed number
-                    </button>
+            <Toggle checked={def.setup.shuffle} onChange={(shuffle) => edit((draft) => void (draft.setup.shuffle = shuffle))} label={gameUi("Shuffle the deck first")} />
+            {gameUi(dealStep && (
+              <Field label={gameUi("Cards dealt to each player")} hint={typeof dealStep.count === "object" ? "Uses a lobby setting — change its default in Game settings." : undefined}>
+                {gameUi(dealStep.count === "all" ? (
+                  <span className="text-sm text-zinc-300">{gameUi(" All cards, evenly")}{gameUi(" ")}
+                    <button type="button" className="text-amber-300 underline" onClick={() => edit((draft) => void (draft.setup.steps[deal].count = 5))}>{gameUi(" use a fixed number ")}</button>
                   </span>
                 ) : typeof dealStep.count === "number" ? (
                   <span className="flex items-center gap-3">
-                    <NumberField value={dealStep.count} min={0} max={32} label="Cards per player" onChange={(count) => edit((draft) => void (draft.setup.steps[deal].count = count))} />
-                    <button type="button" className="text-xs text-amber-300 underline" onClick={() => edit((draft) => void (draft.setup.steps[deal].count = "all"))}>
-                      deal everything
-                    </button>
+                    <NumberField value={dealStep.count} min={0} max={32} label={gameUi("Cards per player")} onChange={(count) => edit((draft) => void (draft.setup.steps[deal].count = count))} />
+                    <button type="button" className="text-xs text-amber-300 underline" onClick={() => edit((draft) => void (draft.setup.steps[deal].count = "all"))}>{gameUi(" deal everything ")}</button>
                   </span>
                 ) : (
-                  <span className="text-sm text-zinc-300">{describeEffects([dealStep], { def })}</span>
-                )}
+                  <span className="text-sm text-zinc-300">{gameUi(describeEffects([dealStep], { def }))}</span>
+                ))}
               </Field>
-            )}
+            ))}
           </div>
         </Panel>
-        <Panel title="Start">
+        <Panel title={gameUi("Start")}>
           <div className="space-y-3">
-            <Field label="Starting player" hint="Used when no setup step picks one.">
-              {def.setup.startingPlayer ? (
+            <Field label={gameUi("Starting player")} hint="Used when no setup step picks one.">
+              {gameUi(def.setup.startingPlayer ? (
                 <span className="flex items-center gap-2">
                   <PlayerRefEditor value={def.setup.startingPlayer} onChange={(startingPlayer) => edit((draft) => void (draft.setup.startingPlayer = startingPlayer))} />
-                  <button type="button" aria-label="Remove starting player" className="text-xs text-zinc-500" onClick={() => edit((draft) => void delete draft.setup.startingPlayer)}>
+                  <button type="button" aria-label={gameUi("Remove starting player")} className="text-xs text-zinc-500" onClick={() => edit((draft) => void delete draft.setup.startingPlayer)}>
                     ✕
                   </button>
                 </span>
               ) : (
-                <Button size="sm" onClick={() => edit((draft) => void (draft.setup.startingPlayer = { seat: 0 }))}>
-                  Choose starting player
-                </Button>
-              )}
+                <Button size="sm" onClick={() => edit((draft) => void (draft.setup.startingPlayer = { seat: 0 }))}>{gameUi(" Choose starting player ")}</Button>
+              ))}
             </Field>
-            <Field label="First phase">
+            <Field label={gameUi("First phase")}>
               <select className={inputClass} value={def.setup.firstPhase} onChange={(event) => edit((draft) => void (draft.setup.firstPhase = event.target.value))}>
-                {!def.phases.some((phase) => phase.id === def.setup.firstPhase) && <option value={def.setup.firstPhase}>⚠ {def.setup.firstPhase || "choose"}</option>}
+                {!def.phases.some((phase) => phase.id === def.setup.firstPhase) && <option value={def.setup.firstPhase}>⚠ {gameUi(def.setup.firstPhase || "choose")}</option>}
                 {def.phases.map((phase) => (
                   <option key={phase.id} value={phase.id}>
                     {phase.name}
@@ -155,16 +151,16 @@ export function SetupSection() {
           </div>
         </Panel>
       </div>
-      <Panel title="Setup steps" eyebrow={mode === "basic" ? "Switch to Advanced to edit" : "Run once, in order"}>
-        {mode === "advanced" ? (
+      <Panel title={gameUi("Setup steps")} eyebrow={mode === "basic" ? "Switch to Advanced to edit" : "Run once, in order"}>
+        {gameUi(mode === "advanced" ? (
           <EffectListEditor value={def.setup.steps} onChange={(steps) => edit((draft) => void (draft.setup.steps = steps))} />
         ) : (
           <ol className="list-decimal space-y-1 pl-5 text-sm text-zinc-300">
             {def.setup.steps.map((step, index) => (
-              <li key={index}>{describeEffects([step], { def })}</li>
+              <li key={index}>{gameUi(describeEffects([step], { def }))}</li>
             ))}
           </ol>
-        )}
+        ))}
       </Panel>
     </SectionShell>
   );
@@ -172,15 +168,17 @@ export function SetupSection() {
 
 /* 6. Turn phases (+ actions) */
 function EffectsField({ label, value, onChange }: { label: string; value: EffectDefinition[] | undefined; onChange: (value: EffectDefinition[]) => void }) {
+  useGameLanguage();
   return (
     <div>
-      <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{label}</p>
+      <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{gameUi(label)}</p>
       <EffectListEditor value={value ?? []} onChange={onChange} />
     </div>
   );
 }
 
 function PhaseCard({ phase, index }: { phase: PhaseDefinition; index: number }) {
+  useGameLanguage();
   const { def, edit, mode } = useCardEditor();
   const issues = useIssuesFor(phase.id);
   const [open, setOpen] = useState(false);
@@ -194,10 +192,10 @@ function PhaseCard({ phase, index }: { phase: PhaseDefinition; index: number }) 
     <Panel
       title={
         <span className="flex items-center gap-2">
-          <span className="font-mono text-xs text-zinc-500">{index + 1}</span> {phase.name}
-          {phase.automatic && <Chip tone="violet">automatic</Chip>}
-          {phase.autoPass && <Chip>auto-pass</Chip>}
-          {def.setup.firstPhase === phase.id && <Chip tone="amber">first</Chip>}
+          <span className="font-mono text-xs text-zinc-500">{gameUi(index + 1)}</span> {phase.name}
+          {phase.automatic && <Chip tone="violet">{gameUi("automatic")}</Chip>}
+          {phase.autoPass && <Chip>{gameUi("auto-pass")}</Chip>}
+          {def.setup.firstPhase === phase.id && <Chip tone="amber">{gameUi("first")}</Chip>}
         </span>
       }
       actions={
@@ -217,73 +215,72 @@ function PhaseCard({ phase, index }: { phase: PhaseDefinition; index: number }) 
         </>
       }
     >
-      <p className="text-sm text-zinc-400">{describePhase(phase, { def })}</p>
+      <p className="text-sm text-zinc-400">{gameUi(describePhase(phase, { def }))}</p>
       <div className="mt-2">
         <IssueList issues={issues} />
       </div>
-      {open && (
+      {gameUi(open && (
         <div className="mt-4 space-y-4 border-t border-white/[0.06] pt-4">
           <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="Name">
+            <Field label={gameUi("Name")}>
               <input className={inputClass} value={phase.name} onChange={(event) => update((draft) => void (draft.name = event.target.value))} />
             </Field>
-            {mode === "advanced" && (
-              <Field label="Id">
+            {gameUi(mode === "advanced" && (
+              <Field label={gameUi("Id")}>
                 <input className={`${inputClass} font-mono`} value={phase.id} onChange={(event) => update((draft) => void (draft.id = ident(event.target.value)))} />
               </Field>
-            )}
-            <Field label="Description">
+            ))}
+            <Field label={gameUi("Description")}>
               <input className={inputClass} value={phase.description ?? ""} onChange={(event) => update((draft) => void (draft.description = event.target.value))} />
             </Field>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Toggle checked={Boolean(phase.automatic)} onChange={(automatic) => update((draft) => void (draft.automatic = automatic))} label="Automatic" description="No player input — entry effects run and the game moves on." />
-            <Toggle checked={Boolean(phase.autoPass)} onChange={(autoPass) => update((draft) => void (draft.autoPass = autoPass))} label="Auto-pass" description="Players whose only option is “pass” pass automatically." />
+            <Toggle checked={Boolean(phase.automatic)} onChange={(automatic) => update((draft) => void (draft.automatic = automatic))} label={gameUi("Automatic")} description={gameUi("No player input — entry effects run and the game moves on.")} />
+            <Toggle checked={Boolean(phase.autoPass)} onChange={(autoPass) => update((draft) => void (draft.autoPass = autoPass))} label={gameUi("Auto-pass")} description={gameUi("Players whose only option is “pass” pass automatically.")} />
           </div>
-          {!phase.automatic && (
+          {gameUi(!phase.automatic && (
             <div>
-              <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Allowed actions</p>
+              <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{gameUi("Allowed actions")}</p>
               <div className="flex flex-wrap gap-2">
                 {def.actions.map((action) => {
                   const on = phase.allowedActions.includes(action.id);
                   return (
                     <label key={action.id} className={`inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-xs ${on ? "border-amber-300/50 bg-amber-300/10 text-amber-100" : "border-white/10 text-zinc-400"}`}>
                       <input type="checkbox" checked={on} onChange={(event) => update((draft) => void (draft.allowedActions = event.target.checked ? [...draft.allowedActions, action.id] : draft.allowedActions.filter((id) => id !== action.id)))} />
-                      {action.label}
+                      {gameUi(action.label)}
                     </label>
                   );
                 })}
               </div>
             </div>
-          )}
-          <EffectsField label="When the phase starts" value={phase.onEnter} onChange={(onEnter) => update((draft) => void (draft.onEnter = onEnter))} />
-          {mode === "advanced" && <EffectsField label="When the phase ends" value={phase.onExit} onChange={(onExit) => update((draft) => void (draft.onExit = onExit))} />}
+          ))}
+          <EffectsField label={gameUi("When the phase starts")} value={phase.onEnter} onChange={(onEnter) => update((draft) => void (draft.onEnter = onEnter))} />
+          {mode === "advanced" && <EffectsField label={gameUi("When the phase ends")} value={phase.onExit} onChange={(onExit) => update((draft) => void (draft.onExit = onExit))} />}
           <div>
-            <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Then go to (first match wins, checked after every action)</p>
+            <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{gameUi("Then go to (first match wins, checked after every action)")}</p>
             <ul className="space-y-2">
               {phase.transitions.map((transition, transitionIndex) => (
                 <li key={transitionIndex} className="flex flex-wrap items-start gap-2 rounded-lg border border-white/[0.06] bg-black/20 p-2">
-                  <select aria-label="Next phase" className={`${inputClass} !w-auto py-1 text-xs`} value={transition.to} onChange={(event) => update((draft) => void (draft.transitions[transitionIndex].to = event.target.value))}>
+                  <select aria-label={gameUi("Next phase")} className={`${inputClass} !w-auto py-1 text-xs`} value={transition.to} onChange={(event) => update((draft) => void (draft.transitions[transitionIndex].to = event.target.value))}>
                     {def.phases.map((entry) => (
                       <option key={entry.id} value={entry.id}>
-                        → {entry.name}
+                        → {gameUi(entry.name)}
                       </option>
                     ))}
                   </select>
-                  <span className="mt-1 text-xs text-zinc-500">when</span>
+                  <span className="mt-1 text-xs text-zinc-500">{gameUi("when")}</span>
                   <OptionalCondition value={transition.when} emptyLabel="always" onChange={(when) => update((draft) => void (when ? (draft.transitions[transitionIndex].when = when) : delete draft.transitions[transitionIndex].when))} />
-                  <button type="button" aria-label="Remove transition" className="ml-auto text-xs text-zinc-500 hover:text-red-300" onClick={() => update((draft) => void draft.transitions.splice(transitionIndex, 1))}>
+                  <button type="button" aria-label={gameUi("Remove transition")} className="ml-auto text-xs text-zinc-500 hover:text-red-300" onClick={() => update((draft) => void draft.transitions.splice(transitionIndex, 1))}>
                     ✕
                   </button>
                 </li>
               ))}
             </ul>
             <Button size="sm" className="mt-2" onClick={() => update((draft) => void draft.transitions.push({ to: def.phases[(index + 1) % def.phases.length].id }))}>
-              <Plus size={14} /> Transition
-            </Button>
+              <Plus size={14} />{gameUi(" Transition ")}</Button>
           </div>
         </div>
-      )}
+      ))}
     </Panel>
   );
 }
@@ -293,6 +290,7 @@ function actorKind(actors: ActorSpec) {
 }
 
 function ActionCard({ action, index }: { action: ActionDefinition; index: number }) {
+  useGameLanguage();
   const { def, edit } = useCardEditor();
   const issues = useIssuesFor(action.id);
   const [open, setOpen] = useState(false);
@@ -302,7 +300,7 @@ function ActionCard({ action, index }: { action: ActionDefinition; index: number
     <Panel
       title={
         <span className="flex items-center gap-2">
-          {action.label} <Chip tone="sky">{action.type}</Chip>
+          {gameUi(action.label)} <Chip tone="sky">{gameUi(action.type)}</Chip>
         </span>
       }
       actions={
@@ -316,89 +314,82 @@ function ActionCard({ action, index }: { action: ActionDefinition; index: number
         </>
       }
     >
-      <p className="text-sm text-zinc-400">{describeAction(action, { def })}</p>
+      <p className="text-sm text-zinc-400">{gameUi(describeAction(action, { def }))}</p>
       <div className="mt-2">
         <IssueList issues={issues} />
       </div>
-      {open && (
+      {gameUi(open && (
         <div className="mt-4 space-y-3 border-t border-white/[0.06] pt-4">
           <div className="grid gap-3 sm:grid-cols-3">
-            <Field label="Button label">
+            <Field label={gameUi("Button label")}>
               <input className={inputClass} value={action.label} onChange={(event) => update((draft) => void (draft.label = event.target.value))} />
             </Field>
-            <Field label="Id">
+            <Field label={gameUi("Id")}>
               <input className={`${inputClass} font-mono`} value={action.id} onChange={(event) => update((draft) => void (draft.id = ident(event.target.value)))} />
             </Field>
-            <Field label="Type">
+            <Field label={gameUi("Type")}>
               <select className={inputClass} value={action.type} onChange={(event) => update((draft) => void (draft.type = event.target.value as ActionDefinition["type"]))}>
                 {ACTION_TYPES.map((type) => (
                   <option key={type} value={type}>
-                    {type}
+                    {gameUi(type)}
                   </option>
                 ))}
               </select>
             </Field>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-300">
-            Who may use it:
-            <select aria-label="Who may use it" className={`${inputClass} !w-auto py-1 text-xs`} value={actorKind(action.actors)} onChange={(event) => update((draft) => void (draft.actors = event.target.value === "roles" ? { roles: [def.roles?.[0] ?? "player"] } : (event.target.value as ActorSpec)))}>
-              <option value="current">the current player</option>
-              <option value="all">any active player</option>
-              <option value="roles">players with a role…</option>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-300">{gameUi(" Who may use it: ")}<select aria-label={gameUi("Who may use it")} className={`${inputClass} !w-auto py-1 text-xs`} value={actorKind(action.actors)} onChange={(event) => update((draft) => void (draft.actors = event.target.value === "roles" ? { roles: [def.roles?.[0] ?? "player"] } : (event.target.value as ActorSpec)))}>
+              <option value="current">{gameUi("the current player")}</option>
+              <option value="all">{gameUi("any active player")}</option>
+              <option value="roles">{gameUi("players with a role…")}</option>
             </select>
             {typeof action.actors === "object" && <RoleInput value={action.actors.roles[0] ?? ""} onChange={(role) => update((draft) => void (draft.actors = { roles: [role] }))} />}
           </div>
-          {shape !== "none" && (
+          {gameUi(shape !== "none" && (
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="Card comes from">
+              <Field label={gameUi("Card comes from")}>
                 <ZoneIdSelect value={action.source} onChange={(source) => update((draft) => void (draft.source = source))} />
               </Field>
-              <Field label="Card goes to">
+              <Field label={gameUi("Card goes to")}>
                 <ZoneRefEditor value={action.destination} onChange={(destination) => update((draft) => void (draft.destination = destination))} />
               </Field>
             </div>
-          )}
-          {shape === "cardAndTarget" && (
-            <div className="flex flex-wrap items-start gap-2 text-sm text-zinc-300">
-              Target a card in <ZoneRefEditor value={action.target?.zone} onChange={(zone) => update((draft) => void (draft.target = { ...draft.target, zone }))} />
-              where <OptionalCondition value={action.target?.where} emptyLabel="any card" onChange={(where) => update((draft) => void (draft.target = { zone: draft.target?.zone ?? { zone: def.zones[0].id }, ...(where ? { where } : {}) }))} />
+          ))}
+          {gameUi(shape === "cardAndTarget" && (
+            <div className="flex flex-wrap items-start gap-2 text-sm text-zinc-300">{gameUi(" Target a card in ")}<ZoneRefEditor value={action.target?.zone} onChange={(zone) => update((draft) => void (draft.target = { ...draft.target, zone }))} />{gameUi(" where ")}<OptionalCondition value={action.target?.where} emptyLabel="any card" onChange={(where) => update((draft) => void (draft.target = { zone: draft.target?.zone ?? { zone: def.zones[0].id }, ...(where ? { where } : {}) }))} />
             </div>
-          )}
-          <div className="flex flex-wrap items-start gap-2 text-sm text-zinc-300">
-            Available when <OptionalCondition value={action.condition} onChange={(condition) => update((draft) => void (condition ? (draft.condition = condition) : delete draft.condition))} />
+          ))}
+          <div className="flex flex-wrap items-start gap-2 text-sm text-zinc-300">{gameUi(" Available when ")}<OptionalCondition value={action.condition} onChange={(condition) => update((draft) => void (condition ? (draft.condition = condition) : delete draft.condition))} />
           </div>
-          {shape !== "none" && (
-            <div className="flex flex-wrap items-start gap-2 text-sm text-zinc-300">
-              The card is allowed if <OptionalCondition value={action.cardCondition} emptyLabel="any card" onChange={(cardCondition) => update((draft) => void (cardCondition ? (draft.cardCondition = cardCondition) : delete draft.cardCondition))} />
+          {gameUi(shape !== "none" && (
+            <div className="flex flex-wrap items-start gap-2 text-sm text-zinc-300">{gameUi(" The card is allowed if ")}<OptionalCondition value={action.cardCondition} emptyLabel="any card" onChange={(cardCondition) => update((draft) => void (cardCondition ? (draft.cardCondition = cardCondition) : delete draft.cardCondition))} />
             </div>
-          )}
-          <EffectsField label="Then" value={action.effects} onChange={(effects) => update((draft) => void (draft.effects = effects))} />
-          <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-300">
-            Test bots pick this
-            <NumberField value={action.botWeight ?? 1} min={0} max={100} label="Bot weight" onChange={(botWeight) => update((draft) => void (botWeight === 1 ? delete draft.botWeight : (draft.botWeight = botWeight)))} />
-            <span className="text-xs text-zinc-500">× as often as other buttons (0 = only as a last resort; card plays always come first)</span>
+          ))}
+          <EffectsField label={gameUi("Then")} value={action.effects} onChange={(effects) => update((draft) => void (draft.effects = effects))} />
+          <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-300">{gameUi(" Test bots pick this ")}<NumberField value={action.botWeight ?? 1} min={0} max={100} label={gameUi("Bot weight")} onChange={(botWeight) => update((draft) => void (botWeight === 1 ? delete draft.botWeight : (draft.botWeight = botWeight)))} />
+            <span className="text-xs text-zinc-500">{gameUi("× as often as other buttons (0 = only as a last resort; card plays always come first)")}</span>
           </div>
         </div>
-      )}
+      ))}
     </Panel>
   );
 }
 
 export function PhasesSection() {
+  useGameLanguage();
   const { def, edit, mode } = useCardEditor();
   return (
     <SectionShell
       section="phases"
       eyebrow="6 · Turn phases"
-      title="Turn phases & actions"
-      description="A round moves through phases. Each phase lists what players may do; transitions decide when the game moves on. Actions are the buttons players press."
+      title={gameUi("Turn phases & actions")}
+      description={gameUi("A round moves through phases. Each phase lists what players may do; transitions decide when the game moves on. Actions are the buttons players press.")}
       actions={
         <Button size="sm" onClick={() => edit((draft) => void draft.phases.push({ id: uniqueId("phase", draft.phases.map((phase) => phase.id)), name: "New phase", allowedActions: [], onEnter: [], transitions: [] }))}>
           <Plus size={14} /> Add phase
         </Button>
       }
     >
-      <ol aria-label="Phase order" className="flex flex-wrap items-center gap-2 text-sm">
+      <ol aria-label={gameUi("Phase order")} className="flex flex-wrap items-center gap-2 text-sm">
         {def.phases.map((phase, index) => (
           <li key={phase.id} className="flex items-center gap-2">
             <span className={`rounded-lg border px-2.5 py-1 ${phase.automatic ? "border-violet-400/30 text-violet-200" : "border-amber-300/30 text-amber-100"}`}>{phase.name}</span>
@@ -413,14 +404,13 @@ export function PhasesSection() {
       </div>
       <div className="flex flex-wrap items-end justify-between gap-3 pt-4">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300/80">Actions</p>
-          <h3 className="mt-1 text-xl font-bold text-white">What players can do</h3>
+          <p className="text-[10px] font-black uppercase tracking-[0.28em] text-amber-300/80">{gameUi("Actions")}</p>
+          <h3 className="mt-1 text-xl font-bold text-white">{gameUi("What players can do")}</h3>
         </div>
         <Button size="sm" onClick={() => edit((draft) => void draft.actions.push({ id: uniqueId("action", draft.actions.map((action) => action.id)), type: "playCard", label: "Play", actors: "current", source: draft.zones.find((zone) => zone.owner === "player")?.id, destination: { zone: draft.zones.find((zone) => zone.owner === "game")?.id ?? "" }, effects: [] }))}>
-          <Plus size={14} /> Add action
-        </Button>
+          <Plus size={14} />{gameUi(" Add action ")}</Button>
       </div>
-      {mode === "basic" && <p className="text-sm text-zinc-500">Tip: switch to Advanced mode to change card conditions, targets and ids.</p>}
+      {mode === "basic" && <p className="text-sm text-zinc-500">{gameUi("Tip: switch to Advanced mode to change card conditions, targets and ids.")}</p>}
       <div className="grid gap-3 xl:grid-cols-2">
         {def.actions.map((action, index) => (
           <ActionCard key={`${action.id}-${index}`} action={action} index={index} />

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Canvas } from "@react-three/fiber";
@@ -16,6 +17,7 @@ export default function PartyBoard({ map, match, onSelect, overlay = null, explo
   explosion?: { id: number; nodeId: string; kind: "melon" | "fallout" } | null; preview?: boolean;
   cameraMode?: "pawn" | "whole"; cameraReset?: number; children?: ReactNode;
 }) {
+  useGameLanguage();
   const activeNodeId = match ? activePlayer(match).currentNodeId : null;
   const turnKey = `${match?.round}:${match?.turnIndex}`;
   const [mobile, setMobile] = useState(() => window.matchMedia("(max-width: 600px)").matches);
@@ -61,11 +63,11 @@ export default function PartyBoard({ map, match, onSelect, overlay = null, explo
     {!preview && <>
       {motion && landing && landing.amount > 0 && ["coin", "boost", "bank", "deposit"].includes(landing.kind) && <div key={landing.id} ref={flight} className="pp-coin-flight" aria-hidden="true">{[0, 1, 2].map((i) => <i key={i} style={{ animationDelay: `${i * .09}s` }}>◉</i>)}</div>}
       <div className="pp-board-tools">
-        {children}
-        <div className="pp-camera" role="group" aria-label="Board zoom"><button aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(.7, z - .4))}>−</button><span>Drag to explore</span><button aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(5.5, z + .4))}>+</button></div>
+        {gameUi(children)}
+        <div className="pp-camera" role="group" aria-label={gameUi("Board zoom")}><button aria-label={gameUi("Zoom out")} onClick={() => setZoom((z) => Math.max(.7, z - .4))}>−</button><span>{gameUi("Drag to explore")}</span><button aria-label={gameUi("Zoom in")} onClick={() => setZoom((z) => Math.min(5.5, z + .4))}>+</button></div>
       </div>
-      <span className="pp-map-caption">{map.name.toUpperCase()} · {map.nodes.length} SPACES · DRAG TO EXPLORE</span>
-      <details className="pp-board-access"><summary>Choose a space</summary><label>Board space<select value={inspected} onChange={(e) => select(e.target.value)}><option value="">Select a space…</option>{map.nodes.map((n) => <option key={n.id} value={n.id}>Space {spaceNumber(n.id)} · {map.cleansingNodeIds?.includes(n.id) ? "cleanse +10 HP" : n.type} · {map.regions[n.region].name}</option>)}</select></label></details>
+      <span className="pp-map-caption">{gameUi(map.name.toUpperCase())} · {gameUi(map.nodes.length)}{gameUi(" SPACES · DRAG TO EXPLORE")}</span>
+      <details className="pp-board-access"><summary>{gameUi("Choose a space")}</summary><label>{gameUi("Board space")}<select value={inspected} onChange={(e) => select(e.target.value)}><option value="">{gameUi("Select a space…")}</option>{map.nodes.map((n) => <option key={n.id} value={n.id}>{gameUi("Space ")}{gameUi(spaceNumber(n.id))} · {gameUi(map.cleansingNodeIds?.includes(n.id) ? "cleanse +10 HP" : n.type)} · {gameUi(map.regions[n.region].name)}</option>)}</select></label></details>
     </>}
   </div>;
 }

@@ -1,3 +1,4 @@
+import { useGameLanguage } from "../../../i18n/gameUi.ts";
 import type { House } from "../../../games/MedievalKingdoms/edravane/types.ts";
 
 // Original vector heraldry. House identity selects the charge and the shield's ordinary.
@@ -23,6 +24,7 @@ function sigilVariant(id: string) {
 }
 
 export function HouseSigil({ house, size = 28 }: { house: House; size?: number }) {
+  useGameLanguage();
   const variant = sigilVariant(house.id);
   const ordinary = ["M6 9h14v30l-14-9Z", "M6 11 34 31v-8L15 9H6Z", "M6 24l14-10 14 10v8L20 22 6 32Z", "M17 9h6v27l-3 3-3-3Z"][variant];
   return <svg className="ed-house-sigil" width={size} height={size * 1.2} viewBox="0 0 40 48" fill="none" aria-hidden="true" focusable="false">

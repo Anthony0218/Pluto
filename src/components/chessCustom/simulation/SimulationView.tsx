@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import GameXpReward from "@/components/games/GameXpReward";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -43,6 +44,7 @@ const playersFor = (teams: { id: string }[], mode: SimulationMode, level: AiKind
  * in AI vs AI to watch the variant; from Play it starts in the chosen mode.
  */
 export default function SimulationView({ context }: { context: "create" | "play" }) {
+  useGameLanguage();
   const { variant, testSetup, simulationSource, go, goToStep, route, save, dirty, inLibrary, isDirty } = useEditor();
   const [params, setParams] = useSearchParams();
   // 2D is the default; 3D is opt-in (?view=3d), e.g. from the 3D Chess entry points.
@@ -142,9 +144,9 @@ export default function SimulationView({ context }: { context: "create" | "play"
         {/* Left sidebar: Play, Board, Customize, Settings — nothing else. */}
         <aside className="z-20 flex flex-row items-center gap-2 overflow-x-auto border-b border-white/[0.06] bg-black/45 px-3 py-2 backdrop-blur-xl lg:flex-col lg:items-stretch lg:overflow-visible lg:border-b-0 lg:border-r lg:px-3 lg:py-4">
           <div className="hidden px-2 pb-4 lg:block">
-            <p className="text-[9px] font-black uppercase tracking-[0.24em] text-amber-300/70">{context === "create" ? `${ui("Create")} · ${stepNumber("simulation")} ${ui("Simulation")}` : `${ui("Play")} · ${ui(playLabel ?? "")}`}</p>
-            <p className="mt-1 truncate font-serif text-lg text-white">{variant.name}</p>
-            {context === "create" && <p className="text-[11px] text-zinc-500">{dirty ? ui("Unsaved changes") : inLibrary ? ui("Saved") : ui("Not saved yet")}</p>}
+            <p className="text-[9px] font-black uppercase tracking-[0.24em] text-amber-300/70">{gameUi(context === "create" ? `${ui("Create")} · ${stepNumber("simulation")} ${ui("Simulation")}` : `${ui("Play")} · ${ui(playLabel ?? "")}`)}</p>
+            <p className="mt-1 truncate font-serif text-lg text-white">{gameUi(variant.name)}</p>
+            {context === "create" && <p className="text-[11px] text-zinc-500">{gameUi(dirty ? ui("Unsaved changes") : inLibrary ? ui("Saved") : ui("Not saved yet"))}</p>}
           </div>
           <nav aria-label={ui("Simulation")} className="flex gap-1 lg:flex-col">
             {SIMULATION_SIDEBAR.map(({ id, label }) => {
@@ -174,7 +176,7 @@ export default function SimulationView({ context }: { context: "create" | "play"
                 <button type="button" onClick={() => goToStep("position")} className="flex shrink-0 items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-zinc-300 transition hover:border-white/25 hover:text-white">
                   <PreviousIcon size={16} />
                   <span className="hidden sm:inline">
-                    {ui("Previous")}: {stepNumber("position")} {ui("Position")}
+                    {ui("Previous")}: {gameUi(stepNumber("position"))} {ui("Position")}
                   </span>
                 </button>
                 <button
@@ -213,7 +215,7 @@ export default function SimulationView({ context }: { context: "create" | "play"
                   onClick={() => setView(id)}
                   className={`rounded-lg px-3 py-1.5 text-xs font-black tracking-wider transition ${view === id ? "bg-amber-300 text-zinc-950 shadow-[0_0_18px_rgba(252,211,77,.3)]" : "text-zinc-400 hover:bg-white/[0.06] hover:text-white"}`}
                 >
-                  {id.toUpperCase()}
+                  {gameUi(id.toUpperCase())}
                 </button>
               ))}
             </div>
@@ -221,7 +223,7 @@ export default function SimulationView({ context }: { context: "create" | "play"
               type="button"
               onClick={() => setDrawer(drawer === "play" ? null : "play")}
               className="inline-flex items-center gap-2 rounded-xl border border-sky-400/40 bg-sky-400/10 px-3 py-1.5 text-xs font-semibold text-sky-100 transition hover:bg-sky-400/20"
-              aria-label={`${ui("Mode")}: ${ui(SIMULATION_MODES.find((mode) => mode.id === matchMode)?.label ?? "")}. ${ui("Change in Play")}`}
+              aria-label={gameUi(`${ui("Mode")}: ${ui(SIMULATION_MODES.find((mode) => mode.id === matchMode)?.label ?? "")}. ${ui("Change in Play")}`)}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-sky-300" aria-hidden="true" />
               {ui(SIMULATION_MODES.find((mode) => mode.id === matchMode)?.label ?? "")}
@@ -229,10 +231,10 @@ export default function SimulationView({ context }: { context: "create" | "play"
             </button>
             {layers.length > 1 && (
               <span className="text-[11px] text-zinc-400">
-                {ui("Layer")} {shownLayer.name}
+                {ui("Layer")} {gameUi(shownLayer.name)}
               </span>
             )}
-            <span className="ml-auto hidden text-[11px] text-zinc-500 xl:inline">{simulationSource === "test" ? ui("From your test position") : ui("From the starting position")}</span>
+            <span className="ml-auto hidden text-[11px] text-zinc-500 xl:inline">{gameUi(simulationSource === "test" ? ui("From your test position") : ui("From the starting position"))}</span>
           </div>
 
           <div className="relative h-[56vh] min-h-[360px] lg:h-auto lg:flex-1">
@@ -282,14 +284,14 @@ export default function SimulationView({ context }: { context: "create" | "play"
                 {state.result ? (
                   <span className="flex items-center gap-2 font-semibold">
                     <VictoryIcon size={16} className="text-amber-300" />
-                    {state.result.reason}
+                    {gameUi(state.result.reason)}
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full ring-1 ring-white/40" style={{ background: turnTeam?.color }} />
-                    <span className="font-semibold">{turnTeam?.name}{turnTeam?.alliance ? ` · ${turnTeam.alliance}` : ""}</span>
+                    <span className="font-semibold">{gameUi(turnTeam?.name)}{gameUi(turnTeam?.alliance ? ` · ${turnTeam.alliance}` : "")}</span>
                     <span className="text-zinc-400">
-                      {ui("to move")} · {players[state.turn] === "human" ? ui("your move") : session.playing || !playback ? ui("AI thinking…") : ui("press Play")}
+                      {ui("to move")} · {gameUi(players[state.turn] === "human" ? ui("your move") : session.playing || !playback ? ui("AI thinking…") : ui("press Play"))}
                     </span>
                   </span>
                 )}
@@ -298,7 +300,7 @@ export default function SimulationView({ context }: { context: "create" | "play"
               {recentMessages.map((message, index) => (
                 <div key={`${message.ply}-${index}`} className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs backdrop-blur-xl ${message.kind === "warning" ? "border-amber-400/30 bg-amber-500/15 text-amber-100" : "border-sky-400/25 bg-sky-500/10 text-sky-100"}`}>
                   <EventsIcon size={13} />
-                  {message.text}
+                  {gameUi(message.text)}
                 </div>
               ))}
             </div>
@@ -391,7 +393,7 @@ export default function SimulationView({ context }: { context: "create" | "play"
             <button type="button" aria-expanded={historyOpen} onClick={() => setHistoryOpen((value) => !value)} className="flex w-full items-center justify-between gap-2 px-3 py-2.5">
               <span className="text-[11px] font-black uppercase tracking-[0.18em] text-amber-200/90">{ui("Move History")}</span>
               <span className="flex items-center gap-2 text-[11px] text-zinc-500">
-                {ui("Turn")} {state.turnNumber}
+                {ui("Turn")} {gameUi(state.turnNumber)}
                 {historyOpen ? <ChevronUpIcon size={14} /> : <ChevronDownIcon size={14} />}
               </span>
             </button>

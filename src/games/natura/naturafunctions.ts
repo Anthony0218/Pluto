@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import { W, H, GROUND, HUNT_SECONDS, BOSS_SECONDS, CAPTURE_SECONDS, GRASS, PERCH, BURROW_EXITS, QUESTIONS } from "./naturaData.ts";
 import type { Role, Mode, Vec, Game, Player, PlayMode } from "./naturaData.ts";
 import { randomStep, worldRandom } from './random.ts';
@@ -557,7 +558,7 @@ export function drawScene(ctx: CanvasRenderingContext2D, g: Game) {
   ctx.font = "700 11px system-ui";
   ctx.textAlign = "center";
   ctx.fillStyle = "#ffebbb";
-  ctx.fillText("PERCH", PERCH.x + PERCH.width / 2, PERCH.y - 36);
+  ctx.fillText(gameUi("PERCH"), PERCH.x + PERCH.width / 2, PERCH.y - 36);
   if (g.perchFocus > 0 && g.phase === "hunt") {
     ctx.strokeStyle = "#ffdc90";
     ctx.lineWidth = 3;
@@ -585,7 +586,7 @@ export function drawScene(ctx: CanvasRenderingContext2D, g: Game) {
     ellipse(ctx, x, GROUND + 3, 27, 10, "#243b31");
     ctx.fillStyle = "#f9e4aa";
     ctx.font = "700 10px system-ui";
-    ctx.fillText(`BURROW ${i + 1}`, x, GROUND - 28);
+    ctx.fillText(gameUi(`BURROW ${i + 1}`), x, GROUND - 28);
     if (g.burrowTravel > 0 && g.burrowExit === i)
       ellipse(ctx, x, GROUND + 14, 4, 4, "#ffe9a8");
   });
@@ -634,7 +635,7 @@ export function drawScene(ctx: CanvasRenderingContext2D, g: Game) {
       ctx.fillStyle = g.coverTime > 0 ? "#e8f6b0" : "#ffcf9a";
       ctx.font = "700 11px system-ui";
       ctx.fillText(
-        g.coverTime > 0 ? `HIDDEN ${g.coverTime.toFixed(1)}s` : "RUSTLING!",
+        gameUi(g.coverTime > 0 ? `HIDDEN ${g.coverTime.toFixed(1)}s` : "RUSTLING!"),
         patch.x + patch.width / 2,
         GROUND - 62,
       );
@@ -673,12 +674,12 @@ export function drawScene(ctx: CanvasRenderingContext2D, g: Game) {
     ctx.fillStyle = "#fff1ce";
     ctx.font = "bold 28px system-ui";
     ctx.textAlign = "center";
-    ctx.fillText(`VOLE ${g.catches} CAUGHT`, W / 2, 105);
+    ctx.fillText(gameUi(`VOLE ${g.catches} CAUGHT`), W / 2, 105);
     ctx.font = "15px system-ui";
     ctx.fillText(
-      g.catches === 3
+      gameUi(g.catches === 3
         ? "The kestrel takes its final flight…"
-        : "A new vole is coming out…",
+        : "A new vole is coming out…"),
       W / 2,
       132,
     );
@@ -687,7 +688,7 @@ export function drawScene(ctx: CanvasRenderingContext2D, g: Game) {
     ctx.textAlign = "center";
     ctx.font = "700 17px system-ui";
     ctx.fillStyle = "#ffe8b4";
-    ctx.fillText("THE GIANT VOLE AWAKENS", W / 2, 35);
+    ctx.fillText(gameUi("THE GIANT VOLE AWAKENS"), W / 2, 35);
   }
 }
 

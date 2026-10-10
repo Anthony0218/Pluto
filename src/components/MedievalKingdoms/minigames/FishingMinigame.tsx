@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import GameXpReward from "@/components/games/GameXpReward";
 import {
   useEffect,
@@ -10,6 +11,7 @@ export default function FishingMinigame({
 }: {
   onComplete: () => void;
 }) {
+  useGameLanguage();
   const [
     marker,
     setMarker,
@@ -140,13 +142,9 @@ export default function FishingMinigame({
           🎣
         </div>
 
-        <h2 className="mt-3 text-2xl font-black text-[#ffe6ad]">
-          Moonriver Fishing
-        </h2>
+        <h2 className="mt-3 text-2xl font-black text-[#ffe6ad]">{gameUi(" Moonriver Fishing ")}</h2>
 
-        <p className="mt-2 text-sm text-[#bba381]">
-          Catch 3 fish by stopping the hook inside the moving green catch zone.
-        </p>
+        <p className="mt-2 text-sm text-[#bba381]">{gameUi(" Catch 3 fish by stopping the hook inside the moving green catch zone. ")}</p>
 
         <div className="mt-7 rounded-2xl border-2 border-[#496a74] bg-gradient-to-b from-[#24485d] to-[#102a3d] p-5">
           <div className="relative h-14 overflow-hidden rounded-full border border-[#88a7ac] bg-[#0e2634]">
@@ -173,14 +171,12 @@ export default function FishingMinigame({
               cast
             }
             className="mt-5 rounded-xl border-2 border-[#d4b372] bg-[#76522c] px-8 py-3 font-black text-[#fff0c6] hover:bg-[#8c6535]"
-          >
-            Reel In!
-          </button>
+          >{gameUi(" Reel In! ")}</button>
         </div>
 
         <div className="mt-5 text-sm font-black text-[#dfc282]">
           {
-            message
+            gameUi(message)
           }
         </div>
 

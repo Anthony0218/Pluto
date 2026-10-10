@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useState } from "react";
 import { useNewEvents } from "./useNewEvents.ts";
 import type { FeedbackKind, Match } from "../../../games/party/types.ts";
@@ -8,6 +9,7 @@ interface Toast {
   text: string;
 }
 export default function FeedbackToasts({ match }: { match: Match }) {
+  useGameLanguage();
   const [toasts, setToasts] = useState<Toast[]>([]);
   useNewEvents(match, (events) => {
     const added = events
@@ -27,7 +29,7 @@ export default function FeedbackToasts({ match }: { match: Match }) {
     <div className="pp-toasts" role="status" aria-live="polite">
       {toasts.map((toast) => (
         <div key={toast.key} className={`pp-toast pp-toast-${toast.kind}`}>
-          {toast.text}
+          {gameUi(toast.text)}
         </div>
       ))}
     </div>

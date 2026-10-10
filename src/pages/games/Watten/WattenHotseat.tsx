@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { useAppLanguage } from "@/i18n/languageStore";
 import "./wattenMenus.css";
 import { useCallback, useState } from "react";
@@ -66,7 +67,7 @@ export default function WattenHotseat() {
                 {t("Bavarian Watten")}
               </p>
 
-              <h1 className="mt-2 text-3xl font-black">Hotseat</h1>
+              <h1 className="mt-2 text-3xl font-black">{gameUi("Hotseat")}</h1>
             </div>
 
           </div>
@@ -154,7 +155,7 @@ export default function WattenHotseat() {
                             : "bg-emerald-500/15 text-emerald-300"
                       }`}
                     >
-                      {index + 1}
+                      {gameUi(index + 1)}
                     </div>
 
                     {/* PLAYER NAME */}
@@ -174,7 +175,7 @@ export default function WattenHotseat() {
                     />
 
                     {/* TEAM RADIO */}
-                    {variant === "four-player" && (
+                    {gameUi(variant === "four-player" && (
                       <label
                         className={`flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 ${
                           isTeamA
@@ -187,10 +188,10 @@ export default function WattenHotseat() {
                             isTeamA ? "text-amber-300" : "text-emerald-300"
                           }`}
                         >
-                          {isTeamA ? "Team A" : "Team B"}
+                          {gameUi(isTeamA ? "Team A" : "Team B")}
                         </span>
                       </label>
-                    )}
+                    ))}
                   </div>
                 );
               })}

@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -276,7 +277,7 @@ function Panel({
   return (
     <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20">
       <h2 className="font-black text-zinc-100">{ui(title)}</h2>
-      <div className="mt-4">{children}</div>
+      <div className="mt-4">{gameUi(children)}</div>
     </section>
   );
 }
@@ -352,11 +353,11 @@ export function HotPotatoMultiplayerLobby() {
           className="mt-2 w-full rounded-xl border border-white/10 bg-black/25 px-4 py-3 outline-none"
         />
 
-        {error && (
+        {gameUi(error && (
           <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
             {ui(error)}
           </div>
-        )}
+        ))}
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           <section className="rounded-2xl border border-white/5 bg-black/20 p-4">
@@ -996,27 +997,27 @@ export function HotPotatoMultiplayerGame() {
         <ChessPageHeader className="mb-6 flex flex-col gap-4 rounded-3xl border border-orange-400/10 bg-zinc-900/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between" description={<> {ui("Room ")}{room.code} </>}>
 
           <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-sm">
-            {gameState.status === "waiting" ? ui("Waiting for opponent…") : finished ? ui("Game finished") : canMove ? ui("Your turn") : ui("Opponent's turn")}
+            {gameUi(gameState.status === "waiting" ? ui("Waiting for opponent…") : finished ? ui("Game finished") : canMove ? ui("Your turn") : ui("Opponent's turn"))}
           </div>
         </ChessPageHeader>
 
-        {error && (
+        {gameUi(error && (
           <div className="mb-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">
             {ui(error)}
           </div>
-        )}
+        ))}
 
         <div className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="space-y-4">
             <Panel title={ui("Players")}>
               <div className="space-y-2 text-sm">
                 <div className="rounded-xl bg-white/5 p-3">
-                  <b>{me.display_name}</b> · {myColor}
+                  <b>{me.display_name}</b> · {gameUi(myColor)}
                   <p className="text-xs text-zinc-500">{ui("You")}</p>
                 </div>
                 <div className="rounded-xl bg-white/5 p-3">
-                  <b>{opponent?.display_name ?? "Waiting…"}</b>
-                  {opponent ? ` · ${opponent.chosen_color}` : ""}
+                  <b>{gameUi(opponent?.display_name ?? "Waiting…")}</b>
+                  {gameUi(opponent ? ` · ${opponent.chosen_color}` : "")}
                   <p className="text-xs text-zinc-500">{ui("Opponent")}</p>
                 </div>
               </div>
@@ -1055,8 +1056,8 @@ export function HotPotatoMultiplayerGame() {
                   ply: record.ply,
                   side: record.color,
                   moveNumber: record.moveNumber,
-                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{record.san}</span>,
-                  trailing: <span>{`${record.potatoTransferred ? "💣→" : ""}${record.explosionSquaresAfter.length ? "💥" : ""}`}</span>,
+                  content: <span className="truncate font-mono text-xs font-bold text-zinc-200">{gameUi(record.san)}</span>,
+                  trailing: <span>{gameUi(`${record.potatoTransferred ? "💣→" : ""}${record.explosionSquaresAfter.length ? "💥" : ""}`)}</span>,
                 }))}
                 onSelect={(ply) => {
                   setHistoryPreviewPly(ply);
@@ -1068,17 +1069,17 @@ export function HotPotatoMultiplayerGame() {
           </aside>
 
           <section className="mx-auto w-full max-w-[820px] min-w-0">
-            {historyPreviewPly !== null && (
+            {gameUi(historyPreviewPly !== null && (
               <div className="mb-3 flex items-center justify-between rounded-xl border border-orange-400/20 bg-orange-400/[0.07] px-4 py-3">
-                <span className="text-sm font-black">{ui("History · action")}{historyPreviewPly}
+                <span className="text-sm font-black">{ui("History · action")}{gameUi(historyPreviewPly)}
                 </span>
                 <button
                   onClick={() => setHistoryPreviewPly(null)}
                   className="rounded-lg bg-white/10 px-3 py-2 text-xs font-black"
                 >{ui("Back to live")}</button>
               </div>
-            )}
-            {promotion && historyPreviewPly === null && (
+            ))}
+            {gameUi(promotion && historyPreviewPly === null && (
               <div className="relative mb-3">
                 <PromotionBar
                   onPromote={(piece) =>
@@ -1086,8 +1087,8 @@ export function HotPotatoMultiplayerGame() {
                   }
                 />
               </div>
-            )}
-            {finished && historyPreviewPly === null && (
+            ))}
+            {gameUi(finished && historyPreviewPly === null && (
               <VisibleGameResult
                 winner={gameState.winner}
                 playerColor={myColor}
@@ -1099,11 +1100,11 @@ export function HotPotatoMultiplayerGame() {
                     disabled={myRematchReady || actionBusy}
                     className="mt-5 w-full rounded-xl bg-orange-400 px-4 py-3 font-black text-orange-950 disabled:opacity-50"
                   >
-                    {myRematchReady ? ui("Waiting for opponent…") : ui("Play again")}
+                    {gameUi(myRematchReady ? ui("Waiting for opponent…") : ui("Play again"))}
                   </button>
                 }
               />
-            )}
+            ))}
 
             <div className="relative">
               <Board
@@ -1152,7 +1153,7 @@ export function HotPotatoMultiplayerGame() {
                     <p className="mt-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">{ui("Waiting for players")}</p>
 
                     <h2 className="mt-2 text-2xl font-black text-white">
-                      {players.length}{ui("/2 players connected")}</h2>
+                      {gameUi(players.length)}{ui("/2 players connected")}</h2>
 
                     <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-zinc-500">{ui("Share this room code. The game starts automatically when everyone has joined.")}</p>
 
@@ -1165,7 +1166,7 @@ export function HotPotatoMultiplayerGame() {
                     </div>
 
                     <p className="mt-4 text-xs font-bold text-zinc-400">
-                      {copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code")}
+                      {gameUi(copied ? ui("✓ Copied to clipboard") : ui("Click this box to copy the code"))}
                     </p>
                   </button>
                     <RoomSlots total={2} names={players.map((player) => player.display_name)} overlay />
@@ -1204,28 +1205,28 @@ export function HotPotatoMultiplayerGame() {
                     >
                       <div className="flex items-center justify-between gap-3">
                         <p className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                          {owner === "w" ? ui("White bomb") : ui("Black bomb")}
+                          {gameUi(owner === "w" ? ui("White bomb") : ui("Black bomb"))}
                         </p>
 
                         <span className="rounded-full border border-white/10 bg-black/25 px-2 py-1 text-[10px] font-black text-zinc-300">
-                          {patternLabel}
+                          {gameUi(patternLabel)}
                         </span>
                       </div>
 
-                      {potato.square ? (
+                      {gameUi(potato.square ? (
                         <>
                           <div className="mt-3 flex items-end justify-between gap-4">
                             <div>
                               <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">{ui("Carrier")}</p>
                               <p className="mt-1 font-mono text-xl font-black uppercase text-white">
-                                {potato.square}
+                                {gameUi(potato.square)}
                               </p>
                             </div>
 
                             <div className="text-right">
                               <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600">{ui("Explodes in")}</p>
                               <p className="mt-1 text-3xl font-black text-orange-200">
-                                {potato.movesUntilExplosion}{potato.dropped ? ui(" · Paused on ground") : ""}
+                                {gameUi(potato.movesUntilExplosion)}{gameUi(potato.dropped ? ui(" · Paused on ground") : "")}
                               </p>
                             </div>
                           </div>
@@ -1255,10 +1256,10 @@ export function HotPotatoMultiplayerGame() {
                           </div>
 
                           <span className="text-2xl font-black text-cyan-200">
-                            {potato.respawnMovesRemaining}
+                            {gameUi(potato.respawnMovesRemaining)}
                           </span>
                         </div>
-                      )}
+                      ))}
                     </div>
                   );
                 })}
@@ -1276,7 +1277,7 @@ export function HotPotatoMultiplayerGame() {
                     className="rounded-xl bg-black/20 p-3"
                   >
                     <p className="text-xl font-black text-orange-300">
-                      {value}
+                      {gameUi(value)}
                     </p>
                     <p className="text-[9px] text-zinc-600">{ui(label)}</p>
                   </div>

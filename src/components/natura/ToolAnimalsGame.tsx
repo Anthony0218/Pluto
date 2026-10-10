@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { GameResult, Player, PlayMode } from "../../games/natura/naturaData";
 import { createToolGame, idleToolInput, updateToolGame, toolGoal, TOOL_W, TOOL_H } from "../../games/natura/toolAnimals";
@@ -18,18 +19,20 @@ const titles = { bolas: "Midnight Lasso", coconut: "Carry Your Cover" };
 function HoldButton({ label, title, disabled, press, release }: {
   label: string; title: string; disabled: boolean; press: (id: number) => void; release: (id: number) => void;
 }) {
-  return <button type="button" aria-label={title} title={title} disabled={disabled}
+  useGameLanguage();
+  return <button type="button" aria-label={gameUi(title)} title={gameUi(title)} disabled={disabled}
     onPointerDown={event => { event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId); press(event.pointerId); }}
     onPointerUp={event => release(event.pointerId)} onPointerCancel={event => release(event.pointerId)}
     onLostPointerCapture={event => release(event.pointerId)}
     onKeyDown={event => { if (event.code === "Space" || event.code === "Enter") { event.preventDefault(); press(-1); } }}
     onKeyUp={event => { if (event.code === "Space" || event.code === "Enter") { event.preventDefault(); release(-1); } }}
-    onBlur={() => release(-1)}>{label}</button>;
+    onBlur={() => release(-1)}>{gameUi(label)}</button>;
 }
 
 export default function ToolAnimalsGame({ kind, mode, rulesOpen = false, onComplete }: {
   kind: ToolKind; mode: PlayMode; round?: number; rulesOpen?: boolean; onComplete: (result: GameResult) => void;
 }) {
+  useGameLanguage();
   const canvas = useRef<HTMLCanvasElement>(null);
   const [initial] = useState(() => createToolGame(kind));
   const game = useRef<ToolGame>(initial);
@@ -103,34 +106,34 @@ export default function ToolAnimalsGame({ kind, mode, rulesOpen = false, onCompl
     ["action", kind === "bolas" ? "Swing" : "Pick / drop", "Primary action"],
     ["secondary", kind === "bolas" ? "Lure" : "Cover / emerge", "Secondary action"],
   ];
-  return <section className="nw-game" aria-label={`${titles[kind]} game`}>
-    <header className="nw-heading"><p className="natura-eyebrow">{kind === "bolas" ? "09 / AFTER DARK" : "10 / THE OPEN SEABED"}</p><h1>{titles[kind]}<span>.</span></h1>
-      <p>{kind === "bolas" ? "A scent lure. One sticky thread. Perfect timing." : "Bring your shelter. Choose when to slow down."}</p></header>
+  return <section className="nw-game" aria-label={gameUi(`${titles[kind]} game`)}>
+    <header className="nw-heading"><p className="natura-eyebrow">{gameUi(kind === "bolas" ? "09 / AFTER DARK" : "10 / THE OPEN SEABED")}</p><h1>{gameUi(titles[kind])}<span>.</span></h1>
+      <p>{gameUi(kind === "bolas" ? "A scent lure. One sticky thread. Perfect timing." : "Bring your shelter. Choose when to slow down.")}</p></header>
     <div className="nw-layout"><div className="nw-play"><div className="nw-arena">
       <div className="nw-hud">{([0, 1] as const).map(player => <div className={player === 0 ? "nw-coral" : "nw-gold"} key={player}>
-        <small>{name(player, mode)}</small><b>{view.players[player].food} / {toolGoal(kind)} {kind === "bolas" ? "moths" : "food"}</b>
-        {kind === "coconut" && <span>{"♥".repeat(view.players[player].lives)}{"♡".repeat(3 - view.players[player].lives)}</span>}
-      </div>)}<div className="nw-clock"><small>TIME LEFT</small><b>{Math.ceil(view.time)}<em>s</em></b></div></div>
+        <small>{gameUi(name(player, mode))}</small><b>{gameUi(view.players[player].food)} / {gameUi(toolGoal(kind))} {gameUi(kind === "bolas" ? "moths" : "food")}</b>
+        {kind === "coconut" && <span>{gameUi("♥".repeat(view.players[player].lives))}{gameUi("♡".repeat(3 - view.players[player].lives))}</span>}
+      </div>)}<div className="nw-clock"><small>{gameUi("TIME LEFT")}</small><b>{gameUi(Math.ceil(view.time))}<em>s</em></b></div></div>
       <div className="nw-stage"><canvas ref={canvas} width={TOOL_W} height={TOOL_H} tabIndex={0} onPointerDown={event => event.currentTarget.focus()}
-        aria-label={kind === "bolas" ? "Spiders on a branch swing sticky threads at passing moths." : "Octopuses carry shells between food markers while predators patrol."} aria-describedby="tool-mode-controls" />
+        aria-label={gameUi(kind === "bolas" ? "Spiders on a branch swing sticky threads at passing moths." : "Octopuses carry shells between food markers while predators patrol.")} aria-describedby="tool-mode-controls" />
         {!active && <div className="nw-overlay"><div className="nw-dialog">
-          {view.phase === "finished" ? <><small>FIELD CHALLENGE COMPLETE</small><h2>{view.winner === null ? "A draw in the wild." : `${name(view.winner, mode)} ${view.winner === 0 && mode === "ai" ? "win" : "wins"}!`}</h2>
-            <p>Food collected: {view.players[0].food} – {view.players[1].food}.</p><button className="natura-primary" onClick={finish}>Continue to animal quiz →</button></> : <>
-            <h2>{rulesOpen || view.phase === "paused" ? "The habitat is paused." : "Ready for the challenge?"}</h2>
-            <p>{rulesOpen ? "Close the rules to return." : kind === "bolas" ? "Lure moths closer, aim, then swing. First to eight catches wins." : "Collect six food. Carry a shell for safety, and assemble it before a patrol reaches you."}</p>
-            {!rulesOpen && <button className="natura-primary" onClick={start}>{view.phase === "ready" ? "Enter the habitat →" : "Resume →"}</button>}
-            {canvasError && <p role="alert">This browser could not start the canvas.</p>}</>}
+          {view.phase === "finished" ? <><small>{gameUi("FIELD CHALLENGE COMPLETE")}</small><h2>{gameUi(view.winner === null ? "A draw in the wild." : `${name(view.winner, mode)} ${view.winner === 0 && mode === "ai" ? "win" : "wins"}!`)}</h2>
+            <p>{gameUi("Food collected: ")}{gameUi(view.players[0].food)} – {gameUi(view.players[1].food)}.</p><button className="natura-primary" onClick={finish}>{gameUi("Continue to animal quiz →")}</button></> : <>
+            <h2>{gameUi(rulesOpen || view.phase === "paused" ? "The habitat is paused." : "Ready for the challenge?")}</h2>
+            <p>{gameUi(rulesOpen ? "Close the rules to return." : kind === "bolas" ? "Lure moths closer, aim, then swing. First to eight catches wins." : "Collect six food. Carry a shell for safety, and assemble it before a patrol reaches you.")}</p>
+            {!rulesOpen && <button className="natura-primary" onClick={start}>{gameUi(view.phase === "ready" ? "Enter the habitat →" : "Resume →")}</button>}
+            {canvasError && <p role="alert">{gameUi("This browser could not start the canvas.")}</p>}</>}
         </div></div>}
-      </div><div className="nw-status"><p role="status">{view.notice}</p><button onClick={pause} disabled={!active}>Ⅱ Pause</button></div>
+      </div><div className="nw-status"><p role="status">{gameUi(view.notice)}</p><button onClick={pause} disabled={!active}>{gameUi("Ⅱ Pause")}</button></div>
     </div><div className="nw-controls" id="tool-mode-controls">{([0, 1] as const).filter(player => mode !== "ai" || player === 0).map(player => <div className={`nw-control nw-player-${player}`} key={player}>
-      <strong>{name(player, mode)} · {player === 0 ? "Coral" : "Gold"}</strong>
-      <p>{kind === "bolas" ? player === 0 ? "A/D move · W/S aim · Space swing · Left Shift lure" : "←/→ move · ↑/↓ aim · Enter swing · Right Shift lure" : player === 0 ? "WASD move · Space pick/drop · Left Shift cover/emerge" : "Arrows move · Enter pick/drop · Right Shift cover/emerge"}</p>
-      <div className="nw-hold-buttons">{controls.map(([action, label, title]) => <HoldButton key={action} label={label} title={`${name(player, mode)}: ${title}`} disabled={!active} press={id => held.current.set(id, { player, action })} release={id => held.current.delete(id)} />)}</div>
-      <p className="nw-control-state">{kind === "bolas" ? `Aim ${Math.round(view.players[player].angle)}° · Lure ${view.players[player].lureCooldown > 0 ? `ready in ${Math.ceil(view.players[player].lureCooldown)}s` : "ready"}` : view.players[player].hidden ? view.players[player].coverTime > 0 ? "Assembling shelter…" : "Covered · emerge to forage" : view.players[player].carrying ? "Carrying shelter · slower movement" : "Moving freely · shell left behind"}</p>
-    </div>)}</div></div><aside className="nw-guide"><div className="nw-tip"><small>FIELD GUIDE</small>
-      <h3>{kind === "bolas" ? "Let the prey come closer." : "Safety has a carrying cost."}</h3>
-      <p>{kind === "bolas" ? "The sticky ball at the end of the thread catches prey. Move along the branch and aim with up/down before swinging. A scent lure draws nearby moths toward you for a few seconds; it needs time to recharge. Release the action key between swings." : "Follow your numbered food rings. Pick up your numbered shell within reach. Carrying slows you down; dropping it lets you travel faster. Cover takes a moment to assemble, and you cannot move or collect food while hidden. Emerge and pick up the shell again after danger passes."}</p>
-      <p>{kind === "bolas" ? "One moth per swing. Simultaneous catches split the point. After 60 seconds, most catches wins." : "Patrol lanes light up before predators arrive. Take cover early or move out of the lanes. Three hits end your run. After 60 seconds, compare food, then hearts."}</p>
-      <small>Esc pauses · on-screen buttons support touch</small></div><DidYouKnow scenario={kind} /></aside></div>
+      <strong>{gameUi(name(player, mode))} · {gameUi(player === 0 ? "Coral" : "Gold")}</strong>
+      <p>{gameUi(kind === "bolas" ? player === 0 ? "A/D move · W/S aim · Space swing · Left Shift lure" : "←/→ move · ↑/↓ aim · Enter swing · Right Shift lure" : player === 0 ? "WASD move · Space pick/drop · Left Shift cover/emerge" : "Arrows move · Enter pick/drop · Right Shift cover/emerge")}</p>
+      <div className="nw-hold-buttons">{controls.map(([action, label, title]) => <HoldButton key={action} label={gameUi(label)} title={gameUi(`${name(player, mode)}: ${title}`)} disabled={!active} press={id => held.current.set(id, { player, action })} release={id => held.current.delete(id)} />)}</div>
+      <p className="nw-control-state">{gameUi(kind === "bolas" ? `Aim ${Math.round(view.players[player].angle)}° · Lure ${view.players[player].lureCooldown > 0 ? `ready in ${Math.ceil(view.players[player].lureCooldown)}s` : "ready"}` : view.players[player].hidden ? view.players[player].coverTime > 0 ? "Assembling shelter…" : "Covered · emerge to forage" : view.players[player].carrying ? "Carrying shelter · slower movement" : "Moving freely · shell left behind")}</p>
+    </div>)}</div></div><aside className="nw-guide"><div className="nw-tip"><small>{gameUi("FIELD GUIDE")}</small>
+      <h3>{gameUi(kind === "bolas" ? "Let the prey come closer." : "Safety has a carrying cost.")}</h3>
+      <p>{gameUi(kind === "bolas" ? "The sticky ball at the end of the thread catches prey. Move along the branch and aim with up/down before swinging. A scent lure draws nearby moths toward you for a few seconds; it needs time to recharge. Release the action key between swings." : "Follow your numbered food rings. Pick up your numbered shell within reach. Carrying slows you down; dropping it lets you travel faster. Cover takes a moment to assemble, and you cannot move or collect food while hidden. Emerge and pick up the shell again after danger passes.")}</p>
+      <p>{gameUi(kind === "bolas" ? "One moth per swing. Simultaneous catches split the point. After 60 seconds, most catches wins." : "Patrol lanes light up before predators arrive. Take cover early or move out of the lanes. Three hits end your run. After 60 seconds, compare food, then hearts.")}</p>
+      <small>{gameUi("Esc pauses · on-screen buttons support touch")}</small></div><DidYouKnow scenario={kind} /></aside></div>
   </section>;
 }

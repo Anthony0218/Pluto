@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import type {
   BattlefieldObject,
   Unit,
@@ -38,6 +39,7 @@ export default function BattlefieldObjectPanel({
   onInteract: () => void;
   onClose: () => void;
 }) {
+  useGameLanguage();
   const stateText =
     objectStateText(
       object,
@@ -48,14 +50,14 @@ export default function BattlefieldObjectPanel({
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-[9px] font-black uppercase tracking-[0.2em] text-[#d6ad5c]">
-            {object.interactive
+            {gameUi(object.interactive
               ? "Battlefield object"
-              : "Battlefield zone"}
+              : "Battlefield zone")}
           </div>
 
           <div className="mt-1 text-lg font-black text-[#ffe4a3]">
             {
-              object.name
+              gameUi(object.name)
             }
           </div>
         </div>
@@ -73,43 +75,43 @@ export default function BattlefieldObjectPanel({
 
       <p className="mt-3 text-xs leading-5 text-[#c8ae82]">
         {
-          object.description
+          gameUi(object.description)
         }
       </p>
 
       <div className="mt-3 grid grid-cols-3 gap-2 text-[9px]">
         <div className="rounded-lg border border-[#6d5131] bg-[#2d2015]/80 px-2 py-2">
           <div className="text-[#9f8867]">x / y</div>
-          <div className="font-black">{object.position.x} / {object.position.y}</div>
+          <div className="font-black">{gameUi(object.position.x)} / {gameUi(object.position.y)}</div>
         </div>
 
         <div className="rounded-lg border border-[#6d5131] bg-[#2d2015]/80 px-2 py-2">
-          <div className="text-[#9f8867]">visual</div>
-          <div className="font-black">{object.visualSize}%</div>
+          <div className="text-[#9f8867]">{gameUi("visual")}</div>
+          <div className="font-black">{gameUi(object.visualSize)}%</div>
         </div>
 
         <div className="rounded-lg border border-[#6d5131] bg-[#2d2015]/80 px-2 py-2">
-          <div className="text-[#9f8867]">effect radius</div>
-          <div className="font-black">{object.radius}</div>
+          <div className="text-[#9f8867]">{gameUi("effect radius")}</div>
+          <div className="font-black">{gameUi(object.radius)}</div>
         </div>
       </div>
 
-      {stateText && (
+      {gameUi(stateText && (
         <div className="mt-3 rounded-lg border border-[#82623b] bg-[#2d2015]/80 px-3 py-2 text-[10px] font-bold text-[#efd29a]">
           {
-            stateText
+            gameUi(stateText)
           }
         </div>
-      )}
+      ))}
 
-      {object.interactive ? (
+      {gameUi(object.interactive ? (
         <>
           <div className="mt-3 rounded-lg border border-[#6d5131] bg-[#2d2015]/80 px-3 py-2 text-[10px]">
-            {!selectedUnit
+            {gameUi(!selectedUnit
               ? "Select one of your units first."
               : inRange
                 ? `${selectedUnit.name} is close enough to interact.`
-                : `${selectedUnit.name} is too far away.`}
+                : `${selectedUnit.name} is too far away.`)}
           </div>
 
           <button
@@ -124,15 +126,11 @@ export default function BattlefieldObjectPanel({
               onInteract
             }
             className="mt-3 w-full rounded-xl border-2 border-[#b88a43] bg-[#c59b4b] px-4 py-2 text-sm font-black text-[#3a2818] hover:bg-[#e1bd69] disabled:cursor-not-allowed disabled:opacity-35"
-          >
-            Interact
-          </button>
+          >{gameUi(" Interact ")}</button>
         </>
       ) : (
-        <div className="mt-3 rounded-lg border border-[#765533] bg-[#2c2017]/75 px-3 py-2 text-[10px] text-[#d8c29b]">
-          Passive terrain / hazard — its effect is applied automatically.
-        </div>
-      )}
+        <div className="mt-3 rounded-lg border border-[#765533] bg-[#2c2017]/75 px-3 py-2 text-[10px] text-[#d8c29b]">{gameUi(" Passive terrain / hazard — its effect is applied automatically. ")}</div>
+      ))}
     </div>
   );
 }

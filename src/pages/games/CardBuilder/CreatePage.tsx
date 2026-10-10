@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import type { GameDefinition } from "@/games/cards/engine/types";
@@ -21,6 +22,7 @@ function fromTemplate(templateId: string | null): GameDefinition {
 
 /** `/games/create` (new, optionally ?template=…) and `/games/create/:gameId` (edit). */
 export default function CreatePage() {
+  useGameLanguage();
   const { gameId } = useParams();
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -69,8 +71,8 @@ export default function CreatePage() {
   const name = session && "def" in session ? session.def.name : "Create";
   return (
     <CardBuilderLayout crumbs={[{ label: gameId ? name : "New game" }]}>
-      {!session && <p className="text-sm text-zinc-500">Loading…</p>}
-      {session && "error" in session && <p className="text-sm text-red-300">{session.error}</p>}
+      {!session && <p className="text-sm text-zinc-500">{gameUi("Loading…")}</p>}
+      {session && "error" in session && <p className="text-sm text-red-300">{gameUi(session.error)}</p>}
       {session && "def" in session && <CardGameEditor key={session.key} initial={session.def} initialRecord={session.record} repository={store} fallback={local} onSaved={onSaved} />}
     </CardBuilderLayout>
   );

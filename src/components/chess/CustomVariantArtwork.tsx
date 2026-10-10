@@ -1,8 +1,10 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import { useId } from "react";
 import type { VariantCard } from "@/data/chessVariants";
 
 /** Vector artwork only for the packaged, editable Pluto games. */
 export default function CustomVariantArtwork({ variant, compact }: { variant: VariantCard; compact: boolean }) {
+  useGameLanguage();
   const id = useId().replace(/:/g, "");
   const chaos = variant.customId === "pluto-chaos-chess";
   const long = variant.customId === "pluto-team-chess-long";
@@ -11,7 +13,7 @@ export default function CustomVariantArtwork({ variant, compact }: { variant: Va
   const crown = "M-13 4 -17-10 -7-4 0-15 7-4 17-10 13 4Z M-12 9H12";
   const label = chaos ? "ROYAL RUMBLE" : long ? "SIDE BY SIDE" : "TWO ALLIANCES";
   return <div className={`relative h-full overflow-hidden bg-[#080e15] ${compact ? "min-h-[180px]" : "min-h-[300px]"}`}>
-    <svg viewBox="0 0 240 280" role="img" aria-label={`${variant.title}: ${chaos ? "a dragon between glowing portals" : long ? "allied armies side by side facing their opponents" : "four kings linked into two alliances"}`} className="absolute inset-0 h-full w-full transition duration-500 group-hover:scale-105">
+    <svg viewBox="0 0 240 280" role="img" aria-label={gameUi(`${variant.title}: ${chaos ? "a dragon between glowing portals" : long ? "allied armies side by side facing their opponents" : "four kings linked into two alliances"}`)} className="absolute inset-0 h-full w-full transition duration-500 group-hover:scale-105">
       <defs>
         <radialGradient id={`${id}-halo`}><stop stopColor={primary} stopOpacity=".24" /><stop offset="1" stopColor={primary} stopOpacity="0" /></radialGradient>
         <linearGradient id={`${id}-metal`} x2=".8" y2="1"><stop stopColor="#f0e6ff" /><stop offset=".5" stopColor={primary} /><stop offset="1" stopColor="#694d9c" /></linearGradient>
@@ -50,8 +52,8 @@ export default function CustomVariantArtwork({ variant, compact }: { variant: Va
         })}
         {long && <path d="m78 159 10-9 10 9 M142 159l10-9 10 9 M78 116l10 9 10-9 M142 116l10 9 10-9" fill="none" stroke={primary} strokeWidth="1.5" opacity=".6" />}
       </>}
-      <text x="120" y="32" textAnchor="middle" fill={primary} opacity=".65" fontSize="7" fontFamily="sans-serif" letterSpacing="3">PLUTO ORIGINAL</text>
-      <text x="120" y="258" textAnchor="middle" fill={primary} opacity=".7" fontSize="8" fontFamily="sans-serif" letterSpacing="2">{label}</text>
+      <text x="120" y="32" textAnchor="middle" fill={primary} opacity=".65" fontSize="7" fontFamily="sans-serif" letterSpacing="3">{gameUi("PLUTO ORIGINAL")}</text>
+      <text x="120" y="258" textAnchor="middle" fill={primary} opacity=".7" fontSize="8" fontFamily="sans-serif" letterSpacing="2">{gameUi(label)}</text>
     </svg>
   </div>;
 }

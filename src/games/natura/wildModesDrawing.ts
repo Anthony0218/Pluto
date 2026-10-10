@@ -1,3 +1,4 @@
+import { gameUi } from "../../i18n/gameUi.ts";
 import { HABITATS, PATTERN_NAMES, SNAP_LEVELS, snapPlatforms, SNAP_GRAVITY, SNAP_SPEED, WILD_H as H, WILD_W as W,
   camouflageMatches, foodTarget, inPredatorView, predatorsAt } from "./wildModes";
 import type { CuttleGame, SnapGame, WildGame } from "./wildModes";
@@ -7,7 +8,7 @@ function oval(ctx: CanvasRenderingContext2D, x: number, y: number, rx: number, r
   ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); ctx.fillStyle = fill; ctx.fill();
 }
 function label(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color = "#f4edcf", size = 12) {
-  ctx.font = `600 ${size}px system-ui`; ctx.fillStyle = color; ctx.textAlign = "center"; ctx.fillText(text, x, y);
+  ctx.font = `600 ${size}px system-ui`; ctx.fillStyle = color; ctx.textAlign = "center"; ctx.fillText(gameUi(text), x, y);
 }
 
 function drawSnap(ctx: CanvasRenderingContext2D, game: SnapGame, ai: boolean) {

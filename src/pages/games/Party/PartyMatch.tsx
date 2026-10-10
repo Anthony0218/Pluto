@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import ItemShop from "./ItemShop.tsx";
 import { routePreview } from "../../../games/party/engine/routePreview.ts";
 import { useMemo, useState } from "react";
@@ -92,6 +93,7 @@ export default function PartyMatch({
   lobby: Lobby;
   match: Match;
 }) {
+  useGameLanguage();
   const { status, playerId, send, sessionEpoch, serverOffset } = connection;
   const online = status === "online",
     active = activePlayer(match),
@@ -247,42 +249,38 @@ export default function PartyMatch({
       {me && <ItemShop match={match} player={me} connection={connection}/>}
       <div className="pp-match-heading">
         <div>
-          <span className="pp-eyebrow">{map.name.toUpperCase()}</span>
-          <h1>
-            Round {match.round}{match.roundLimit ? ` / ${match.roundLimit}` : ""}
+          <span className="pp-eyebrow">{gameUi(map.name.toUpperCase())}</span>
+          <h1>{gameUi(" Round ")}{gameUi(match.round)}{gameUi(match.roundLimit ? ` / ${match.roundLimit}` : "")}
             <span>
-              {" "}
-              /{" "}
-              {match.phase === "START_ROLL"
+              {gameUi(" ")}
+              /{gameUi(" ")}
+              {gameUi(match.phase === "START_ROLL"
                 ? "Starting rolls"
                 : match.phase === "GAME_OVER"
                   ? "Results"
                   : alpine
                     ? "Mountain climb"
-                    : "Board adventure"}
+                    : "Board adventure")}
             </span>
           </h1>
         </div>
         <div className="pp-match-goal">
-          <span>
-            Central bank <strong>◉ {match.bank}</strong>
+          <span>{gameUi(" Central bank ")}<strong>◉ {gameUi(match.bank)}</strong>
           </span>
           <span>
-            {lobby.settings.victory === "coins"
+            {gameUi(lobby.settings.victory === "coins"
               ? `First to ${lobby.settings.coinTarget} coins`
-              : match.roundLimit ? `Most Golden Plutos after ${match.roundLimit} rounds` : `First to ${lobby.settings.plutoTarget} Golden Plutos`}
+              : match.roundLimit ? `Most Golden Plutos after ${match.roundLimit} rounds` : `First to ${lobby.settings.plutoTarget} Golden Plutos`)}
           </span>
-          {match.phase !== "GAME_OVER" &&
+          {gameUi(match.phase !== "GAME_OVER" &&
             (confirmLeave ? (
-              <span className="pp-leave-confirm" role="group" aria-label="Leave the match?">
-                <button className="pp-danger" onClick={() => send({ type: "LEAVE" })}>
-                  Leave · a bot takes your seat
-                </button>
-                <button onClick={() => setConfirmLeave(false)}>Stay</button>
+              <span className="pp-leave-confirm" role="group" aria-label={gameUi("Leave the match?")}>
+                <button className="pp-danger" onClick={() => send({ type: "LEAVE" })}>{gameUi(" Leave · a bot takes your seat ")}</button>
+                <button onClick={() => setConfirmLeave(false)}>{gameUi("Stay")}</button>
               </span>
             ) : (
-              <button onClick={() => setConfirmLeave(true)}>Leave</button>
-            ))}
+              <button onClick={() => setConfirmLeave(true)}>{gameUi("Leave")}</button>
+            )))}
         </div>
       </div>
       <div className="pp-scoreboard">
@@ -298,11 +296,11 @@ export default function PartyMatch({
             <div>
               <strong>
                 {p.name}
-                {p.id === playerId ? " · you" : ""}
+                {gameUi(p.id === playerId ? " · you" : "")}
               </strong>
               <small>
                 <PlayerStatus player={p} serverOffset={serverOffset} />
-                {p.id === active?.id ? " · ▶ playing" : ""}
+                {gameUi(p.id === active?.id ? " · ▶ playing" : "")}
               </small>
               <div
                 className={`pp-hp ${p.hp <= 10 ? "low" : ""}`}
@@ -316,20 +314,20 @@ export default function PartyMatch({
               </div>
             </div>
             <ul className="pp-hud-stats">
-              <li aria-label={`HP ${p.hp} of ${p.maxHp}`}>
-                ❤️ <b>{p.hp}</b> / {p.maxHp}
+              <li aria-label={gameUi(`HP ${p.hp} of ${p.maxHp}`)}>
+                ❤️ <b>{gameUi(p.hp)}</b> / {gameUi(p.maxHp)}
               </li>
-              <li data-coin-counter={p.id} aria-label={`${p.coins} coins`}>
-                🪙 <b>{p.coins}</b>
+              <li data-coin-counter={p.id} aria-label={gameUi(`${p.coins} coins`)}>
+                🪙 <b>{gameUi(p.coins)}</b>
               </li>
-              <li aria-label={`${p.goldenPlutos} Golden Plutos`}>
-                ✦ <span className="pp-long-label">Golden Plutos: </span>
-                <b>{p.goldenPlutos}</b>
+              <li aria-label={gameUi(`${p.goldenPlutos} Golden Plutos`)}>
+                ✦ <span className="pp-long-label">{gameUi("Golden Plutos: ")}</span>
+                <b>{gameUi(p.goldenPlutos)}</b>
               </li>
-              <li aria-label={`${p.inventory.length} of ${MAX_INVENTORY_SIZE} items`}>
-                🎒{" "}
+              <li aria-label={gameUi(`${p.inventory.length} of ${MAX_INVENTORY_SIZE} items`)}>
+                🎒{gameUi(" ")}
                 <b>
-                  {p.inventory.length} / {MAX_INVENTORY_SIZE}
+                  {gameUi(p.inventory.length)} / {gameUi(MAX_INVENTORY_SIZE)}
                 </b>
               </li>
             </ul>
@@ -351,22 +349,22 @@ export default function PartyMatch({
             cameraMode={boardView === "whole" ? "whole" : "pawn"}
             cameraReset={cameraReset}
           >
-            {match.phase !== "GAME_OVER" && <div className="pp-board-commands" aria-label="Board and turn controls">
+            {match.phase !== "GAME_OVER" && <div className="pp-board-commands" aria-label={gameUi("Board and turn controls")}>
               <span className="pp-board-command-title" role="status">
-                {boardView === "whole" ? "Whole board" : boardView === "board" ? "Explore the board" : mine ? "▶ YOUR TURN" : `${active.name.toUpperCase()}’S TURN`}
+                {gameUi(boardView === "whole" ? "Whole board" : boardView === "board" ? "Explore the board" : mine ? "▶ YOUR TURN" : `${active.name.toUpperCase()}’S TURN`)}
               </span>
               {boardView === "actions" ? <>
                 {mine && match.phase === "ITEM_PHASE" ? <div className="pp-board-actions">
-                  <button disabled={!canUseItems || !me?.inventory.length} aria-expanded={itemsOpen} onClick={() => { setItemsOpen(!itemsOpen); setBoardOnly(itemsOpen); }}>🎒 Use item</button>
-                  <button className="pp-primary" disabled={!canUseItems || !!targetingItem || !!pickingItem} onClick={() => { setItemsOpen(false); setBoardOnly(true); send({ type: "ACTION", action: { type: "ROLL_DICE" } }); }}>Roll dice <ArrowRight size={16}/></button>
-                </div> : <small className="pp-board-command-hint">{mine && match.phase === "PATH_SELECTION" ? "Choose an arrow on the map" : waitingText(match.phase, active, map.propertyName)}</small>}
+                  <button disabled={!canUseItems || !me?.inventory.length} aria-expanded={itemsOpen} onClick={() => { setItemsOpen(!itemsOpen); setBoardOnly(itemsOpen); }}>{gameUi("🎒 Use item")}</button>
+                  <button className="pp-primary" disabled={!canUseItems || !!targetingItem || !!pickingItem} onClick={() => { setItemsOpen(false); setBoardOnly(true); send({ type: "ACTION", action: { type: "ROLL_DICE" } }); }}>{gameUi("Roll dice ")}<ArrowRight size={16}/></button>
+                </div> : <small className="pp-board-command-hint">{gameUi(mine && match.phase === "PATH_SELECTION" ? "Choose an arrow on the map" : waitingText(match.phase, active, map.propertyName))}</small>}
                 <div className="pp-board-view-actions">
-                  <button onClick={() => viewBoard("board")}>See board</button>
-                  <button onClick={() => viewBoard("whole")}>See whole board</button>
+                  <button onClick={() => viewBoard("board")}>{gameUi("See board")}</button>
+                  <button onClick={() => viewBoard("whole")}>{gameUi("See whole board")}</button>
                 </div>
               </> : <div className="pp-board-view-actions">
-                <button className="pp-primary" onClick={backToPawn}>← Back</button>
-                <button onClick={() => viewBoard(boardView === "whole" ? "board" : "whole")}>{boardView === "whole" ? "See board" : "See whole board"}</button>
+                <button className="pp-primary" onClick={backToPawn}>{gameUi("← Back")}</button>
+                <button onClick={() => viewBoard(boardView === "whole" ? "board" : "whole")}>{gameUi(boardView === "whole" ? "See board" : "See whole board")}</button>
               </div>}
             </div>}
           </PartyBoard>
@@ -389,35 +387,31 @@ export default function PartyMatch({
                     background: `#${presentation[t].color.toString(16)}`,
                   }}
                 >
-                  {presentation[t].icon}
+                  {gameUi(presentation[t].icon)}
                 </b>
-                {t === "deposit" ? "Bank deposit" : t === "rare" ? "rare item" : t}
+                {gameUi(t === "deposit" ? "Bank deposit" : t === "rare" ? "rare item" : t)}
               </span>
             ))}
-            {alpine && (
+            {gameUi(alpine && (
               <>
                 <span>
-                  <b className="pp-legend-mech">❄</b>frozen slide (forced 2 spaces)
-                </span>
+                  <b className="pp-legend-mech">❄</b>{gameUi("frozen slide (forced 2 spaces) ")}</span>
                 <span>
-                  <b className="pp-legend-mech">🚡</b>cable car / ⛏️ mine cart
-                </span>
+                  <b className="pp-legend-mech">🚡</b>{gameUi("cable car / ⛏️ mine cart ")}</span>
               </>
-            )}
+            ))}
             <span>
-              <b className="pp-legend-radiation">☢</b>radiation (land = irradiated)
-            </span>
+              <b className="pp-legend-radiation">☢</b>{gameUi("radiation (land = irradiated) ")}</span>
             <span>
-              <b className="pp-legend-animal">◆</b>summoned animal
-            </span>
-            <span className="pp-hint">Tap any space to inspect</span>
+              <b className="pp-legend-animal">◆</b>{gameUi("summoned animal ")}</span>
+            <span className="pp-hint">{gameUi("Tap any space to inspect")}</span>
           </div>
         </div>
         {((boardView === "actions" && mine) || (inspected && !boardOnly) || match.phase === "GAME_OVER") && <aside className={"pp-turn-panel pp-card" + (["ITEM_PHASE", "MOVEMENT", "DICE_ROLL", "TURN_END", "ANIMAL_PHASE", "ROUND_END"].includes(match.phase) ? " is-optional" : "")} id="pp-turn-panel">
-          {match.phase !== "GAME_OVER" && <button className="pp-panel-close" onClick={() => { if (boardView === "actions") viewBoard("board"); else { setInspected(null); setBoardOnly(true); } }} aria-label={boardView === "actions" ? "See the board" : "Close space details"}>✕</button>}
+          {match.phase !== "GAME_OVER" && <button className="pp-panel-close" onClick={() => { if (boardView === "actions") viewBoard("board"); else { setInspected(null); setBoardOnly(true); } }} aria-label={gameUi(boardView === "actions" ? "See the board" : "Close space details")}>✕</button>}
           {(boardView === "actions" || match.phase === "GAME_OVER") && <>
-          {match.phase === "ZERO_BONUS" && mine ? (
-            <div className="pp-zero-choice"><span className="pp-eyebrow">A LUCKY LITTLE PAUSE</span><h2>Zero roll? Your choice.</h2><p>Recover or save for your next move.</p><button disabled={!online} onClick={() => send({ type: "ACTION", action: { type: "ZERO_REWARD", reward: "heal" } })}>✚ Heal 5 HP</button><button disabled={!online} onClick={() => send({ type: "ACTION", action: { type: "ZERO_REWARD", reward: "coins" } })}>🪙 Gain 2 coins</button></div>
+          {gameUi(match.phase === "ZERO_BONUS" && mine ? (
+            <div className="pp-zero-choice"><span className="pp-eyebrow">{gameUi("A LUCKY LITTLE PAUSE")}</span><h2>{gameUi("Zero roll? Your choice.")}</h2><p>{gameUi("Recover or save for your next move.")}</p><button disabled={!online} onClick={() => send({ type: "ACTION", action: { type: "ZERO_REWARD", reward: "heal" } })}>{gameUi("✚ Heal 5 HP")}</button><button disabled={!online} onClick={() => send({ type: "ACTION", action: { type: "ZERO_REWARD", reward: "coins" } })}>{gameUi("🪙 Gain 2 coins")}</button></div>
           ) : match.phase === "GAME_OVER" ? (
             <FinalResults connection={connection} lobby={lobby} match={match} alpine={alpine} />
           ) : !mine ? null : match.phase === "ITEM_REPLACE" && match.pendingItem ? (
@@ -503,35 +497,35 @@ export default function PartyMatch({
           ) : match.phase === "ANIMAL_PHASE" || match.phase === "ROUND_END" ? (
             <>
               <span className="pp-eyebrow pp-turn-owner">
-                {match.phase === "ANIMAL_PHASE" ? "ANIMAL PHASE" : "NEXT ROUND"}
+                {gameUi(match.phase === "ANIMAL_PHASE" ? "ANIMAL PHASE" : "NEXT ROUND")}
               </span>
               <h2>
-                {match.phase === "ANIMAL_PHASE"
+                {gameUi(match.phase === "ANIMAL_PHASE"
                   ? "Minigame incoming!"
                   : alpine
                     ? "Back up the mountain."
-                    : "Back to the islands."}
+                    : "Back to the islands.")}
               </h2>
               <p>
-                {match.phase === "ANIMAL_PHASE"
+                {gameUi(match.phase === "ANIMAL_PHASE"
                   ? "Every explorer has moved. Get ready to play."
-                  : "The minigame winner goes first."}
+                  : "The minigame winner goes first.")}
               </p>
             </>
           ) : match.phase === "START_ROLL" ? (
             <>
-              <span className="pp-eyebrow">WHO GOES FIRST?</span>
-              <h2>Let fate decide.</h2>
+              <span className="pp-eyebrow">{gameUi("WHO GOES FIRST?")}</span>
+              <h2>{gameUi("Let fate decide.")}</h2>
               <div className="pp-die rolling">?</div>
-              <p>Everyone rolls 0–10. Only tied players reroll.</p>
+              <p>{gameUi("Everyone rolls 0–10. Only tied players reroll.")}</p>
             </>
           ) : (
             <>
               <span className={`pp-eyebrow pp-turn-owner ${mine ? "is-mine" : ""}`}>
-                {mine ? "▶ YOUR TURN" : `${active?.name.toUpperCase()}’S TURN`}
+                {gameUi(mine ? "▶ YOUR TURN" : `${active?.name.toUpperCase()}’S TURN`)}
               </span>
               <h2>
-                {!mine
+                {gameUi(!mine
                   ? waitingText(match.phase, active, map.propertyName)
                   : match.phase === "PATH_SELECTION"
                     ? "Tap an arrow on the map."
@@ -543,10 +537,10 @@ export default function PartyMatch({
                           ? "A little suspense…"
                           : match.phase === "RESOLVE_TILE"
                             ? "You’ve arrived."
-                            : "On the move."}
+                            : "On the move.")}
               </h2>
               <p>
-                {aim && aimTarget
+                {gameUi(aim && aimTarget
                   ? `🎯 ${active.name} is aiming the ${itemRegistry.get(aim.itemId).name} at ${aimTarget.name}${aim.band === "global" ? "" : ` (${aim.band}, ${aim.distance} space${aim.distance === 1 ? "" : "s"})`}…`
                   : match.phase === "ITEM_PHASE"
                   ? match.turn.bonusRolled
@@ -554,18 +548,18 @@ export default function PartyMatch({
                     : alpine ? "Roll 0–10 and see where the mountain takes you." : "Roll 0–10 and see where the islands take you."
                   : match.turn.bonusMovement > 0
                     ? `Rolled ${match.lastRoll} + ${match.turn.bonusMovement} Turbo bonus = ${(match.lastRoll ?? 0) + match.turn.bonusMovement} · ${match.movesRemaining} moves remaining`
-                    : `${match.movesRemaining} moves remaining`}
+                    : `${match.movesRemaining} moves remaining`)}
               </p>
-              {me && itemsOpen && (
+              {gameUi(me && itemsOpen && (
                 <ItemPanel
                   player={me}
                   match={match}
                   interactive={online}
                   onUse={startItemUse}
                 />
-              )}
-              {match.phase === "PATH_SELECTION" && (
-                <details className="pp-path-alternatives"><summary>Other way to choose · {match.movesRemaining} steps left</summary><div className="pp-paths">
+              ))}
+              {gameUi(match.phase === "PATH_SELECTION" && (
+                <details className="pp-path-alternatives"><summary>{gameUi("Other way to choose · ")}{gameUi(match.movesRemaining)}{gameUi(" steps left")}</summary><div className="pp-paths">
                   {legalPaths(match, map).map((id) => {
                     const node = map.nodes.find((n) => n.id === id)!;
                     // Hazard info is never hidden: radiation on the next space or on a possible landing.
@@ -589,44 +583,41 @@ export default function PartyMatch({
                         disabled={!mine || !online}
                         onClick={() => selectNode(id)}
                       >
-                        <span>
-                          ↗ Space {spaceNumber(id)}
-                          <small>{map.regions[node.region].name}</small>
-                          {routePreview(match, map, id).summaries.slice(0, 3).map((summary) => <small key={summary}>{summary}</small>)}
-                          {hazard && <small className="pp-path-hazard">{hazard}</small>}
-                          {slideDestination(map, id) && (
-                            <small className="pp-path-feature">
-                              🧊 Frozen slide → Space {spaceNumber(slideDestination(map, id)!)}
+                        <span>{gameUi(" ↗ Space ")}{gameUi(spaceNumber(id))}
+                          <small>{gameUi(map.regions[node.region].name)}</small>
+                          {routePreview(match, map, id).summaries.slice(0, 3).map((summary) => <small key={summary}>{gameUi(summary)}</small>)}
+                          {hazard && <small className="pp-path-hazard">{gameUi(hazard)}</small>}
+                          {gameUi(slideDestination(map, id) && (
+                            <small className="pp-path-feature">{gameUi(" 🧊 Frozen slide → Space ")}{gameUi(spaceNumber(slideDestination(map, id)!))}
                             </small>
-                          )}
-                          {map.transports?.some((t) => t.endpoints.includes(id)) && (
+                          ))}
+                          {gameUi(map.transports?.some((t) => t.endpoints.includes(id)) && (
                             <small className="pp-path-feature">
-                              {map.transports.find((t) => t.endpoints.includes(id))!.icon}{" "}
-                              {map.transports.find((t) => t.endpoints.includes(id))!.name} station
-                            </small>
-                          )}
+                              {gameUi(map.transports.find((t) => t.endpoints.includes(id))!.icon)}{gameUi(" ")}
+                              {gameUi(map.transports.find((t) => t.endpoints.includes(id))!.name)}{gameUi(" station ")}</small>
+                          ))}
                         </span>
                         <b>
-                          {match.plutoNodeIds.includes(id)
+                          {gameUi(match.plutoNodeIds.includes(id)
                             ? "✦"
-                            : presentation[node.type].icon}
+                            : presentation[node.type].icon)}
                         </b>
                       </button>
                     );
                   })}
                 </div></details>
-              )}
+              ))}
             </>
-          )}
+          ))}
           <details className="pp-board-details">
-            <summary>Board details</summary>
+            <summary>{gameUi("Board details")}</summary>
           {match.startingRolls.length > 0 && (
             <details>
-              <summary>Starting rolls & turn order</summary>
+              <summary>{gameUi("Starting rolls & turn order")}</summary>
               {match.rollGroups.map((group, i) => (
                 <p key={i}>
-                  {i + 1}.{" "}
-                  {group
+                  {gameUi(i + 1)}.{gameUi(" ")}
+                  {gameUi(group
                     .map((id) => {
                       const p = match.players.find((p) => p.id === id)!;
                       return `${p.name} (${match.startingRolls
@@ -634,118 +625,101 @@ export default function PartyMatch({
                         .map((r) => r.value)
                         .join(" → ")})`;
                     })
-                    .join(" / ")}
+                    .join(" / "))}
                 </p>
               ))}
             </details>
           )}
-          <div className="pp-pluto-locations" aria-label="Active Golden Plutos">
-            <span className="pp-eyebrow">
-              GOLDEN PLUTOS · ◉ {RULES.plutoPrice} EACH
-            </span>
-            <p>Land exactly on a glowing space to buy.</p>
+          <div className="pp-pluto-locations" aria-label={gameUi("Active Golden Plutos")}>
+            <span className="pp-eyebrow">{gameUi(" GOLDEN PLUTOS · ◉ ")}{gameUi(RULES.plutoPrice)}{gameUi(" EACH ")}</span>
+            <p>{gameUi("Land exactly on a glowing space to buy.")}</p>
             {match.plutoNodeIds.map((id) => {
               const node = map.nodes.find((n) => n.id === id)!;
               return (
                 <div key={id}>
-                  <b>✦ Space {spaceNumber(id)}</b>
-                  <small>{map.regions[node.region].name}</small>
+                  <b>{gameUi("✦ Space ")}{gameUi(spaceNumber(id))}</b>
+                  <small>{gameUi(map.regions[node.region].name)}</small>
                 </div>
               );
             })}
           </div>
-          {(match.blockedConnections.length > 0 || match.transportOutages.length > 0) && (
-            <div className="pp-closures" aria-label="Route closures">
-              <span className="pp-eyebrow">CLOSURES</span>
+          {gameUi((match.blockedConnections.length > 0 || match.transportOutages.length > 0) && (
+            <div className="pp-closures" aria-label={gameUi("Route closures")}>
+              <span className="pp-eyebrow">{gameUi("CLOSURES")}</span>
               {match.blockedConnections.map((b) => (
-                <p key={b.id}>
-                  ⛔ Path {spaceNumber(b.fromNodeId)} ↔ {spaceNumber(b.toNodeId)} · BLOCKED —{" "}
-                  {blockedRoundsLeft(match, b)} ROUND{blockedRoundsLeft(match, b) === 1 ? "" : "S"}
+                <p key={b.id}>{gameUi(" ⛔ Path ")}{gameUi(spaceNumber(b.fromNodeId))} ↔ {gameUi(spaceNumber(b.toNodeId))}{gameUi(" · BLOCKED —")}{gameUi(" ")}
+                  {gameUi(blockedRoundsLeft(match, b))}{gameUi(" ROUND")}{gameUi(blockedRoundsLeft(match, b) === 1 ? "" : "S")}
                 </p>
               ))}
               {match.transportOutages.map((o) => (
                 <p key={o.transportId}>
-                  🔧 {map.transports?.find((t) => t.id === o.transportId)?.name} closed ·{" "}
-                  {transportRoundsOut(match, o.transportId)} round
-                  {transportRoundsOut(match, o.transportId) === 1 ? "" : "s"} left
-                </p>
+                  🔧 {gameUi(map.transports?.find((t) => t.id === o.transportId)?.name)}{gameUi(" closed ·")}{gameUi(" ")}
+                  {gameUi(transportRoundsOut(match, o.transportId))}{gameUi(" round ")}{gameUi(transportRoundsOut(match, o.transportId) === 1 ? "" : "s")}{gameUi(" left ")}</p>
               ))}
             </div>
-          )}
+          ))}
           <div className="pp-feed" aria-live="polite">
-            <span className="pp-eyebrow">{alpine ? "TRAIL DISPATCH" : "ISLAND DISPATCH"}</span>
+            <span className="pp-eyebrow">{gameUi(alpine ? "TRAIL DISPATCH" : "ISLAND DISPATCH")}</span>
             {match.log.slice(0, 5).map((line, i) => (
-              <p key={`${line}-${i}`}>{line}</p>
+              <p key={`${line}-${i}`}>{gameUi(line)}</p>
             ))}
           </div>
           </details>
           </>}
           {inspected && (
             <div className="pp-inspector">
-              <strong>Space {spaceNumber(inspected)}</strong>
-              <small>{map.regions[map.nodes.find((n) => n.id === inspected)!.region].name}</small>
-              {map.cleansingNodeIds?.includes(inspected) && <p>✚ Cleansing spring · removes all negative effects and heals 10 HP.</p>}
-              {match.plutoNodeIds.includes(inspected) && (
-                <p>
-                  ✦ Golden Pluto · {RULES.plutoPrice} coins · land here to buy
-                </p>
-              )}
+              <strong>{gameUi("Space ")}{gameUi(spaceNumber(inspected))}</strong>
+              <small>{gameUi(map.regions[map.nodes.find((n) => n.id === inspected)!.region].name)}</small>
+              {map.cleansingNodeIds?.includes(inspected) && <p>{gameUi("✚ Cleansing spring · removes all negative effects and heals 10 HP.")}</p>}
+              {gameUi(match.plutoNodeIds.includes(inspected) && (
+                <p>{gameUi(" ✦ Golden Pluto · ")}{gameUi(RULES.plutoPrice)}{gameUi(" coins · land here to buy ")}</p>
+              ))}
               {!map.cleansingNodeIds?.includes(inspected) && !match.boardEffects?.some((e) => e.kind === "relic" && e.nodeIds.includes(inspected)) && <p>
                 {
-                  presentation[
+                  gameUi(presentation[
                     map.nodes.find((n) => n.id === inspected)!.type
-                  ].label
+                  ].label)
                 }
               </p>}
-              {match.boardEffects?.filter((e) => e.nodeIds.includes(inspected)).map((e) => <p key={e.id}>{({ treasure: "💎 Collect +5 treasure coins once", eruption: "⚠ Take 10 HP damage if still here", breeze: "🍃 Land here for +2 bonus coins", sanctuary: "💚 Land here for +5 extra HP", sale: "🛍 Save 2 coins on normal shop items while here", relic: "◆ Collect an item once, instead of the normal field" })[e.kind]} · {e.kind === "eruption" ? "at the end of" : "through"} round {e.expiresAfterRound}.</p>)}
-              {map.slides?.some((sl) => sl.nodeId === inspected) && (
-                <p>
-                  🧊 Frozen Slide · after this space resolves you slide{" "}
-                  {slideAt(map, inspected)!.path.length} spaces to Space{" "}
-                  {spaceNumber(slideDestination(map, inspected)!)}, which resolves once.
-                </p>
-              )}
+              {match.boardEffects?.filter((e) => e.nodeIds.includes(inspected)).map((e) => <p key={e.id}>{gameUi(({ treasure: "💎 Collect +5 treasure coins once", eruption: "⚠ Take 10 HP damage if still here", breeze: "🍃 Land here for +2 bonus coins", sanctuary: "💚 Land here for +5 extra HP", sale: "🛍 Save 2 coins on normal shop items while here", relic: "◆ Collect an item once, instead of the normal field" })[e.kind])} · {gameUi(e.kind === "eruption" ? "at the end of" : "through")}{gameUi(" round ")}{gameUi(e.expiresAfterRound)}.</p>)}
+              {gameUi(map.slides?.some((sl) => sl.nodeId === inspected) && (
+                <p>{gameUi(" 🧊 Frozen Slide · after this space resolves you slide")}{gameUi(" ")}
+                  {gameUi(slideAt(map, inspected)!.path.length)}{gameUi(" spaces to Space")}{gameUi(" ")}
+                  {gameUi(spaceNumber(slideDestination(map, inspected)!))}{gameUi(", which resolves once. ")}</p>
+              ))}
               {map.transports
                 ?.filter((t) => t.endpoints.includes(inspected))
                 .map((t) => (
                   <p key={t.id}>
-                    {t.icon} {t.endpointNames[t.endpoints.indexOf(inspected)]} · ride to{" "}
-                    {t.endpointNames[1 - t.endpoints.indexOf(inspected)]} (Space{" "}
-                    {spaceNumber(t.endpoints[1 - t.endpoints.indexOf(inspected)])}) when you land here.
-                    {transportRoundsOut(match, t.id) > 0 && " Currently closed."}
+                    {gameUi(t.icon)} {gameUi(t.endpointNames[t.endpoints.indexOf(inspected)])}{gameUi(" · ride to")}{gameUi(" ")}
+                    {gameUi(t.endpointNames[1 - t.endpoints.indexOf(inspected)])}{gameUi(" (Space")}{gameUi(" ")}
+                    {gameUi(spaceNumber(t.endpoints[1 - t.endpoints.indexOf(inspected)]))}{gameUi(") when you land here. ")}{gameUi(transportRoundsOut(match, t.id) > 0 && " Currently closed.")}
                   </p>
                 ))}
-              {irradiated.has(inspected) && !map.cleansingNodeIds?.includes(inspected) && (
-                <p className="pp-inspect-radiation">
-                  ☢ Irradiated · {radiationRoundsLeft(match, inspected)} round
-                  {radiationRoundsLeft(match, inspected) === 1 ? "" : "s"} left
-                  (including this one). Landing here gives Radiation: −10 HP
-                  per turn for 3 turns and no items.
-                </p>
-              )}
+              {gameUi(irradiated.has(inspected) && !map.cleansingNodeIds?.includes(inspected) && (
+                <p className="pp-inspect-radiation">{gameUi(" ☢ Irradiated · ")}{gameUi(radiationRoundsLeft(match, inspected))}{gameUi(" round ")}{gameUi(radiationRoundsLeft(match, inspected) === 1 ? "" : "s")}{gameUi(" left (including this one). Landing here gives Radiation: −10 HP per turn for 3 turns and no items. ")}</p>
+              ))}
               {match.animals
                 .filter((a) => a.currentNodeId === inspected)
                 .map((a) => (
                   <p key={a.id}>
-                    {animalRegistry.get(a.type).icon}{" "}
+                    {gameUi(animalRegistry.get(a.type).icon)}{gameUi(" ")}
                     {match.players.find((p) => p.id === a.ownerPlayerId)?.name}
-                    ’s {animalRegistry.get(a.type).name} · {a.movementPerPhase}{" "}
-                    spaces/phase · {a.damage} dmg · {a.remainingRounds} rounds left
-                  </p>
+                    ’s {gameUi(animalRegistry.get(a.type).name)} · {gameUi(a.movementPerPhase)}{gameUi(" ")}{gameUi(" spaces/phase · ")}{gameUi(a.damage)}{gameUi(" dmg · ")}{gameUi(a.remainingRounds)}{gameUi(" rounds left ")}</p>
                 ))}
-              {inspectedProperty && (
+              {gameUi(inspectedProperty && (
                 <PropertyDetails
                   match={match}
                   property={inspectedProperty}
                   name={map.propertyName}
                 />
-              )}
+              ))}
             </div>
           )}
 
         </aside>}
       </div>
-      {pickingItem && me && (
+      {gameUi(pickingItem && me && (
         <TargetPicker
           match={match}
           me={me}
@@ -753,8 +727,8 @@ export default function PartyMatch({
           onCancel={() => setPicking(null)}
           onConfirm={(targetPlayerId, wager) => targetPlayerWith(pickingItem, targetPlayerId, wager)}
         />
-      )}
-      {aim && mine && online && (
+      ))}
+      {gameUi(aim && mine && online && (
         <AimOverlay
           key={`${aim.itemInstanceId}-${aim.startedAt}`}
           match={match}
@@ -764,40 +738,40 @@ export default function PartyMatch({
           }
           onCancel={() => send({ type: "ACTION", action: { type: "CANCEL_AIM" } })}
         />
-      )}
+      ))}
       {targetingItem && (
         <div
           className={`pp-target-bar ${fallout ? "fallout" : ""}`}
           role="dialog"
-          aria-label={fallout ? "Target Fallout Core" : "Aim Comet Melon"}
+          aria-label={gameUi(fallout ? "Target Fallout Core" : "Aim Comet Melon")}
         >
           <div>
-            <strong>{fallout ? "☢️ Fallout Core · ★ RARE" : "🍉 Comet Melon"}</strong>
+            <strong>{gameUi(fallout ? "☢️ Fallout Core · ★ RARE" : "🍉 Comet Melon")}</strong>
             <small>
-              {fallout
+              {gameUi(fallout
                 ? blastNodes
                   ? `Blast: centre + ${blastNodes.length - 1} connected spaces, irradiated for 3 full rounds. You are immune to the blast.`
                   : "Tap a space on the board. The blast covers it and every directly connected space."
                 : targetingItem.target
                   ? "Blast zone shown on the board: 15 at the target, 10 one space away, 5 two away."
-                  : "Tap a space on the board to aim."}
+                  : "Tap a space on the board to aim.")}
             </small>
             {fallout && blastNodes && (
               <small className="pp-fallout-warning">
-                {falloutVictims.length
+                {gameUi(falloutVictims.length
                   ? `⚠ KO: ${falloutVictims.map((p) => p.name).join(", ")} — they respawn at Start with Radiation.`
-                  : "No opponent is inside the blast right now."}
+                  : "No opponent is inside the blast right now.")}
               </small>
             )}
             {preview.length > 0 && (
               <small>
-                {preview
+                {gameUi(preview
                   .map((v) =>
                     v.damage
                       ? `${v.player.name} −${v.damage}`
                       : `${v.player.name} safe`,
                   )
-                  .join(" · ")}
+                  .join(" · "))}
               </small>
             )}
           </div>
@@ -816,9 +790,9 @@ export default function PartyMatch({
               setAiming(null);
             }}
           >
-            {fallout ? "☢ Detonate" : "Confirm"}
+            {gameUi(fallout ? "☢ Detonate" : "Confirm")}
           </button>
-          <button onClick={() => setAiming(null)}>Cancel</button>
+          <button onClick={() => setAiming(null)}>{gameUi("Cancel")}</button>
         </div>
       )}
     </section>

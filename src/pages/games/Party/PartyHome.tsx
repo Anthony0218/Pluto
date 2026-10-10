@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
@@ -17,6 +18,7 @@ export default function PartyHome({
 }: {
   connection: PartyConnection;
 }) {
+  useGameLanguage();
   const { status, lobbies, lobbiesLoaded, pending, send } = connection;
   const [tab, setTab] = useState<"create" | "find" | "join">("create");
   const [name, setName] = useState(() => {
@@ -51,46 +53,33 @@ export default function PartyHome({
       <section className="pp-home">
         <div className="pp-hero">
           <span className="pp-eyebrow">
-            <span /> A LITTLE FRIENDLY CHAOS
-          </span>
-          <h1>
-            Good friends.
-            <br />
-            Questionable
-            <br />
-            <em>decisions.</em>
+            <span />{gameUi(" A LITTLE FRIENDLY CHAOS ")}</span>
+          <h1>{gameUi(" Good friends. ")}<br />{gameUi(" Questionable ")}<br />
+            <em>{gameUi("decisions.")}</em>
           </h1>
-          <p>
-            Four explorers. Six sun-soaked islands.
-            <br />
-            Take a chance, choose your path, and make
-            <br className="pp-desktop" /> a little trouble along the way.
-          </p>
+          <p>{gameUi(" Four explorers. Six sun-soaked islands. ")}<br />{gameUi(" Take a chance, choose your path, and make ")}<br className="pp-desktop" />{gameUi(" a little trouble along the way. ")}</p>
           <div className="pp-tags">
             <span>
-              <Users size={16} /> 4 players
-            </span>
-            <span>Friends + bots</span>
-            <span>Touch friendly</span>
+              <Users size={16} />{gameUi(" 4 players ")}</span>
+            <span>{gameUi("Friends + bots")}</span>
+            <span>{gameUi("Touch friendly")}</span>
           </div>
           <div className="pp-home-art">
             <PartyBoard map={tropical} match={null} onSelect={() => {}} preview />
-            <div className="pp-postcard">
-              Greetings from
-              <br />
-              <strong>Sunspill Islands</strong>
-              <span>YOUR NEXT BAD IDEA STARTS HERE ↗</span>
+            <div className="pp-postcard">{gameUi(" Greetings from ")}<br />
+              <strong>{gameUi("Sunspill Islands")}</strong>
+              <span>{gameUi("YOUR NEXT BAD IDEA STARTS HERE ↗")}</span>
             </div>
           </div>
         </div>
         <section className="pp-card pp-launch">
           <div className="pp-card-top">
-            <span className="pp-eyebrow">MAKE SOME MEMORIES</span>
+            <span className="pp-eyebrow">{gameUi("MAKE SOME MEMORIES")}</span>
             <span className="pp-sticker">✦</span>
           </div>
-          <h2>Get the party started.</h2>
+          <h2>{gameUi("Get the party started.")}</h2>
           <p>Play the board or jump straight into a Minigame Festival. Choose in your lobby.</p>
-          <div className="pp-tabs" role="tablist" aria-label="Lobby options">
+          <div className="pp-tabs" role="tablist" aria-label={gameUi("Lobby options")}>
             {(["create", "find", "join"] as const).map((t) => (
               <button
                 role="tab"
@@ -99,17 +88,15 @@ export default function PartyHome({
                 className={tab === t ? "selected" : ""}
                 onClick={() => setTab(t)}
               >
-                {t === "create"
+                {gameUi(t === "create"
                   ? "Create game"
                   : t === "find"
                     ? "Find game"
-                    : "Join with code"}
+                    : "Join with code")}
               </button>
             ))}
           </div>
-          <label>
-            Your explorer name
-            <input
+          <label>{gameUi(" Your explorer name ")}<input
               maxLength={NAME_LIMITS.player}
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -129,9 +116,7 @@ export default function PartyHome({
                 });
               }}
             >
-              <label>
-                Lobby name
-                <input
+              <label>{gameUi(" Lobby name ")}<input
                   required
                   maxLength={NAME_LIMITS.lobby}
                   value={lobbyName}
@@ -145,8 +130,7 @@ export default function PartyHome({
                   onClick={() => setIsPublic(true)}
                 >
                   <Globe2 size={18} />
-                  <span>
-                    Public<small>Everyone’s invited</small>
+                  <span>{gameUi(" Public")}<small>{gameUi("Everyone’s invited")}</small>
                   </span>
                   {isPublic && <Check size={16} />}
                 </button>
@@ -156,8 +140,7 @@ export default function PartyHome({
                   onClick={() => setIsPublic(false)}
                 >
                   <LockKeyhole size={18} />
-                  <span>
-                    Private<small>Just your crew</small>
+                  <span>{gameUi(" Private")}<small>{gameUi("Just your crew")}</small>
                   </span>
                   {!isPublic && <Check size={16} />}
                 </button>
@@ -169,11 +152,9 @@ export default function PartyHome({
               >
                 {pending === "create" ? (
                   <>
-                    <span className="pp-spinner small" aria-hidden="true" /> Creating lobby…
-                  </>
+                    <span className="pp-spinner small" aria-hidden="true" />{gameUi(" Creating lobby… ")}</>
                 ) : (
-                  <>
-                    Create lobby <ArrowRight size={19} />
+                  <>{gameUi(" Create lobby ")}<ArrowRight size={19} />
                   </>
                 )}
               </button>
@@ -187,11 +168,9 @@ export default function PartyHome({
                 send({ type: "JOIN", code, playerName: name });
               }}
             >
-              <label>
-                Lobby code
-                <input
+              <label>{gameUi(" Lobby code ")}<input
                   required
-                  placeholder="PLUTO-123456"
+                  placeholder={gameUi("PLUTO-123456")}
                   maxLength={20}
                   value={code}
                   autoCapitalize="characters"
@@ -201,7 +180,7 @@ export default function PartyHome({
                   aria-describedby="pp-code-help"
                   onChange={(e) => setCode(e.target.value.toUpperCase())}
                 />
-                <small id="pp-code-help">The six digits alone work too.</small>
+                <small id="pp-code-help">{gameUi("The six digits alone work too.")}</small>
               </label>
               <button
                 className="pp-primary"
@@ -210,11 +189,9 @@ export default function PartyHome({
               >
                 {pending === "join" ? (
                   <>
-                    <span className="pp-spinner small" aria-hidden="true" /> Joining…
-                  </>
+                    <span className="pp-spinner small" aria-hidden="true" />{gameUi(" Joining… ")}</>
                 ) : (
-                  <>
-                    Join the crew <ArrowRight size={19} />
+                  <>{gameUi(" Join the crew ")}<ArrowRight size={19} />
                   </>
                 )}
               </button>
@@ -222,10 +199,8 @@ export default function PartyHome({
           )}
           {tab === "find" && (
             <div>
-              <label>
-                Search lobbies
-                <input
-                  placeholder="Lobby name or exact private code"
+              <label>{gameUi(" Search lobbies ")}<input
+                  placeholder={gameUi("Lobby name or exact private code")}
                   value={query}
                   maxLength={60}
                   onChange={(e) => setQuery(e.target.value)}
@@ -234,20 +209,20 @@ export default function PartyHome({
               <div className="pp-lobby-list" aria-busy={!lobbiesLoaded}>
                 {!lobbiesLoaded ? (
                   <p>
-                    <span className="pp-spinner small" aria-hidden="true" />{" "}
-                    {online ? "Looking for lobbies…" : "Waiting for the server…"}
+                    <span className="pp-spinner small" aria-hidden="true" />{gameUi(" ")}
+                    {gameUi(online ? "Looking for lobbies…" : "Waiting for the server…")}
                   </p>
                 ) : lobbies.length === 0 ? (
-                  <p>No open lobbies yet. Start one and invite your crew.</p>
+                  <p>{gameUi("No open lobbies yet. Start one and invite your crew.")}</p>
                 ) : (
                   lobbies.map((room) => (
                     <article key={room.code}>
                       <div>
                         <strong>{room.name}</strong>
                         <small>
-                          {room.count}/4 ·{" "}
-                          {room.mode === "festival" ? "Minigames only" : mapRegistry.all().find((m) => m.id === room.mapId)?.name ?? "Unknown map"} ·{" "}
-                          {room.public ? "Public" : "Private"}
+                          {gameUi(room.count)}/4 ·{gameUi(" ")}
+                          {room.mode === "festival" ? "Minigames only" : mapRegistry.all().find((m) => m.id === room.mapId)?.name ?? "Unknown map"} ·{gameUi(" ")}
+                          {gameUi(room.public ? "Public" : "Private")}
                         </small>
                       </div>
                       <button
@@ -261,8 +236,7 @@ export default function PartyHome({
                             playerName: name,
                           });
                         }}
-                      >
-                        Join <ArrowRight size={15} />
+                      >{gameUi(" Join ")}<ArrowRight size={15} />
                       </button>
                     </article>
                   ))
@@ -271,16 +245,13 @@ export default function PartyHome({
             </div>
           )}
           <div className="pp-footnote">
-            <Radio size={15} /> Live multiplayer · no account needed
-          </div>
+            <Radio size={15} />{gameUi(" Live multiplayer · no account needed ")}</div>
         </section>
       </section>
       <MinigameCatalog />
       <footer className="pp-home-footer">
-        <span>01 / THE ISLAND CHAPTER</span>
-        <span>
-          THE GOLDEN PLUTO HUNT <i>•</i> EARLY PLAYABLE BUILD
-        </span>
+        <span>{gameUi("01 / THE ISLAND CHAPTER")}</span>
+        <span>{gameUi(" THE GOLDEN PLUTO HUNT ")}<i>•</i>{gameUi(" EARLY PLAYABLE BUILD ")}</span>
       </footer>
     </>
   );

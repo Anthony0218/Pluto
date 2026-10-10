@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../../i18n/gameUi.ts";
 import { useState } from "react";
 import type { PartyConnection } from "../../../../games/party/network/usePartyConnection.ts";
 import ItemShop from "../ItemShop.tsx";
@@ -30,6 +31,7 @@ export default function PartyMinigame({
   match: Match;
   minigame: MinigameRuntime;
 }) {
+  useGameLanguage();
   const { status, playerId, send } = connection;
   const now = useServerClock(minigame.serverNow);
   const definition = minigameRegistry.get(minigame.minigameId);
@@ -42,22 +44,19 @@ export default function PartyMinigame({
   return (
     <section className="pp-match mg-screen">
       <div className="mg-topbar">
-        <span className="pp-eyebrow">
-          ROUND {match.round} ·{duel ? " DUEL ·" : ""}{" "}
-          {match.mode === "festival" ? `MINIGAME FESTIVAL · ${match.round} / ${match.roundLimit}` : match.roundLimit ? `FINAL ROUND ${match.roundLimit} · MOST ${lobby.settings.victory === "coins" ? "COINS" : "PLUTOS"} WINS` : lobby.settings.victory === "coins"
+        <span className="pp-eyebrow">{gameUi(" ROUND ")}{gameUi(match.round)} ·{gameUi(duel ? " DUEL ·" : "")}{gameUi(" ")}
+          {gameUi(match.mode === "festival" ? `MINIGAME FESTIVAL · ${match.round} / ${match.roundLimit}` : match.roundLimit ? `FINAL ROUND ${match.roundLimit} · MOST ${lobby.settings.victory === "coins" ? "COINS" : "PLUTOS"} WINS` : lobby.settings.victory === "coins"
             ? `FIRST TO ${lobby.settings.coinTarget} COINS`
-            : `FIRST TO ${lobby.settings.plutoTarget} GOLDEN PLUTOS`}
+            : `FIRST TO ${lobby.settings.plutoTarget} GOLDEN PLUTOS`)}
         </span>
-        {confirmLeave ? (
-          <span className="pp-leave-confirm" role="group" aria-label="Leave the match?">
-            <button className="pp-danger" onClick={() => send({ type: "LEAVE" })}>
-              Leave · a bot takes your seat
-            </button>
-            <button onClick={() => setConfirmLeave(false)}>Stay</button>
+        {gameUi(confirmLeave ? (
+          <span className="pp-leave-confirm" role="group" aria-label={gameUi("Leave the match?")}>
+            <button className="pp-danger" onClick={() => send({ type: "LEAVE" })}>{gameUi(" Leave · a bot takes your seat ")}</button>
+            <button onClick={() => setConfirmLeave(false)}>{gameUi("Stay")}</button>
           </span>
         ) : (
-          <button onClick={() => setConfirmLeave(true)}>Leave</button>
-        )}
+          <button onClick={() => setConfirmLeave(true)}>{gameUi("Leave")}</button>
+        ))}
       </div>
       {match.mode === "festival" && <div className="pp-festival-standings" aria-label="Festival standings">
         {[...match.players].sort((a, b) => (match.festivalScores?.[b.id] ?? 0) - (match.festivalScores?.[a.id] ?? 0)).map((p) => <span key={p.id} className={p.id === playerId ? "me" : ""}><strong>{p.name}</strong><b>★ {match.festivalScores?.[p.id] ?? 0}</b></span>)}
@@ -65,7 +64,7 @@ export default function PartyMinigame({
       {match.mode !== "festival" && match.players.find((p) => p.id === playerId) && <ItemShop match={match} player={match.players.find((p) => p.id === playerId)!} connection={connection}/>}
       {playing && participant && LANDSCAPE_GAMES.has(minigame.minigameId) && <OrientationHint />}
       <div className="pp-card mg-stage">
-        {intro ? (
+        {gameUi(intro ? (
           <MinigameIntro definition={definition} match={match} minigame={minigame} playerId={playerId} now={now} online={status === "online"} onReady={() => send({ type: "ACTION", action: { type: "MINIGAME_READY" } })}/>
         ) : playing && View ? (
           <View
@@ -79,9 +78,7 @@ export default function PartyMinigame({
             }
           />
         ) : playing ? (
-          <p role="alert" className="mg-unsupported">
-            This minigame is not supported by this version of the game. Reload the page to update.
-          </p>
+          <p role="alert" className="mg-unsupported">{gameUi(" This minigame is not supported by this version of the game. Reload the page to update. ")}</p>
         ) : duel ? (
           <DuelResults match={match} duel={duel} playerId={playerId} />
         ) : (
@@ -91,7 +88,7 @@ export default function PartyMinigame({
             minigame={minigame}
             playerId={playerId}
           />
-        )}
+        ))}
       </div>
     </section>
   );

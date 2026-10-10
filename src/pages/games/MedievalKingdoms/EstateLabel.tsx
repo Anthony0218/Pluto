@@ -1,10 +1,12 @@
 import { memo, useEffect, useMemo, useRef } from "react";
+import { useGameLanguage } from "../../../i18n/gameUi.ts";
 import type { Campaign } from "../../../games/MedievalKingdoms/edravane/types.ts";
 import { mapBounds } from "./territoryLayout.ts";
 import { createEstateLabelPainter, estateLabelPlacements } from "./estateLabelPainter.ts";
 
 /** One non-interactive bitmap replaces hundreds of nested SVG clipping/text layouts. */
 export const EstateLabels = memo(function EstateLabels({ view, viewport, resolution }: { view: Campaign; viewport: string; resolution: number }) {
+  const { language } = useGameLanguage();
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const painter = useRef<ReturnType<typeof createEstateLabelPainter> | null>(null);
   const labels = useMemo(() => estateLabelPlacements(view), [view]);
@@ -34,7 +36,7 @@ export const EstateLabels = memo(function EstateLabels({ view, viewport, resolut
     };
     void document.fonts.load('6px "Edravane Fell"').then(draw, draw);
     return () => { cancelled = true; };
-  }, [labels, box, resolution]);
+  }, [labels, box, resolution, language]);
   return <foreignObject className="ed-estate-label-layer" x={box.minX} y={box.minY} width={box.width} height={box.height} pointerEvents="none" aria-hidden="true">
     <canvas ref={canvas} style={{ display: "block", width: "100%", height: "100%" }} />
   </foreignObject>;

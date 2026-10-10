@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useState } from 'react';
 import * as T from 'three';
 import { FOOD, type FoodKind, type PowerKind } from '../../../games/eat-it/config';
@@ -8,6 +9,7 @@ import { ui } from '../../../i18n/ui';
 
 /** Review thumbnails reuse the actual world models, with one disposable renderer per grid. */
 export default function ObjectCollection({ counts }: { counts: Record<string, number> }) {
+  useGameLanguage();
   const [icons, setIcons] = useState<Record<string, string>>({});
   useEffect(() => {
     const kinds = Object.keys(counts).filter(k => k in FOOD) as FoodKind[];
@@ -36,6 +38,6 @@ export default function ObjectCollection({ counts }: { counts: Record<string, nu
   if (!entries.length) return null;
   return <section><h3>{ui('Objects collected')}</h3><div className="eat-collection">{entries.map(([kind,count]) => {
     const name = ui(collectionLabel(kind));
-    return <figure key={kind}>{icons[kind] ? <img src={icons[kind]} alt={name} /> : <span className="eat-collection-icon" style={{ color:POWER_COLOR[kind as PowerKind] }}>{POWER_SYMBOL[kind as PowerKind] ?? '●'}</span>}<figcaption>{name}<br/><strong>× {count}</strong></figcaption></figure>;
+    return <figure key={kind}>{icons[kind] ? <img src={icons[kind]} alt={gameUi(name)} /> : <span className="eat-collection-icon" style={{ color:POWER_COLOR[kind as PowerKind] }}>{gameUi(POWER_SYMBOL[kind as PowerKind] ?? '●')}</span>}<figcaption>{gameUi(name)}<br/><strong>× {gameUi(count)}</strong></figcaption></figure>;
   })}</div></section>;
 }

@@ -1,3 +1,4 @@
+import { gameUi } from "../../../i18n/gameUi.ts";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import "./ChessBoard.css";
 type GameStatusProps = {
@@ -22,18 +23,18 @@ export default function GameStatus({
     <div className="game-status">
       {illegal && <div>{ui("This is an illegal move!")}</div>}
 
-      <div>{ui("white:")}{whiteCheckCounter}{ui(", black: ")}{blackCheckCounter}
+      <div>{ui("white:")}{gameUi(whiteCheckCounter)}{ui(", black: ")}{gameUi(blackCheckCounter)}
       </div>
 
-      {gameOver && (
+      {gameUi(gameOver && (
         <div className="game-over">
-          {gameOverReason === "Checkmate" ? (
-            <span>{winner}{ui(" has won by checkmate!")}</span>
+          {gameUi(gameOverReason === "Checkmate" ? (
+            <span>{gameUi(winner)}{ui(" has won by checkmate!")}</span>
           ) : (
-            <span>{ui("Game drawn: ")}{gameOverReason}</span>
-          )}
+            <span>{ui("Game drawn: ")}{gameUi(gameOverReason)}</span>
+          ))}
         </div>
-      )}
+      ))}
     </div>
   );
 }

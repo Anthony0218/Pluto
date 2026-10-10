@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { COLORS, PROPERTY_CONFIG } from "../../../games/party/config.ts";
 import {
   plutoStealRoundsLeft,
@@ -15,48 +16,47 @@ export function PropertyDetails({
   property: PropertyState;
   name: string;
 }) {
+  useGameLanguage();
   const owner = match.players.find((p) => p.id === property.ownerPlayerId);
   const steal = plutoStealRoundsLeft(property, match.round);
   return (
-    <dl className="pp-property-details" aria-label={`${name} details`}>
+    <dl className="pp-property-details" aria-label={gameUi(`${name} details`)}>
       <div>
-        <dt>Owner</dt>
+        <dt>{gameUi("Owner")}</dt>
         <dd>
-          {owner ? (
+          {gameUi(owner ? (
             <>
               <i style={{ background: COLORS[owner.avatarId] }} /> {owner.name}
             </>
           ) : (
             "Unowned"
-          )}
+          ))}
         </dd>
       </div>
       <div>
-        <dt>Level</dt>
-        <dd>{property.level || "—"}</dd>
+        <dt>{gameUi("Level")}</dt>
+        <dd>{gameUi(property.level || "—")}</dd>
       </div>
       <div>
-        <dt>Visitor toll</dt>
-        <dd>{tollDescription(property, match.round)}</dd>
+        <dt>{gameUi("Visitor toll")}</dt>
+        <dd>{gameUi(tollDescription(property, match.round))}</dd>
       </div>
-      {property.level >= 1 && property.level < 4 && (
+      {gameUi(property.level >= 1 && property.level < 4 && (
         <div>
-          <dt>Next upgrade</dt>
-          <dd>
-            Level {property.level + 1} · {PROPERTY_CONFIG.upgradeCost} coins
-          </dd>
+          <dt>{gameUi("Next upgrade")}</dt>
+          <dd>{gameUi(" Level ")}{gameUi(property.level + 1)} · {gameUi(PROPERTY_CONFIG.upgradeCost)}{gameUi(" coins ")}</dd>
         </div>
-      )}
-      {property.level === 4 && (
+      ))}
+      {gameUi(property.level === 4 && (
         <div>
-          <dt>Pluto theft</dt>
+          <dt>{gameUi("Pluto theft")}</dt>
           <dd>
-            {steal === 0
+            {gameUi(steal === 0
               ? "Ready"
-              : `Available in ${steal} round${steal === 1 ? "" : "s"}`}
+              : `Available in ${steal} round${steal === 1 ? "" : "s"}`)}
           </dd>
         </div>
-      )}
+      ))}
     </dl>
   );
 }
@@ -79,19 +79,19 @@ export default function PropertyOffer({
   onUpgrade: () => void;
   onLeave: () => void;
 }) {
+  useGameLanguage();
   const buying = property.level === 0,
     cost = buying ? PROPERTY_CONFIG.purchaseCost : PROPERTY_CONFIG.upgradeCost,
     active = match.players.find((p) => p.id === match.order[match.turnIndex]);
   return (
-    <section className="pp-property-offer" aria-label={`${name} decision`}>
+    <section className="pp-property-offer" aria-label={gameUi(`${name} decision`)}>
       <span className="pp-eyebrow">
-        {buying ? "UNCLAIMED" : `${name.toUpperCase()} · LEVEL ${property.level}`}
+        {gameUi(buying ? "UNCLAIMED" : `${name.toUpperCase()} · LEVEL ${property.level}`)}
       </span>
-      <h2>{buying ? `Claim this ${name}?` : `Upgrade to Level ${property.level + 1}?`}</h2>
+      <h2>{gameUi(buying ? `Claim this ${name}?` : `Upgrade to Level ${property.level + 1}?`)}</h2>
       <p>
-        {mine ? "" : `${active?.name ?? "A player"} is deciding. `}
-        {buying ? "Claim" : "Upgrade"} for {cost} coins
-        {mine && active ? ` (you have ${active.coins})` : ""}.
+        {gameUi(mine ? "" : `${active?.name ?? "A player"} is deciding. `)}
+        {gameUi(buying ? "Claim" : "Upgrade")}{gameUi(" for ")}{gameUi(cost)}{gameUi(" coins ")}{gameUi(mine && active ? ` (you have ${active.coins})` : "")}.
       </p>
       <PropertyDetails match={match} property={property} name={name} />
       <button
@@ -99,11 +99,9 @@ export default function PropertyOffer({
         disabled={!mine || !online}
         onClick={buying ? onBuy : onUpgrade}
       >
-        {buying ? "Buy" : "Upgrade"} · ◉ {cost}
+        {gameUi(buying ? "Buy" : "Upgrade")} · ◉ {gameUi(cost)}
       </button>
-      <button disabled={!mine || !online} onClick={onLeave}>
-        Leave
-      </button>
+      <button disabled={!mine || !online} onClick={onLeave}>{gameUi(" Leave ")}</button>
     </section>
   );
 }

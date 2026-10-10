@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useState } from "react";
 import { ui } from "@/i18n/ui";
 import { Button } from "../ui";
@@ -22,6 +23,7 @@ export default function UnsavedChangesDialog({
   onDiscard: () => Promise<void> | void;
   onCancel: () => void;
 }) {
+  useGameLanguage();
   const [busy, setBusy] = useState(false);
   const run = (action: () => Promise<void> | void) => async () => {
     setBusy(true);
@@ -40,7 +42,7 @@ export default function UnsavedChangesDialog({
       title={ui("You have unsaved changes.")}
       description={
         <>
-          “{name}” {intent === "leave" ? ui("has changes that are not in My Games yet.") : ui("has changes that will be replaced by the variant you are opening.")}
+          “{name}” {gameUi(intent === "leave" ? ui("has changes that are not in My Games yet.") : ui("has changes that will be replaced by the variant you are opening."))}
         </>
       }
       footer={
@@ -49,10 +51,10 @@ export default function UnsavedChangesDialog({
             {ui("Cancel")}
           </Button>
           <Button tone="danger" onClick={run(onDiscard)} disabled={busy}>
-            {intent === "leave" ? ui("Leave Without Saving") : ui("Discard changes")}
+            {gameUi(intent === "leave" ? ui("Leave Without Saving") : ui("Discard changes"))}
           </Button>
           <Button tone="primary" onClick={run(onSave)} disabled={busy}>
-            {intent === "leave" ? ui("Save and Leave") : ui("Save and Continue")}
+            {gameUi(intent === "leave" ? ui("Save and Leave") : ui("Save and Continue"))}
           </Button>
         </>
       }

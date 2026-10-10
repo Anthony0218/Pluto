@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { AtlasCountryShape } from "../AtlasCountryShape";
@@ -16,6 +17,7 @@ function representativeCountry(language: string, countries: Iterable<TrialCountr
 }
 
 export function LanguageGuesserGame({ seed, difficulty, best, byId, topology, onRecord, onRestart, onExit }: TrialModeProps) {
+  useGameLanguage();
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
@@ -30,20 +32,20 @@ export function LanguageGuesserGame({ seed, difficulty, best, byId, topology, on
     if (language === round.language) { setScore((value) => value + LANGUAGE_GUESSER.correct); setCorrectCount((value) => value + 1); }
   };
   useOptionHotkeys(round?.options.length ?? 0, (option) => { if (round) answer(round.options[option]); }, !over && picked === null);
-  return <TrialShell title="Language Guesser" accent="violet" roundLabel={`Sentence ${Math.min(index + 1, LANGUAGE_GUESSER.rounds)} / ${LANGUAGE_GUESSER.rounds}`} score={score} progress={index / LANGUAGE_GUESSER.rounds * 100} onExit={onExit}>
+  return <TrialShell title={gameUi("Language Guesser")} accent="violet" roundLabel={`Sentence ${Math.min(index + 1, LANGUAGE_GUESSER.rounds)} / ${LANGUAGE_GUESSER.rounds}`} score={score} progress={index / LANGUAGE_GUESSER.rounds * 100} onExit={onExit}>
     {round && <div className="language-layout">
-      <div className="trial-panel language-guesser"><span className="atlas-eyebrow">Identify the language</span>
-      <h1 className="trial-title">Which language is this?</h1>
+      <div className="trial-panel language-guesser"><span className="atlas-eyebrow">{gameUi("Identify the language")}</span>
+      <h1 className="trial-title">{gameUi("Which language is this?")}</h1>
       <blockquote lang="und">{round.sentence}</blockquote>
       <div className="language-options">{round.options.map((language, option) =>
-        <button key={language} type="button" disabled={picked !== null} className={picked !== null ? language === round.language ? "is-correct" : language === picked ? "is-wrong" : "" : ""} onClick={() => answer(language)}><kbd>{option + 1}</kbd>{language}</button>)}</div>
+        <button key={language} type="button" disabled={picked !== null} className={picked !== null ? language === round.language ? "is-correct" : language === picked ? "is-wrong" : "" : ""} onClick={() => answer(language)}><kbd>{gameUi(option + 1)}</kbd>{gameUi(language)}</button>)}</div>
       {picked !== null && <>
-        <TrialFeedback tone={picked === round.language ? "good" : "bad"} title={picked === round.language ? `Correct · +${LANGUAGE_GUESSER.correct}` : `That was ${round.language}`} detail={country ? `${round.language} is spoken in ${country.name}.` : "The sentence is an everyday greeting."} action={<button type="button" className="trial-next" onClick={() => { setPicked(null); setIndex(index + 1); }}>Next <ChevronRight size={16} /></button>} />
+        <TrialFeedback tone={picked === round.language ? "good" : "bad"} title={gameUi(picked === round.language ? `Correct · +${LANGUAGE_GUESSER.correct}` : `That was ${round.language}`)} detail={country ? `${round.language} is spoken in ${country.name}.` : "The sentence is an everyday greeting."} action={<button type="button" className="trial-next" onClick={() => { setPicked(null); setIndex(index + 1); }}>Next <ChevronRight size={16} /></button>} />
       </>}
-    </div>{picked !== null && <section className="language-reveal" aria-label="Answer details">
-          <div className="language-translation"><span className="atlas-eyebrow">English translation</span><p>{round.translation}</p></div>
-          {country && <div className="language-country"><div><span className="atlas-eyebrow">A country where it is spoken</span><strong>{country.name}</strong><img src={country.flag} alt={`Flag of ${country.name}`} /></div><AtlasCountryShape topology={topology} geometryId={country.geometryId!} label={country.name} showLabel={false} /></div>}
+    </div>{picked !== null && <section className="language-reveal" aria-label={gameUi("Answer details")}>
+          <div className="language-translation"><span className="atlas-eyebrow">{gameUi("Translation")}</span><p>{gameUi(round.translation)}</p></div>
+          {country && <div className="language-country"><div><span className="atlas-eyebrow">{gameUi("A country where it is spoken")}</span><strong>{gameUi(country.name)}</strong><img src={country.flag} alt={gameUi(`Flag of ${country.name}`)} /></div><AtlasCountryShape topology={topology} geometryId={country.geometryId!} label={gameUi(country.name)} showLabel={false} /></div>}
         </section>}</div>}
-    {over && <GameOverPanel title="Languages complete" score={score} best={best} stats={[{ label: "Correct", value: `${correctCount} / ${LANGUAGE_GUESSER.rounds}` }, { label: "Accuracy", value: `${Math.round(correctCount / LANGUAGE_GUESSER.rounds * 100)}%` }]} onRestart={onRestart} onExit={onExit} />}
+    {over && <GameOverPanel title={gameUi("Languages complete")} score={score} best={best} stats={[{ label: "Correct", value: `${correctCount} / ${LANGUAGE_GUESSER.rounds}` }, { label: "Accuracy", value: `${Math.round(correctCount / LANGUAGE_GUESSER.rounds * 100)}%` }]} onRestart={onRestart} onExit={onExit} />}
   </TrialShell>;
 }

@@ -35,8 +35,8 @@ export default function SchafkopfNameplates({ scene, labels, knocked, spritzed, 
       const offsetX = (width - image.naturalWidth * scale) / 2;
       const offsetY = (height - image.naturalHeight * scale) / 2;
       const pageRect = page.getBoundingClientRect();
-      const narrow = width < 700 || height < 500 && window.matchMedia("(pointer: coarse)").matches;
-      const shortViewport = narrow && height < 500;
+      const narrow = width < 700 || window.innerHeight <= 600 && window.matchMedia("(orientation: landscape)").matches;
+      const shortViewport = narrow && window.innerHeight <= 600;
       const stage = page.querySelector<HTMLElement>(".sk-game-stage");
       const stageRect = stage?.getBoundingClientRect();
       for (const position of ["north", "west", "east", "south"] as const) {
@@ -47,7 +47,10 @@ export default function SchafkopfNameplates({ scene, labels, knocked, spritzed, 
         const plateHeight = shortViewport ? 24 : narrow ? 35 : 46;
         const avatar = page.querySelector<HTMLElement>(`.sk-avatar-${position}`);
         const avatarRect = avatar?.getBoundingClientRect();
-        const x = avatarRect ? avatarRect.left - pageRect.left + avatarRect.width / 2 : narrow && position === "west" ? width * .16 : narrow && position === "east" ? width * .84 : Math.max(42, Math.min(width - 42, naturalX));
+        const seatX = avatarRect ? avatarRect.left - pageRect.left + avatarRect.width / 2 : narrow && position === "west" ? width * .16 : narrow && position === "east" ? width * .84 : Math.max(42, Math.min(width - 42, naturalX));
+        const stageLeft = stageRect ? stageRect.left - pageRect.left : 0;
+        const stageRight = stageRect ? stageRect.right - pageRect.left : width;
+        const x = Math.max(stageLeft + plateWidth / 2 + 6, Math.min(stageRight - plateWidth / 2 - 6, seatX));
         // Avatars fade out over their lower half. The nameplate follows the
         // lower of the visible portrait and its held cards, regardless of role.
         const portraitBottom = avatarRect ? avatarRect.top + avatarRect.height * .53 : 0;
@@ -56,7 +59,8 @@ export default function SchafkopfNameplates({ scene, labels, knocked, spritzed, 
         const westLabelDrop = position === "west" ? narrow ? 31 : Math.min(59, Math.max(42, width * .045)) : 0;
         const backgroundY = sourceY * scale + offsetY + (position === "south" ? 0 : height * .055);
         const mobileSouthY = stageRect ? stageRect.bottom - pageRect.top - plateHeight / 2 - 3 : backgroundY;
-        const y = (avatarRect ? attachmentBottom - pageRect.top + plateHeight / 2 + 2 : narrow && position === "south" ? mobileSouthY : backgroundY) + westLabelDrop;
+        const seatY = (avatarRect ? attachmentBottom - pageRect.top + plateHeight / 2 + 2 : narrow && position === "south" ? mobileSouthY : backgroundY) + westLabelDrop;
+        const y = stageRect ? Math.min(stageRect.bottom - pageRect.top - plateHeight / 2 - 6, seatY) : seatY;
         ctx.save();
         ctx.translate(x, y);
         ctx.transform(1, 0, -0.08, .78, 0, 0);
@@ -164,8 +168,9 @@ export default function SchafkopfNameplates({ scene, labels, knocked, spritzed, 
         if (trickStack && stackParent) {
           const parentRect = stackParent.getBoundingClientRect();
           const stackRect = trickStack.getBoundingClientRect();
-          trickStack.style.left = `${x + plateWidth / 2 + 10 - parentRect.left}px`;
-          trickStack.style.top = `${y - stackRect.height / 2 - parentRect.top}px`;
+          const stackX = Math.min(stageRight - stackRect.width - 12, x + plateWidth / 2 + 10);
+          trickStack.style.left = `${pageRect.left + stackX - parentRect.left}px`;
+          trickStack.style.top = `${pageRect.top + y - stackRect.height / 2 - parentRect.top}px`;
           trickStack.style.right = "auto";
         }
       }
@@ -175,6 +180,8 @@ export default function SchafkopfNameplates({ scene, labels, knocked, spritzed, 
     if (image.complete) draw();
     const observer = new ResizeObserver(draw);
     observer.observe(page);
+    const stage = page.querySelector<HTMLElement>(".sk-game-stage");
+    if (stage) observer.observe(stage);
     return () => { cancelled = true; image.removeEventListener("load", draw); observer.disconnect(); };
   }, [scene, overlayKey, pageRef]);
   return <canvas ref={canvasRef} className="sk-scene-nameplates" aria-hidden="true" />;

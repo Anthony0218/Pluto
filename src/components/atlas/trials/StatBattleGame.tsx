@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../../i18n/gameUi.ts";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowDown, ArrowUp, Crown, Layers, RotateCcw, Swords } from "lucide-react";
 import { STAT_BATTLE } from "../../../games/atlas/trials/config";
@@ -13,6 +14,7 @@ const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce
 
 /** Counts a revealed stat up from zero; reduced-motion players see the final value at once. */
 function CountUp({ value, statId }: { value: number; statId: TrialStatId }) {
+  useGameLanguage();
   const [shown, setShown] = useState(() => reducedMotion() ? value : 0);
   useEffect(() => {
     if (reducedMotion()) return;
@@ -26,22 +28,24 @@ function CountUp({ value, statId }: { value: number; statId: TrialStatId }) {
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
   }, [value]);
-  return <>{formatCountryStat(statId, statId === "neighborCount" ? Math.round(shown) : shown)}</>;
+  return <>{gameUi(formatCountryStat(statId, statId === "neighborCount" ? Math.round(shown) : shown))}</>;
 }
 
 export function ArenaCard({ country, side, statId, value, showValue, result }: { country: TrialCountry; side: "player" | "opponent"; statId: TrialStatId; value: number; showValue: boolean; result: "winner" | "loser" | "tie" | null }) {
+  useGameLanguage();
   return (
     <div className={`battle-arena-card is-${side} ${result ? `is-${result}` : ""}`}>
       {result === "winner" && <Crown className="battle-crown" aria-hidden />}
       <CountryFlag country={country} />
-      <strong>{country.name}</strong>
-      <small>{country.continent}</small>
-      <span className={`battle-value ${showValue ? "is-shown" : ""}`} aria-live="polite">{showValue ? <CountUp value={value} statId={statId} /> : "?"}</span>
+      <strong>{gameUi(country.name)}</strong>
+      <small>{gameUi(country.continent)}</small>
+      <span className={`battle-value ${showValue ? "is-shown" : ""}`} aria-live="polite">{gameUi(showValue ? <CountUp value={value} statId={statId} /> : "?")}</span>
     </div>
   );
 }
 
 export function StatBattleGame({ pool, byId, seed, difficulty, best, onRecord, onRestart, onExit }: TrialModeProps) {
+  useGameLanguage();
   const level = LEVELS[difficulty];
   const [battle, setBattle] = useState(() => createBattle(pool, seed, level));
   const [stage, setStage] = useState<Stage>("idle");
@@ -88,77 +92,78 @@ export function StatBattleGame({ pool, byId, seed, difficulty, best, onRecord, o
   const winner = battleWinner(battle);
 
   return (
-    <TrialShell title="Stat Battle" accent="amber" roundLabel={`Round ${battle.round} · first to ${STAT_BATTLE.winTarget}`} score={points} progress={Math.max(playerScore, opponentScore) / STAT_BATTLE.winTarget * 100} onExit={onExit} wide>
-      {!finished && (
+    <TrialShell title={gameUi("Stat Battle")} accent="amber" roundLabel={`Round ${battle.round} · first to ${STAT_BATTLE.winTarget}`} score={points} progress={Math.max(playerScore, opponentScore) / STAT_BATTLE.winTarget * 100} onExit={onExit} wide>
+      {gameUi(!finished && (
         <div className="battle-table">
-          <div className="battle-opponent" aria-label={`Opponent holds ${opponentCards} cards`}>
-            <div className="battle-player-tag"><span>Opponent · {level}</span><Pips score={opponentScore} side="opponent" /></div>
+          <div className="battle-opponent" aria-label={gameUi(`Opponent holds ${opponentCards} cards`)}>
+            <div className="battle-player-tag"><span>{gameUi("Opponent · ")}{gameUi(level)}</span><Pips score={opponentScore} side="opponent" /></div>
             <div className="battle-card-backs">{Array.from({ length: opponentCards }, (_, index) => <i key={index} style={{ "--fan": index - (opponentCards - 1) / 2 } as CSSProperties} />)}</div>
           </div>
 
           <div className="battle-category" key={battle.round} aria-live="polite">
-            <span className="battle-group">{category.group}</span>
-            <strong>{category.label}</strong>
-            <span className={`trial-direction is-${category.direction}`}>{category.direction === "highest" ? <ArrowUp size={15} aria-hidden /> : <ArrowDown size={15} aria-hidden />}{category.direction === "highest" ? "Higher wins" : "Lower wins"}</span>
-            <small>{STATS[category.statId].source}</small>
+            <span className="battle-group">{gameUi(category.group)}</span>
+            <strong>{gameUi(category.label)}</strong>
+            <span className={`trial-direction is-${category.direction}`}>{category.direction === "highest" ? <ArrowUp size={15} aria-hidden /> : <ArrowDown size={15} aria-hidden />}{gameUi(category.direction === "highest" ? "Higher wins" : "Lower wins")}</span>
+            <small>{gameUi(STATS[category.statId].source)}</small>
           </div>
 
           <div className="battle-arena">
             <div className="battle-slot is-player" ref={playerSlot}>
-              {outcome && stage !== "lift" ? <ArenaCard country={byId.get(outcome.player)!} side="player" statId={category.statId} value={outcome.playerValue} showValue={showValues} result={resultFor("player")} /> : <span className="battle-slot-empty">Your card</span>}
+              {outcome && stage !== "lift" ? <ArenaCard country={byId.get(outcome.player)!} side="player" statId={category.statId} value={outcome.playerValue} showValue={showValues} result={resultFor("player")} /> : <span className="battle-slot-empty">{gameUi("Your card")}</span>}
             </div>
-            <span className="battle-vs" aria-hidden><Swords size={18} />VS</span>
+            <span className="battle-vs" aria-hidden><Swords size={18} />{gameUi("VS")}</span>
             <div className="battle-slot is-opponent">
-              {showOpponent ? <ArenaCard country={byId.get(outcome.opponent)!} side="opponent" statId={category.statId} value={outcome.opponentValue} showValue={showValues} result={resultFor("opponent")} /> : <span className="battle-slot-empty">{outcome ? "Opponent is choosing…" : "Opponent"}</span>}
+              {showOpponent ? <ArenaCard country={byId.get(outcome.opponent)!} side="opponent" statId={category.statId} value={outcome.opponentValue} showValue={showValues} result={resultFor("opponent")} /> : <span className="battle-slot-empty">{gameUi(outcome ? "Opponent is choosing…" : "Opponent")}</span>}
             </div>
           </div>
           <p className={`battle-verdict ${settled && outcome ? `is-${outcome.winner}` : ""}`} role="status">
-            {settled && outcome ? outcome.winner === "tie" ? "Tie — nobody scores" : `${byId.get(outcome.winner === "player" ? outcome.player : outcome.opponent)!.name} wins${outcome.winner === "player" ? " — point to you" : ""}` : stage === "idle" ? "Choose a card. Its stats stay hidden until both cards are down." : " "}
+            {gameUi(settled && outcome ? outcome.winner === "tie" ? "Tie — nobody scores" : `${byId.get(outcome.winner === "player" ? outcome.player : outcome.opponent)!.name} wins${outcome.winner === "player" ? " — point to you" : ""}` : stage === "idle" ? "Choose a card. Its stats stay hidden until both cards are down." : " ")}
           </p>
 
           <div className="battle-you">
-            <div className="battle-player-tag"><span>You</span><Pips score={playerScore} side="player" /><span className="battle-deck"><Layers size={14} aria-hidden /> {battle.deck.length}</span>
-              <button type="button" className="battle-reroll" disabled={stage !== "idle" || battle.rerolls[0] >= MAX_BATTLE_REROLLS} onClick={() => setBattle((current) => rerollBattleHand(current, 0))} title="Replace every card in your hand"><RotateCcw size={14} aria-hidden /> Reroll all ({MAX_BATTLE_REROLLS - battle.rerolls[0]} left)</button>
+            <div className="battle-player-tag"><span>{gameUi("You")}</span><Pips score={playerScore} side="player" /><span className="battle-deck"><Layers size={14} aria-hidden /> {gameUi(battle.deck.length)}</span>
+              <button type="button" className="battle-reroll" disabled={stage !== "idle" || battle.rerolls[0] >= MAX_BATTLE_REROLLS} onClick={() => setBattle((current) => rerollBattleHand(current, 0))} title={gameUi("Replace every card in your hand")}><RotateCcw size={14} aria-hidden />{gameUi(" Reroll all (")}{gameUi(MAX_BATTLE_REROLLS - battle.rerolls[0])}{gameUi(" left)")}</button>
             </div>
-            <div className="battle-hand" role="group" aria-label="Your hand">
+            <div className="battle-hand" role="group" aria-label={gameUi("Your hand")}>
               {battle.player.map((id, index) => {
                 const country = byId.get(id)!;
                 return (
                   <button type="button" key={id} className={`battle-hand-card ${lifted === id ? "is-lifted" : ""}`} style={{ "--fan": index - (battle.player.length - 1) / 2, "--i": index } as CSSProperties}
-                    disabled={stage !== "idle"} onClick={(event) => play(id, event.currentTarget)} aria-label={`Play ${country.name}`}>
+                    disabled={stage !== "idle"} onClick={(event) => play(id, event.currentTarget)} aria-label={gameUi(`Play ${country.name}`)}>
                     <CountryFlag country={country} />
-                    <strong>{country.name}</strong>
-                    <small>{country.continent}</small>
+                    <strong>{gameUi(country.name)}</strong>
+                    <small>{gameUi(country.continent)}</small>
                   </button>
                 );
               })}
             </div>
           </div>
         </div>
-      )}
-      {finished && (
-        <GameOverPanel title={winner === "player" ? "Victory" : winner === "opponent" ? "Defeat" : "Draw"} subtitle={`${battle.playerScore} – ${battle.opponentScore} against the ${level} opponent`} score={points} best={best}
+      ))}
+      {gameUi(finished && (
+        <GameOverPanel title={gameUi(winner === "player" ? "Victory" : winner === "opponent" ? "Defeat" : "Draw")} subtitle={gameUi(`${battle.playerScore} – ${battle.opponentScore} against the ${level} opponent`)} score={points} best={best}
           stats={[{ label: "Rounds won", value: battle.playerScore }, { label: "Rounds lost", value: battle.opponentScore }, { label: "Ties", value: battle.history.filter((item) => item.winner === "tie").length }]} onRestart={onRestart} onExit={onExit}>
           <ol className="battle-history">
             {battle.history.map((item) => {
               const mine = byId.get(item.player)!, theirs = byId.get(item.opponent)!, itemCategory = battleCategoryById(item.categoryId);
               return (
                 <li key={item.round} className={`is-${item.winner}`}>
-                  <span className="battle-history-category">{itemCategory.label} {itemCategory.direction === "highest" ? "↑" : "↓"}</span>
-                  <span><CountryFlag country={mine} />{mine.name} <b>{formatCountryStat(itemCategory.statId, item.playerValue)}</b></span>
-                  <span className="battle-history-vs">vs</span>
-                  <span><CountryFlag country={theirs} />{theirs.name} <b>{formatCountryStat(itemCategory.statId, item.opponentValue)}</b></span>
-                  <em>{item.winner === "tie" ? "Tie" : item.winner === "player" ? "Won" : "Lost"}</em>
+                  <span className="battle-history-category">{gameUi(itemCategory.label)} {gameUi(itemCategory.direction === "highest" ? "↑" : "↓")}</span>
+                  <span><CountryFlag country={mine} />{gameUi(mine.name)} <b>{gameUi(formatCountryStat(itemCategory.statId, item.playerValue))}</b></span>
+                  <span className="battle-history-vs">{gameUi("vs")}</span>
+                  <span><CountryFlag country={theirs} />{gameUi(theirs.name)} <b>{gameUi(formatCountryStat(itemCategory.statId, item.opponentValue))}</b></span>
+                  <em>{gameUi(item.winner === "tie" ? "Tie" : item.winner === "player" ? "Won" : "Lost")}</em>
                 </li>
               );
             })}
           </ol>
         </GameOverPanel>
-      )}
+      ))}
     </TrialShell>
   );
 }
 
 export function Pips({ score, side }: { score: number; side: "player" | "opponent" }) {
-  return <span className={`battle-pips is-${side}`} aria-label={`${score} of ${STAT_BATTLE.winTarget}`}>{Array.from({ length: STAT_BATTLE.winTarget }, (_, index) => <i key={index} className={index < score ? "is-won" : ""} />)}<b>{score}</b></span>;
+  useGameLanguage();
+  return <span className={`battle-pips is-${side}`} aria-label={gameUi(`${score} of ${STAT_BATTLE.winTarget}`)}>{Array.from({ length: STAT_BATTLE.winTarget }, (_, index) => <i key={index} className={index < score ? "is-won" : ""} />)}<b>{gameUi(score)}</b></span>;
 }

@@ -1,3 +1,4 @@
+import { gameUi, useGameLanguage } from "../../i18n/gameUi.ts";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { BookOpen } from "lucide-react";
@@ -117,19 +118,19 @@ export function VariantArtwork({
       <span
         className={`absolute left-4 top-4 font-black tracking-widest opacity-45 ${compact ? "text-[10px]" : "text-sm"}`}
       >
-        {art.left}
+        {gameUi(art.left)}
       </span>
       <span
         className={`absolute right-4 top-4 font-black tracking-widest opacity-45 ${compact ? "text-[10px]" : "text-sm"}`}
       >
-        {art.right}
+        {gameUi(art.right)}
       </span>
       <span
         className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[52%] select-none leading-none drop-shadow-[0_18px_28px_rgba(0,0,0,.65)] transition duration-500 group-hover:scale-105 ${
           compact ? "text-[74px]" : "text-[145px]"
         }`}
       >
-        {art.main}
+        {gameUi(art.main)}
       </span>
       <span
         className={`absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap font-black uppercase tracking-[0.22em] opacity-45 ${compact ? "text-[7px]" : "text-[9px]"}`}
@@ -152,6 +153,7 @@ export function VariantCardFrame({
   accent?: VariantCard["accent"];
   labelledBy?: string;
 }) {
+  useGameLanguage();
   return (
     <article
       aria-labelledby={labelledBy}
@@ -159,10 +161,10 @@ export function VariantCardFrame({
     >
       <div className="grid min-h-[180px] grid-cols-[34%_minmax(0,1fr)]">
         <div className="relative overflow-hidden border-r border-white/[0.08]">
-          {artwork}
+          {gameUi(artwork)}
         </div>
         <div className="relative flex min-w-0 flex-col p-3.5">
-          {children}
+          {gameUi(children)}
         </div>
       </div>
     </article>
@@ -190,13 +192,13 @@ export function VariantDesignCard({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="text-[8px] font-black uppercase tracking-[0.18em] text-zinc-600">
-            {String(number).padStart(2, "0")} ·{" "}
-            {translate(variant.subtitle)}
+            {gameUi(String(number).padStart(2, "0"))} ·{gameUi(" ")}
+            {gameUi(translate(variant.subtitle))}
           </p>
           <h3 className="mt-1.5 font-serif text-[20px] leading-tight text-white">
-            {translate(variant.title)}
+            {gameUi(translate(variant.title))}
           </h3>
-          {variant.author && <p className="mt-1 text-[10px] text-zinc-400">{translate("by")} <UserLink username={variant.author} className="font-semibold text-zinc-200">{variant.author}</UserLink></p>}
+          {variant.author && <p className="mt-1 text-[10px] text-zinc-400">{gameUi(translate("by"))} <UserLink username={variant.author} className="font-semibold text-zinc-200">{gameUi(variant.author)}</UserLink></p>}
         </div>
 
         <span
@@ -206,12 +208,12 @@ export function VariantDesignCard({
               : "border-amber-400/30 bg-amber-400/[0.08] text-amber-300"
           }`}
         >
-          {badge ?? translate(variant.configurable === false ? "Not configurable" : variant.customId ? "Configurable" : variant.available ? "Available" : "Coming soon")}
+          {gameUi(badge ?? translate(variant.configurable === false ? "Not configurable" : variant.customId ? "Configurable" : variant.available ? "Available" : "Coming soon"))}
         </span>
       </div>
 
       <p className="mt-2 line-clamp-2 font-serif text-[12px] leading-[1.45rem] text-zinc-400">
-        {translate(variant.description)}
+        {gameUi(translate(variant.description))}
       </p>
 
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
@@ -220,15 +222,15 @@ export function VariantDesignCard({
             key={tag}
             className={`rounded-full border px-2 py-0.5 text-[8px] font-semibold ${accentClasses[variant.accent]}`}
           >
-            {translate(tag)}
+            {gameUi(translate(tag))}
           </span>
         ))}
-        {showConfigure && variant.configureRoute && <Link to={variant.configureRoute} className="ml-auto text-[9px] font-semibold text-zinc-300 underline underline-offset-2">{translate("Customize")}</Link>}
-        {variant.rulesRoute && <Link to={variant.rulesRoute} className="ml-auto inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/[.05] px-2 py-1 text-[9px] font-semibold text-zinc-300 transition hover:bg-white/10 hover:text-white"><BookOpen size={12} />{translate("Rules")}</Link>}
+        {showConfigure && variant.configureRoute && <Link to={variant.configureRoute} className="ml-auto text-[9px] font-semibold text-zinc-300 underline underline-offset-2">{gameUi(translate("Customize"))}</Link>}
+        {variant.rulesRoute && <Link to={variant.rulesRoute} className="ml-auto inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/[.05] px-2 py-1 text-[9px] font-semibold text-zinc-300 transition hover:bg-white/10 hover:text-white"><BookOpen size={12} />{gameUi(translate("Rules"))}</Link>}
       </div>
 
       <div className="mt-auto pt-3">
-        {actions}
+        {gameUi(actions)}
       </div>
     </VariantCardFrame>
   );
