@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -111,6 +112,7 @@ function RankedGoGame({ code }: { code?: string }) {
         const ms = clock.inByoYomi ? clock.periodMs : clock.mainMs;
         return <div key={player.user_id}><RankedPlayerBar name={player.username} avatarId={player.avatar_id} color={player.color} active={g.status === "playing" && state.currentPlayer === player.color} me={player.user_id === user.id} rating={change?.after ?? profile?.rating ?? player.rating} ratingChange={change} leaderboardRank={position} topRank={isTop10(position) ? position! : undefined} showTier t={ui} /><div role="timer" aria-label={`${player.color} clock`} className={`mt-2 rounded-xl border px-4 py-2 text-right font-mono text-3xl font-bold tabular-nums ${ms < 10000 ? "border-red-400 bg-red-950 text-red-200" : "border-white/10 text-zinc-300"}`}>{formatClock(ms)}<span className="mt-1 block font-sans text-xs font-medium">{clock.inByoYomi ? "Byo-yomi" : "Main time"} · {clock.periodsRemaining} × {g.byo_yomi_ms / 1000}s{clock.inByoYomi ? " remaining" : " byo-yomi"}</span></div></div>;
       })}</div>
+      {g.status === "finished" && <GameXpReward amount={100} />}
       <div className="go-controls"><button disabled={disabled} onClick={() => void action("move", { type: "pass" })}>Pass</button><button disabled={busy || g.status !== "playing"} onClick={() => setConfirmResign(true)}>Resign</button></div>
       {confirmResign && <div className="mt-3 rounded-xl border border-red-400/25 bg-red-400/10 p-4"><p>Resigning counts as a ranked loss.</p><div className="go-controls"><button disabled={busy} onClick={() => void action("resign")}>Confirm resignation</button><button onClick={() => setConfirmResign(false)}>Keep playing</button></div></div>}
       {state.moveHistory.length > 0 && <div className="go-result-actions"><button className="go-action" onClick={() => saveResult(false)}>Save Game</button>{reviewAvailable && <button className="go-action" onClick={() => saveResult(true)}>Analyze Game</button>}</div>}

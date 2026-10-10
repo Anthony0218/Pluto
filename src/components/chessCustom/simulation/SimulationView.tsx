@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { CameraCommand } from "@/components/chess3d/Board3DScene";
@@ -293,6 +294,7 @@ export default function SimulationView({ context }: { context: "create" | "play"
                   </span>
                 )}
               </div>
+
               {recentMessages.map((message, index) => (
                 <div key={`${message.ply}-${index}`} className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs backdrop-blur-xl ${message.kind === "warning" ? "border-amber-400/30 bg-amber-500/15 text-amber-100" : "border-sky-400/25 bg-sky-500/10 text-sky-100"}`}>
                   <EventsIcon size={13} />
@@ -384,6 +386,7 @@ export default function SimulationView({ context }: { context: "create" | "play"
 
         {/* Right: secondary panels — move history and the selected piece. */}
         <aside className="z-20 flex min-h-0 flex-col gap-3 p-3 lg:max-h-[calc(var(--app-height)-72px)] lg:pl-0">
+          {state.result && <GameXpReward />}
           <section aria-label={ui("Move history")} className="rounded-2xl border border-white/[0.09] bg-black/55 shadow-[0_20px_50px_rgba(0,0,0,.45)] backdrop-blur-xl">
             <button type="button" aria-expanded={historyOpen} onClick={() => setHistoryOpen((value) => !value)} className="flex w-full items-center justify-between gap-2 px-3 py-2.5">
               <span className="text-[11px] font-black uppercase tracking-[0.18em] text-amber-200/90">{ui("Move History")}</span>

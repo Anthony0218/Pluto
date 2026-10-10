@@ -46,11 +46,11 @@ function RootContent() {
     {!integratedNavigation && <PublicHeader compact={!fullHeader} />}
     <div ref={viewport} className="app-viewport">
       {passwordRecovery && location.pathname !== "/reset-password" ? <Navigate to="/reset-password" replace /> : <Outlet key={pageGeneration} />}
+      <ChessLayoutControls />
     </div>
     <RoomFriends />
     <GlobalFriendsSidebar key={location.pathname} />
     <GameInviteDelivery />
-    <ChessLayoutControls />
     <IncomingNotificationToasts />
   </div>;
 }

@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -1389,6 +1390,7 @@ export default function Battlefield({
                   <div className="mt-2 text-3xl font-black capitalize text-[#ffe4a3]">
                     {game.winner} Victory
                   </div>
+                  <GameXpReward />
                 </div>
               </div>
             )}

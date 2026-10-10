@@ -1804,7 +1804,7 @@ export default function ThreeLivesChessBoard({
            ================================================= */}
 
         <main
-          className="
+          className="chess-game-grid
             grid
             gap-6
             xl:grid-cols-[300px_minmax(0,1fr)_300px]
@@ -1820,7 +1820,7 @@ export default function ThreeLivesChessBoard({
                   GAME CONTROLS
                  =========================================== */}
 
-              <section
+              <section data-chess-controls
                 className="
                   rounded-3xl
                   border

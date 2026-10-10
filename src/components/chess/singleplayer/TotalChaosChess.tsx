@@ -636,7 +636,7 @@ export default function TotalChaosChess({
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel
+              <Panel gameControls
                 title={t("Game Controls")}
                 subtitle={t("Players and actions")}
               >
@@ -862,17 +862,19 @@ export default function TotalChaosChess({
 }
 
 function Panel({
+  gameControls = false,
   title,
   subtitle,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   subtitle: string;
   children: ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       <h2 className="font-black text-zinc-100">{ui(title)}</h2>
 
       <p className="mt-1 mb-4 text-xs text-zinc-600">{ui(subtitle)}</p>

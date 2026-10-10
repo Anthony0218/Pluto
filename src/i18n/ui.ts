@@ -1,3 +1,4 @@
+import gameXp from "./gameXpTranslations.json";
 import finalTools from './finalToolsTranslations.json';
 import lifeTools from './lifeToolsTranslations.json';
 import footballReference from './footballReferenceTranslations.json';
@@ -36,6 +37,7 @@ for (const [index, language] of learningLanguages.entries()) {
   Object.assign(lookup[language], (chessCustom as Table)[language]);
   Object.assign(lookup[language], (janmann as Table)[language]);
   Object.assign(lookup[language], (social as Table)[language]);
+  Object.assign(lookup[language], (gameXp as Table)[language]);
   Object.assign(lookup[language], (information as Table)[language]);
   Object.assign(lookup[language], (learningTools as Table)[language]);
   Object.assign(lookup[language], Object.fromEntries(learnContent.map(row => [normalized(row[0]), row[index + 1]])));

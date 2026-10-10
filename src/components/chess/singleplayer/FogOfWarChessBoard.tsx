@@ -688,7 +688,7 @@ export default function FogOfWarChessBoard({
         <main className="grid gap-6 chess-game-grid xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel>
+              <Panel gameControls>
                 <PanelTitle
                   title={t("Game Controls")}
                   subtitle={t("Private hotseat")}
@@ -941,10 +941,10 @@ function historyPieceSymbol(color: "w" | "b", type: string) {
     ? (whiteSymbols[type] ?? "")
     : (blackSymbols[type] ?? "");
 }
-function Panel({ children }: { children: ReactNode }) {
+function Panel({ gameControls = false, children }: { gameControls?: boolean; children: ReactNode }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20">
       {children}
     </section>
   );

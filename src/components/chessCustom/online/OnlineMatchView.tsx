@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import { recordCreatedGameInviteCode } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
@@ -174,7 +175,7 @@ export default function OnlineMatchView() {
         {view === "3d" ? <Suspense fallback={<p className="p-6 text-zinc-400">Loading board…</p>}><Board3D className="absolute! inset-0" width={state!.board.width} height={state!.board.height} cells={state!.board.cells} layers={state!.board.layers} pieces={pieces3D} marks={marks} selectedPieceId={selectedId} theme={theme} skin="classic" cameraView={cameraView} effects={effects} trail={match.history.length ? [match.history.at(-1)!.move.from, match.history.at(-1)!.move.to] : null} visibleLayers={stackView === "isolated" ? [activeLayer] : undefined} focusLayer={stackView === "focus" ? activeLayer : undefined} enablePan onCellClick={(x, y, z = 0) => { setActiveLayer(z); click({ x, y, z }); }} /></Suspense> : <div className="mx-auto flex h-full max-w-[700px] items-center p-4"><Board2D board={shownLayer} variant={variant} theme={theme} pieces={pieces2D} highlights={layerMarks} label="Online Chess Custom board" onCellClick={(coord) => click({ ...coord, z: activeLayer })} /></div>}
         {promotion && <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/75"><div className="rounded-2xl border border-amber-300/30 bg-zinc-950 p-5"><p className="mb-3 text-sm text-white">Choose promotion</p><div className="flex gap-2">{promotion.map((move) => <Button key={move.promotion} onClick={() => void send(move)}>{variant.pieces.find((piece) => piece.id === move.promotion)?.name ?? move.promotion}</Button>)}</div><Button className="mt-3" size="sm" onClick={() => setPromotion(null)}>Cancel</Button></div></div>}
       </div>
-      <Panel title="Move history"><ol className="max-h-[65vh] space-y-1 overflow-y-auto text-xs text-zinc-300">{match.history.map((entry, index) => <li key={index} className="rounded-lg bg-white/[0.04] px-2 py-1.5"><span className="mr-2 text-zinc-600">{index + 1}.</span>{entry.notation}</li>)}</ol></Panel>
+      <div className="space-y-3">{state?.result && <GameXpReward />}<Panel title="Move history"><ol className="max-h-[65vh] space-y-1 overflow-y-auto text-xs text-zinc-300">{match.history.map((entry, index) => <li key={index} className="rounded-lg bg-white/[0.04] px-2 py-1.5"><span className="mr-2 text-zinc-600">{index + 1}.</span>{entry.notation}</li>)}</ol></Panel></div>
     </div>
   </div>;
 }

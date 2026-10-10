@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { useEffect, useRef, useState } from "react";
 
 type Platform = {
@@ -267,6 +268,7 @@ export default function DoodleJumpTowerGame({
 
   return (
     <div className="rounded-3xl border-2 border-[#84613b] bg-[#241a18] p-5 shadow-2xl">
+      {(reachedTop) && <GameXpReward />}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-black text-[#ffe6aa]">

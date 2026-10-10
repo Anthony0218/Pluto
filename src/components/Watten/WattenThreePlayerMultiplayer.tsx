@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import { useAppLanguage } from "@/i18n/languageStore";
 import {
@@ -2437,6 +2438,7 @@ export function WattenThreePlayerMultiplayerGame() {
                   <h2 className="mt-2 text-4xl font-black">
                     {matchWinnerNames}
                   </h2>
+                  <GameXpReward amount={100} />
                   <p className="mt-3 text-zinc-500">
                     {room.target_score} {t("Points")}
                   </p>

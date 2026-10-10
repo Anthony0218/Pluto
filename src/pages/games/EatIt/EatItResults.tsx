@@ -1,4 +1,5 @@
 import ObjectCollection from './ObjectCollection';
+import GameXpReward from '@/components/games/GameXpReward';
 import { matchDuration } from '../../../games/eat-it/config';
 import { reviewSettings, reviewStats, timelineLabel } from '../../../games/eat-it/review';
 import { Link } from 'react-router-dom';
@@ -22,6 +23,7 @@ export default function EatItResults({ result, localId, online, isHost, busy, er
       <span className="eat-eyebrow">{ui(result.result === 'tie' ? 'Tie' : result.winnerId === localId ? 'Winner' : 'Game Over')}</span>
       <h1>{result.result === 'tie' ? ui('Tie') : winner?.name ?? ui('Game Over')}</h1><p>{ui(result.hell ? 'Hell Sudden Death' : result.time >= matchDuration(result) ? 'Size ranking' : 'Last player standing')}</p>
       <div className="eat-result-stats">{stats.map(([label, value]) => <div key={label}><span>{ui(label)}</span><strong>{value}</strong></div>)}</div>
+      <GameXpReward amount={online ? 100 : 0} />
       <ObjectCollection counts={local.stats?.collected ?? {}} />
       <div className="eat-finish-order">{[...result.players].sort((a, b) => (a.placement ?? 9) - (b.placement ?? 9)).map(p =>
         <div key={p.id} className={p.id === localId ? 'is-you' : ''}><span>#{p.placement ?? '—'}</span><i style={{ background: p.color }} /><b>{p.name}</b><span>{Math.round(p.mass).toLocaleString()}</span></div>,

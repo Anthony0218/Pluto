@@ -1,3 +1,4 @@
+import useChessBoardFit from "@/components/chess/useChessBoardFit";
 import { recordCreatedGameInvite } from "@/components/social/GameInviteDelivery";
 import { useInviteAutoCreate } from "@/hooks/useInviteAutoCreate";
 import { useInviteAutoJoin } from "@/hooks/useInviteAutoJoin";
@@ -841,7 +842,7 @@ export function FourPlayerMultiplayerGame() {
         <main className="grid gap-5 chess-game-grid four-player-game-grid xl:grid-cols-[260px_minmax(0,1fr)]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel title={ui("Game Controls")} subtitle={ui("Online actions")}>
+              <Panel gameControls title={ui("Game Controls")} subtitle={ui("Online actions")}>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -1126,8 +1127,9 @@ function FourPlayerBoard({
     return { ...slot, color };
   });
 
+  const frameRef = useChessBoardFit();
   return (
-    <div className="w-full rounded-[28px] border p-2 shadow-[0_30px_80px_rgba(0,0,0,0.55)] sm:p-3" style={{ borderColor: colors.frame, backgroundColor: colors.frame }}>
+    <div ref={frameRef} className="chess-board-frame w-full rounded-[28px] border p-2 shadow-[0_30px_80px_rgba(0,0,0,0.55)] sm:p-3" style={{ borderColor: colors.frame, backgroundColor: colors.frame }}>
       <div className="rounded-[18px] border border-black/40 p-1 shadow-inner sm:p-1.5" style={{ backgroundColor: colors.frame }}>
         <div
           className="grid aspect-square w-full overflow-hidden rounded-xl bg-zinc-950 shadow-[0_12px_30px_rgba(0,0,0,0.45)]"
@@ -1219,17 +1221,19 @@ function FourPlayerBoard({
 }
 
 function Panel({
+  gameControls = false,
   title,
   subtitle,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   subtitle?: string;
   children: ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/15 backdrop-blur-md">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/15 backdrop-blur-md">
       <div className="mb-4">
         <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
         {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}

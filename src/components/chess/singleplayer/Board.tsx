@@ -1,3 +1,4 @@
+import useChessBoardFit from "@/components/chess/useChessBoardFit";
 import { ui, useUiLanguage } from "@/i18n/ui";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { Shield, X } from "lucide-react";
@@ -402,26 +403,7 @@ export default function Board({
       ? "0 38px 90px rgba(0,0,0,0.62)"
       : "0 30px 80px rgba(0,0,0,0.55)";
 
-  const frameRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const frame = frameRef.current;
-    const grid = frame?.closest<HTMLElement>(".chess-game-grid");
-    if (!frame || !grid || frame.closest("aside")) return;
-    const fit = () => {
-      if (window.innerWidth < 1280) { grid.style.removeProperty("--board-size"); return; }
-      const available = Math.max(240, window.innerHeight - frame.getBoundingClientRect().top - 24);
-      grid.style.setProperty("--board-size", `${Math.min(1100, available)}px`);
-    };
-    fit();
-    const observer = new ResizeObserver(fit);
-    observer.observe(grid);
-    if (frame.parentElement) observer.observe(frame.parentElement);
-    const center = frame.closest(".chess-game-grid > section, .chess-game-grid > main");
-    center?.querySelectorAll("section, header, [role=status]").forEach((element) => observer.observe(element));
-    void document.fonts.ready.then(fit);
-    window.addEventListener("resize", fit);
-    return () => { observer.disconnect(); window.removeEventListener("resize", fit); };
-  }, []);
+  const frameRef = useChessBoardFit();
 
   const reviewPoint = (square: Square) => {
     const file = square.charCodeAt(0) - 97;
@@ -551,7 +533,7 @@ export default function Board({
      * No 3D perspective is needed now. This is a flat, tabletop
      * rotation around the center of the board.
      */
-    <div ref={frameRef} className="w-full" style={{ containerType: "inline-size" }}>
+    <div ref={frameRef} className="chess-board-frame w-full" style={{ containerType: "inline-size" }}>
       {/*
        * OUTER WOODEN FRAME
        */}

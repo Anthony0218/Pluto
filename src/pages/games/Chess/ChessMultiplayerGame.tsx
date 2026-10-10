@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import PlayerBar from "@/components/ranked/RankedPlayerBar";
 import { playChessSound, type ChessSoundEvent } from "@/games/chess/audio/chessAudio";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
@@ -2853,71 +2854,74 @@ export default function ChessMultiplayerGame() {
                 </div>
               )}
 
-              <ChessMatchStatus
-                event={multiplayerMatchStatus.event}
-                message={multiplayerMatchStatus.message}
-                detail={multiplayerMatchStatus.detail}
-                label={ui("Match status")}
-                className="mb-2"
-                effects={[
-                  {
-                    id: "room",
-                    label: t("Room"),
-                    value: room.code,
-                    tone: "blue",
-                  },
-                  ...(room.match_kind !== "ranked" && myRematchReady && !opponentRematchReady
-                    ? [
-                        {
-                          id: "rematch-waiting",
-                          label: t("Waiting for opponent..."),
-                          tone: "amber" as const,
-                        },
-                      ]
-                    : room.match_kind !== "ranked" && opponentRematchReady && !myRematchReady
+              <div className={gameState.status === "finished" ? "chess-status-row" : undefined}>
+                <ChessMatchStatus
+                  event={multiplayerMatchStatus.event}
+                  message={multiplayerMatchStatus.message}
+                  detail={multiplayerMatchStatus.detail}
+                  label={ui(gameState.status === "finished" ? "Game over" : "Match status")}
+                  className="mb-2"
+                  effects={[
+                    {
+                      id: "room",
+                      label: t("Room"),
+                      value: room.code,
+                      tone: "blue",
+                    },
+                    ...(room.match_kind !== "ranked" && myRematchReady && !opponentRematchReady
                       ? [
                           {
-                            id: "rematch-offer",
-                            label: t("Opponent wants a rematch."),
-                            tone: "emerald" as const,
+                            id: "rematch-waiting",
+                            label: t("Waiting for opponent..."),
+                            tone: "amber" as const,
                           },
                         ]
-                      : []),
-                ]}
-                actions={
-                  gameReviewAvailable && !historyPreview ? (
-                    <>
-                      <button
-                        type="button"
-                        disabled={reviewMoves.length === 0}
-                        onClick={() => {
-                          setHistoryPreviewPly(null);
-                          setReviewOpen(true);
-                        }}
-                        className="rounded-lg border border-amber-300/25 bg-amber-300/[0.10] px-3 py-2 text-[10px] font-black text-amber-100 transition hover:bg-amber-300/[0.16] disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        {t("Open Game Review")}
-                      </button>
+                      : room.match_kind !== "ranked" && opponentRematchReady && !myRematchReady
+                        ? [
+                            {
+                              id: "rematch-offer",
+                              label: t("Opponent wants a rematch."),
+                              tone: "emerald" as const,
+                            },
+                          ]
+                        : []),
+                  ]}
+                  actions={
+                    gameReviewAvailable && !historyPreview ? (
+                      <>
+                        <button
+                          type="button"
+                          disabled={reviewMoves.length === 0}
+                          onClick={() => {
+                            setHistoryPreviewPly(null);
+                            setReviewOpen(true);
+                          }}
+                          className="rounded-lg border border-amber-300/25 bg-amber-300/[0.10] px-3 py-2 text-[10px] font-black text-amber-100 transition hover:bg-amber-300/[0.16] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {t("Open Game Review")}
+                        </button>
 
-                      {room.match_kind !== "ranked" && <button
-                        type="button"
-                        disabled={myRematchReady || actionLoading === "rematch"}
-                        onClick={requestRematch}
-                        className="rounded-lg border border-emerald-300/20 bg-emerald-300/[0.08] px-3 py-2 text-[10px] font-black text-emerald-100 transition hover:bg-emerald-300/[0.14] disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        {myRematchReady ? t("Rematch requested") : t("Rematch")}
-                      </button>}
+                        {room.match_kind !== "ranked" && <button
+                          type="button"
+                          disabled={myRematchReady || actionLoading === "rematch"}
+                          onClick={requestRematch}
+                          className="rounded-lg border border-emerald-300/20 bg-emerald-300/[0.08] px-3 py-2 text-[10px] font-black text-emerald-100 transition hover:bg-emerald-300/[0.14] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {myRematchReady ? t("Rematch requested") : t("Rematch")}
+                        </button>}
 
-                      <Link
-                        to={lobbyPath}
-                        className="rounded-lg border border-white/10 bg-white/[0.045] px-3 py-2 text-[10px] font-black text-zinc-300 transition hover:bg-white/[0.08] hover:text-white"
-                      >
-                        {t("Back to lobby")}
-                      </Link>
-                    </>
-                  ) : undefined
-                }
-              />
+                        <Link
+                          to={lobbyPath}
+                          className="rounded-lg border border-white/10 bg-white/[0.045] px-3 py-2 text-[10px] font-black text-zinc-300 transition hover:bg-white/[0.08] hover:text-white"
+                        >
+                          {t("Back to lobby")}
+                        </Link>
+                      </>
+                    ) : undefined
+                  }
+                />
+              {gameState.status === "finished" && <GameXpReward amount={100} />}
+            </div>
 
               {/* =====================================================
                 BOARD
@@ -3054,7 +3058,7 @@ export default function ChessMultiplayerGame() {
 
               {/* GAME CONTROLS */}
 
-              <section className="rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] p-4 shadow-2xl shadow-black/35 backdrop-blur-xl">
+              <section data-chess-controls className="rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] p-4 shadow-2xl shadow-black/35 backdrop-blur-xl">
                 <div className="mb-5">
                   <div className="flex items-center gap-2">
                     <div

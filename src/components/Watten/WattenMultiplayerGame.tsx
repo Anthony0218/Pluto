@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import InviteFriendButton from "@/components/chess/InviteFriendButton";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -3130,6 +3131,7 @@ export default function WattenMultiplayerGame() {
                     <h2 className="mt-4 text-4xl font-black text-white">
                       {teamName(game.match_winner)}
                     </h2>
+                    <GameXpReward amount={100} />
 
                     <p className="mt-3 text-zinc-400">
                       {game.match_winner === "team-a" ? teamAScore : teamBScore}{" "}

@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { useState } from "react";
 import type {
   Battle,
@@ -472,6 +473,7 @@ export function BattleOutcome({
             ? `${report.winner} holds the field`
             : "Both armies leave the field"}
         </h2>
+        <GameXpReward />
         <div className="ed-battle-summary">
           {report.sides.map((s) => (
             <article key={s.army}>

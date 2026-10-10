@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { useEffect, useState } from "react";
 import { COLORS } from "../../../../games/party/config.ts";
 import type { MinigameDefinition } from "../../../../games/party/minigames/types.ts";
@@ -46,6 +47,7 @@ export default function MinigameResults({
     <div className="mg-results">
       <span className="pp-eyebrow">RESULTS</span>
       <h2>{definition.name}</h2>
+      <GameXpReward />
       <ol className="mg-podium">
         {results.map((r, i) => {
           const p = match.players.find((player) => player.id === r.playerId)!;

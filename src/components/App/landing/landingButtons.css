@@ -19,6 +19,20 @@
 .lp-btn--ghost { border-color: #c7d2fe55; background: #0b1030aa; color: #e0e7ff; backdrop-filter: blur(8px); }
 .lp-btn--ghost:hover { border-color: #c7d2fe; background: #141b45bb; }
 
+/* An icon on its own, as tall as the buttons beside it. */
+.lp-btn--icon { width: 52px; padding: 0; }
+.lp-btn--icon:hover > svg { transform: none; }
+/* The hero's row holds up to three buttons; on narrow screens they slim down so the row stays on one line. */
+@media (max-width: 480px) {
+  .lp-actions.lp-actions--hero { gap: 8px 10px; }
+  .lp-actions--hero .lp-btn--lg { min-height: 46px; padding: 10px 16px; font-size: 14px; }
+  .lp-actions--hero .lp-btn--icon { width: 46px; padding: 0; }
+}
+@media (max-width: 380px) {
+  .lp-actions--hero .lp-btn--lg { gap: 8px; padding-inline: 14px; }
+  .lp-actions--hero .lp-btn--icon { width: 44px; padding: 0; }
+}
+
 /* A quiet second action beside the primary one. */
 .lp-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 4px; color: var(--section-accent, #c7d2fe); font-size: 14px; font-weight: 700; text-decoration: none; }
 .lp-link > svg { transition: transform .2s cubic-bezier(.22, 1, .36, 1); }

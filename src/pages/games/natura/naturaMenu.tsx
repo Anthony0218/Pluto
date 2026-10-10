@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { lazy, Suspense, useEffect, useState, type CSSProperties } from 'react';
 import { ArrowLeft, ArrowUpRight, BookOpen, Compass, Globe, Leaf, Play, Repeat2, Users } from 'lucide-react';
 import { SCENARIOS, type ScenarioId, type GameResult, type PlayMode, type BotDifficulty } from '../../../games/natura/naturaData';
@@ -43,6 +44,7 @@ export default function NaturaMenu() {
       <header className="nm-masthead"><div className="nm-wordmark"><Leaf aria-hidden="true"/><span>Natura</span><small>FIELD STATION</small></div><span className="nm-collection-label">PLAY · OBSERVE · DISCOVER</span></header>
       {stage === 'results' ? <section className="nm-results" style={{ '--habitat-accent': study.accent } as CSSProperties}>
         <p className="nm-eyebrow">STUDY COMPLETE / ROUND {round}</p><HabitatIcon id={selected}/><h1>{result?.winner === null ? 'An even match.' : format === 'solo' ? result?.winner === 0 ? 'You win.' : result?.opponent==='ocean' ? 'The ocean wins.' : 'Your rival wins.' : `Player ${(result?.winner ?? 0) + 1} wins.`}</h1><h2>{scenario.title}</h2><p>{result?.detail}</p>
+        <GameXpReward />
         <div className="nm-assessment"><b>{scores[0]} : {scores[1]}</b><span>Match record<br/>{result?.winner === null ? 'A draw adds no points.' : 'Three match points awarded to the winner.'}</span></div>
         {result?.review&&<div className="nj-run-review"><h3>Your field observations</h3><div>{result.review.facts.map(f=><span key={f}>{f}</span>)}</div><p>{result.review.tip}</p>{format==='solo'&&awardMedal(result)&&<strong className={`nj-medal nj-${awardMedal(result)}`}>{awardMedal(result)} medal earned</strong>}{format==='solo'&&result.context&&<p>Best progress for this course and difficulty: {journal.runs[recordKey({scenario:selected,...result.context})]?.bestProgress.toFixed(1)??'0'} · Best win: {journal.runs[recordKey({scenario:selected,...result.context})]?.bestTime?.toFixed(1)??'—'}s</p>}</div>}<DidYouKnow scenario={selected}/><div className="nm-result-actions"><button className="nf-primary" onClick={() => { setRound(r => r + 1); setStage('game'); }}><Play size={17}/> Play again</button><button className="nf-button" onClick={() => { setRound(r => r + 1); setStage('menu'); }}><ArrowLeft size={17}/> Choose habitat</button><button className="nf-button" onClick={() => setQuiz(selected)}><BookOpen size={17}/> Field quiz</button></div>
       </section> : <>

@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { HeaderDescription } from "@/components/App/PublicHeader";
@@ -35,6 +36,7 @@ export default function ShogiGamePage({ mode }: { mode: "ai" | "hotseat" }) {
     <div className="grid min-h-0 flex-1 content-center gap-3 overflow-hidden lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-5"><section className="flex min-h-0 items-center justify-center"><ShogiBoard state={state} onMove={play} disabled={disabled} /></section>
       <aside className="space-y-2 overflow-hidden rounded-2xl border border-white/10 bg-white/[.035] p-3 lg:self-center lg:space-y-4 lg:rounded-3xl lg:p-5"><div className="hidden lg:block"><p className="text-xs font-black uppercase tracking-[.2em] text-amber-400">{ui("Standard Japanese rules")}</p><h1 className="mt-2 font-serif text-3xl">{ui("Shogi")} · {ui(mode === "ai" ? "Vs Bot" : "Hotseat")}</h1></div>
         <div role="status" className="rounded-2xl bg-black/25 p-4"><p className="font-bold">{resultLabel ?? (thinking ? ui("White is thinking…") : ui(state.currentPlayer === "white" ? "White to move" : "Black to move"))}</p><p className="mt-1 text-xs text-zinc-500">{state.check ? `${ui("Check")} · ` : ""}{ui("Move")} {state.moveHistory.length + 1}</p></div>
+        {state.status === "finished" && <GameXpReward />}
         <button type="button" disabled={disabled} onClick={() => play({ type: "resign" })} className="min-h-11 w-full rounded-xl border border-red-400/20 text-red-300 hover:bg-red-400/10 disabled:opacity-40">{ui("Resign")}</button>
         <details className="hidden text-sm text-zinc-400 lg:block"><summary className="cursor-pointer font-bold text-zinc-300">{ui("Moves")} ({state.moveHistory.length})</summary><ol className="mt-2 max-h-64 overflow-auto pl-5">{state.moveHistory.map((entry, index) => <li key={index}>{ui(entry.player === "white" ? "White" : "Black")}: {entry.move.type === "move" ? (entry.move.from + 1) + "→" + (entry.move.to + 1) + (entry.move.promote ? "+" : "") : entry.move.type === "drop" ? entry.move.piece + "*" + (entry.move.to + 1) : ui("Resign")}</li>)}</ol></details>
       </aside>

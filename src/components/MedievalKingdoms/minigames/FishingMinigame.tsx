@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import {
   useEffect,
   useRef,
@@ -133,6 +134,7 @@ export default function FishingMinigame({
 
   return (
     <div className="rounded-3xl border-2 border-[#795e44] bg-[#2e241e] p-6 shadow-2xl">
+      {(fish >= 3) && <GameXpReward />}
       <div className="mx-auto max-w-2xl text-center">
         <div className="text-6xl">
           🎣

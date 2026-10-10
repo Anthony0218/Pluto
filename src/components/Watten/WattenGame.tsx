@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { useAppLanguage } from "@/i18n/languageStore";
 import { useCallback, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -2646,6 +2647,7 @@ export default function WattenGame() {
                     </p>
 
                     <h2 className="mt-2 text-3xl font-black">{winner}</h2>
+                    <GameXpReward />
 
                     <p className="mt-3 text-zinc-400">{roundValue} Punkte</p>
 
@@ -3069,6 +3071,7 @@ export default function WattenGame() {
               <h2 className="mt-2 text-4xl font-black text-white">
                 {gameWinner}
               </h2>
+              <GameXpReward />
 
               <p className="mt-3 text-zinc-400">
                 {targetScore} Punkte erreicht
@@ -4251,6 +4254,7 @@ export default function WattenGame() {
                   <h2 className="mt-2 text-4xl font-bold text-white">
                     {winner}
                   </h2>
+                  <GameXpReward />
 
                   <button
                     type="button"

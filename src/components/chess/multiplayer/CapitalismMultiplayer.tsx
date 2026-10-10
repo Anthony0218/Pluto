@@ -281,15 +281,17 @@ function MissionCard({
 }
 
 function Panel({
+  gameControls = false,
   title,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   children: React.ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20">
       <h2 className="font-black text-zinc-100">{ui(title)}</h2>
       <div className="mt-4">{children}</div>
     </section>
@@ -1481,7 +1483,7 @@ export function CapitalismMultiplayerGame() {
               ))}
             </Panel>
 
-            <Panel title={ui("Game Actions")}>
+            <Panel gameControls title={ui("Game Actions")}>
               <div className="grid gap-2">
                 <button
                   type="button"

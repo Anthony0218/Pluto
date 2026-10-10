@@ -347,17 +347,19 @@ function findCheckedKing(game: Chess): Square | null {
 
 
 function Panel({
+  gameControls = false,
   title,
   subtitle,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   subtitle?: string;
   children: ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       <div className="mb-4">
         <h2 className="text-sm font-black text-zinc-100">{ui(title)}</h2>
         {subtitle && <p className="mt-1 text-xs text-zinc-500">{ui(subtitle)}</p>}
@@ -1436,7 +1438,7 @@ export function TectonicMultiplayerGame() {
                 </div>
               </Panel>
 
-              <Panel title={ui("Game Controls")} subtitle={ui("Players, game and actions")}>
+              <Panel gameControls title={ui("Game Controls")} subtitle={ui("Players, game and actions")}>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"

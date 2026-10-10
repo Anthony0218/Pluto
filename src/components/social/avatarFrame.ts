@@ -1,11 +1,12 @@
 /* Activity level and the avatar border it earns. The level is the one shown on
    the profile: 100 XP per completed game, 50 XP per completed puzzle, 1,000 XP
-   per level. get_public_profile computes the same number for other players. */
+   per level. Local classic chess adds 100 XP, or 50 with Chess Coach.
+   get_public_profile computes the same number for other players. */
 
 export const XP_PER_LEVEL = 1000;
 
-export const activityXp = (gamesPlayed: number, puzzles: number | null) =>
-  Math.max(0, gamesPlayed) * 100 + Math.max(0, puzzles ?? 0) * 50;
+export const activityXp = (gamesPlayed: number, puzzles: number | null, localChessXp = 0) =>
+  Math.max(0, gamesPlayed) * 100 + Math.max(0, puzzles ?? 0) * 50 + Math.max(0, localChessXp);
 
 export const activityLevel = (xp: number) => Math.floor(Math.max(0, xp) / XP_PER_LEVEL) + 1;
 

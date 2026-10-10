@@ -1,3 +1,4 @@
+import useChessBoardFit from "@/components/chess/useChessBoardFit";
 import VisibleGameResult from "@/components/chess/VisibleGameResult";
 import ChessPageHeader from "@/components/chess/ChessPageHeader";
 import ChessMoveHistoryList from "../ChessMoveHistoryList";
@@ -434,7 +435,7 @@ export default function FourPlayerChess({
         <main className="grid gap-5 chess-game-grid four-player-game-grid xl:grid-cols-[260px_minmax(0,1fr)]">
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel
+              <Panel gameControls
                 title={t("Game Controls")}
                 subtitle={t("Local four-player game")}
               >
@@ -573,8 +574,9 @@ function FourPlayerBoard({
     return { ...slot, color };
   });
 
+  const frameRef = useChessBoardFit();
   return (
-    <div className="w-full rounded-[28px] border p-2 shadow-[0_30px_80px_rgba(0,0,0,0.55)] sm:p-3" style={{ borderColor: colors.frame, backgroundColor: colors.frame }}>
+    <div ref={frameRef} className="chess-board-frame w-full rounded-[28px] border p-2 shadow-[0_30px_80px_rgba(0,0,0,0.55)] sm:p-3" style={{ borderColor: colors.frame, backgroundColor: colors.frame }}>
       <div className="rounded-[18px] border border-black/40 p-1 shadow-inner sm:p-1.5" style={{ backgroundColor: colors.frame }}>
         <div
           className="grid aspect-square w-full overflow-hidden rounded-xl bg-zinc-950 shadow-[0_12px_30px_rgba(0,0,0,0.45)]"
@@ -665,17 +667,19 @@ function FourPlayerBoard({
 }
 
 function Panel({
+  gameControls = false,
   title,
   subtitle,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   subtitle: string;
   children: ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/5 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       <h2 className="font-black text-zinc-100">{ui(title)}</h2>
       <p className="mt-1 mb-4 text-xs text-zinc-600">{ui(subtitle)}</p>
       {children}

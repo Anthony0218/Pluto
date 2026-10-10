@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { useEffect, useMemo, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
@@ -72,6 +73,7 @@ export default function MoonvilleMinigames() {
   const { completeCampaign } = useCampaignProgress();
 
   const [activeGame, setActiveGame] = useState<MinigameId | null>(null);
+  const [lastCompleted, setLastCompleted] = useState<MinigameId | null>(null);
 
   const [completed, setCompleted] = useState<MinigameId[]>(() =>
     loadCompleted(),
@@ -95,6 +97,7 @@ export default function MoonvilleMinigames() {
   );
 
   function finishGame(id: MinigameId) {
+    setLastCompleted(id);
     setCompleted((current) =>
       current.includes(id) ? current : [...current, id],
     );
@@ -176,6 +179,7 @@ export default function MoonvilleMinigames() {
         </button>
       </div>
 
+      {lastCompleted && <div className="mb-5"><h2 className="font-bold">{GAMES.find(game => game.id === lastCompleted)?.name} complete</h2><GameXpReward /></div>}
       <div className="mb-5 rounded-2xl border border-[#89683e] bg-[#392719] p-4">
         <div className="flex items-center justify-between">
           <span className="text-sm font-black text-[#ffe1a0]">

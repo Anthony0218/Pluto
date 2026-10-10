@@ -1015,7 +1015,7 @@ export default function ChessHotPotatoBoard({
             <div className="space-y-4 xl:sticky xl:top-6">
               {/* GAME CONTROLS */}
 
-              <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+              <section data-chess-controls className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
                 <div className="mb-5">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.55)]" />

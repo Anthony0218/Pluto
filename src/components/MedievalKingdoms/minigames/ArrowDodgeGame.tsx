@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import {
   useEffect,
   useRef,
@@ -348,6 +349,7 @@ export default function ArrowDodgeGame({
 
   return (
     <div className="rounded-3xl border-2 border-[#785838] bg-[#302219] p-5 shadow-2xl">
+      {(lives <= 0 || timeLeft === 0) && <GameXpReward />}
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-black text-[#ffe7ae]">

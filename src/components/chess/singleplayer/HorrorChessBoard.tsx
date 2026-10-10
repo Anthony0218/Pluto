@@ -1110,12 +1110,12 @@ export default function HorrorChessBoard({
           </div>
         </section>
 
-        <main className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
+        <main className="chess-game-grid grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)_300px]">
           {/* LEFT */}
 
           <aside className="min-w-0">
             <div className="space-y-4 xl:sticky xl:top-6">
-              <Panel>
+              <Panel gameControls>
                 <PanelTitle
                   title={t("Game Controls")}
                   subtitle={t("Players and actions")}
@@ -1779,10 +1779,10 @@ function HorrorMessageChip({
   );
 }
 
-function Panel({ children }: { children: ReactNode }) {
+function Panel({ gameControls = false, children }: { gameControls?: boolean; children: ReactNode }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       {children}
     </section>
   );

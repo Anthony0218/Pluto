@@ -209,7 +209,7 @@ export default function AtlasMultiplayerPage() {
 
   if (room.status === "countdown" || room.status === "next_round") return <main className="atlas-page atlas-center"><AtlasFitContent><span className="atlas-eyebrow">{room.status === "countdown" ? "Match begins" : `Round ${room.roundIndex + 1}`}</span><h1>{countdown || "Go"}</h1><p>Every player receives the same server-generated round.</p>{room.ranked && room.status === "countdown" && !room.series?.results.length && <button type="button" className="atlas-room-leave" onClick={() => void act({ op: "cancel", code: room.code })}>Cancel before start</button>}</AtlasFitContent></main>;
   if (room.status === "finished") return <main className="atlas-page atlas-center atlas-random-results"><AtlasFitContent>
-    <AtlasResultHero eyebrow={`Final result · ${room.ranked ? "Ranked match" : room.series ? `Random modes · ${seriesLabel(room.series.order.length)}` : titleOf(room.mode)}`} title={!winningPlayer ? "Draw" : `${winningPlayer.name} wins${room.series && room.series.order.length > 1 ? " the series" : ""}`} />
+    <AtlasResultHero xp={room.players.length === 2 ? 100 : 0} eyebrow={`Final result · ${room.ranked ? "Ranked match" : room.series ? `Random modes · ${seriesLabel(room.series.order.length)}` : titleOf(room.mode)}`} title={!winningPlayer ? "Draw" : `${winningPlayer.name} wins${room.series && room.series.order.length > 1 ? " the series" : ""}`} />
     <p className="atlas-result-score">{room.scores[user.id] || 0} <small>{room.series ? "game wins" : unitFor(room.mode)}</small></p>
     <div className="atlas-result-actions">
       {!room.ranked && <button type="button" disabled={busy} onClick={() => void act({ op: "rematch", code: room.code })}>Replay</button>}

@@ -1379,7 +1379,7 @@ export default function DraftChessBoard({
                     </Panel>
                   )}
 
-                  <Panel>
+                  <Panel gameControls>
                     <PanelTitle
                       title={t("Game Controls")}
                       subtitle={t("Players and actions")}
@@ -1863,10 +1863,10 @@ function MoveHistory({
   );
 }
 
-function Panel({ children }: { children: ReactNode }) {
+function Panel({ gameControls = false, children }: { gameControls?: boolean; children: ReactNode }) {
   useUiLanguage();
   return (
-    <section className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
+    <section data-chess-controls={gameControls || undefined} className="rounded-3xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/20 backdrop-blur-md">
       {children}
     </section>
   );

@@ -15,6 +15,8 @@ import { liveCoachAnnotations } from "./boardAnnotations";
 import AutoBestMoveToggle from "./AutoBestMoveToggle";
 import { useAutoBestMove } from "./useAutoBestMove";
 import { useCoachBackfill } from "./useCoachBackfill";
+import { useClassicChessXp } from "./useClassicChessXp";
+import GameXpReward from "@/components/games/GameXpReward";
 
 import {
   playPieceSelectSound,
@@ -710,6 +712,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
    * is shown and Stockfish can grade moves / suggest best moves.
    */
   const [coachModeEnabled, setCoachModeEnabled] = useState(false);
+  const chessXp = useClassicChessXp({ finished: gameOver, eligible: !onlineGameId && game.history().length > 0, mode: "hotseat" });
   const [savedGamesOpen, setSavedGamesOpen] = useState(false);
 
   /*
@@ -719,6 +722,9 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
    * another game is loaded.
    */
   const coachGenerationRef = useRef(0);
+
+  /** The moves the coach last recommended and the position they are for, so playing one is graded by the search that picked it. */
+  const shownMovesRef = useRef<{ fen: string; moves: MoveSuggestion[] } | null>(null);
 
   /*
    * This component still contains the
@@ -928,6 +934,8 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
   }
 
   function toggleCoachMode() {
+    autoBestMove.reset();
+    if (!coachModeEnabled) chessXp.markCoachUsed();
     if (coachModeEnabled) {
       clearCoach();
     }
@@ -1126,7 +1134,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     const generation = coachGenerationRef.current;
 
     const review = await coachBackfill.queue(() =>
-      gradeMove(beforeFen, afterFen, playedUci, playedSan, analyzePosition),
+      gradeMove(beforeFen, afterFen, playedUci, playedSan, analyzePosition, undefined, () => (shownMovesRef.current?.fen === beforeFen ? shownMovesRef.current.moves : undefined)),
     );
 
     /*
@@ -1184,7 +1192,14 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
     setHighlightedSuggestionUci(null);
 
-    const result = await coachBackfill.queue(() => getBestSuggestions(fen, analyzePosition, 3));
+    const result = await coachBackfill.queue(async () => {
+      const moves = await getBestSuggestions(fen, analyzePosition, 3);
+
+      // Remembered inside the queued search, so a move made while it ran is still graded against it.
+      if (moves.length > 0) shownMovesRef.current = { fen, moves };
+
+      return moves;
+    });
 
     if (generation !== coachGenerationRef.current || game.fen() !== fen) {
       return;
@@ -1305,6 +1320,8 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
       fen: game.fen(),
 
       moves: game.history(),
+      xp_session_id: chessXp.sessionId,
+      coach_used: chessXp.coachUsed,
 
       white_check_counter: counters?.white ?? whiteCheckCounter,
 
@@ -1364,6 +1381,9 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
     if (!data) {
       return;
     }
+
+    chessXp.reset(coachModeEnabled || data.coach_used === true, data.xp_session_id ?? data.id);
+    autoBestMove.reset();
 
     clearCoach();
 
@@ -1505,6 +1525,8 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
      ======================================================= */
 
   function restartGame() {
+    chessXp.reset(coachModeEnabled);
+    autoBestMove.reset();
     clearCoach();
     setCoachGrades({});
 
@@ -2351,6 +2373,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                       </button>
 
                       <AutoBestMoveToggle enabled={autoBestMove.enabled} onToggle={autoBestMove.toggle} />
+                      <p className="mt-2 text-[11px] text-indigo-300">{ui("Chess Coach reduces this game’s XP by 50%.")}</p>
 
                       {/* SUGGESTIONS */}
 
@@ -2648,57 +2671,6 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
 
           <section className="order-1 min-w-0 xl:order-2">
             <div className="mx-auto w-full max-w-[820px] xl:flex xl:max-w-none xl:flex-col">
-              {/* GAME OVER STATUS */}
-
-              {gameOver && (
-                <div
-                  className="
-                    mb-3
-                    rounded-2xl
-                    border
-                    border-amber-500/20
-                    bg-amber-400/[0.07]
-                    px-4
-                    py-3
-                  "
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-amber-400">
-                        {t("Game Over")}
-                      </p>
-
-                      <p className="mt-1 font-black text-white">
-                        {gameOverReason}
-                      </p>
-                    </div>
-
-                    <span className="text-sm font-bold text-zinc-300">
-                      {winner === "draw" ? t("Draw") : winner === "white" ? t("White wins") : t("Black wins")}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setReviewOpen(true)}
-                      className="
-    rounded-xl
-    border
-    border-amber-400/20
-    bg-amber-400/10
-    px-4
-    py-2.5
-    text-sm
-    font-bold
-    text-amber-300
-    transition
-    hover:bg-amber-400/20
-  "
-                    >
-                      ♞ {t("Open Game Review")}
-                    </button>
-                  </div>
-                </div>
-              )}
-
               {/* PROMOTION */}
 
               {promotionSquare && promotionFrom && (
@@ -2767,25 +2739,29 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                 </div>
               )}
 
-              <ChessMatchStatus
-                event={hotseatMatchStatus.event}
-                message={hotseatMatchStatus.message}
-                detail={hotseatMatchStatus.detail}
-                label={ui("Match status")}
-                className="mb-2"
-                effects={
-                  hotseatFlipPending
-                    ? [
-                        {
-                          id: "turn-change",
-                          label: "Board",
-                          value: "Changing sides",
-                          tone: "amber",
-                        },
-                      ]
-                    : []
-                }
-              />
+              <div className={gameOver ? "chess-status-row" : undefined}>
+                <ChessMatchStatus
+                  event={hotseatMatchStatus.event}
+                  message={hotseatMatchStatus.message}
+                  detail={hotseatMatchStatus.detail}
+                  label={ui(gameOver ? "Game over" : "Match status")}
+                  className="mb-2"
+                  actions={gameOver ? <button type="button" onClick={() => setReviewOpen(true)} className="rounded-lg border border-amber-300/25 bg-amber-300/10 px-3 py-2 text-[10px] font-black text-amber-100">♞ {t("Open Game Review")}</button> : undefined}
+                  effects={
+                    hotseatFlipPending
+                      ? [
+                          {
+                            id: "turn-change",
+                            label: "Board",
+                            value: "Changing sides",
+                            tone: "amber",
+                          },
+                        ]
+                      : []
+                  }
+                />
+                {gameOver && <GameXpReward {...(onlineGameId ? { amount: 0 } : chessXp.reward)} />}
+              </div>
 
               {/* BOARD */}
 
@@ -2970,7 +2946,7 @@ export default function ChessBoard({ onlineGameId }: ChessBoardProps) {
                   GAME CONTROLS
                  =========================================== */}
 
-              <section className="rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] p-4 shadow-2xl shadow-black/35 backdrop-blur-xl">
+              <section data-chess-controls className="rounded-3xl border border-amber-400/15 bg-[linear-gradient(145deg,rgba(10,18,28,.97),rgba(5,10,17,.94))] p-4 shadow-2xl shadow-black/35 backdrop-blur-xl">
                 <div className="mb-5">
                   <div className="flex items-center gap-2">
                     <div

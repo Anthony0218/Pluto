@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
@@ -603,6 +604,7 @@ export default function SchafkopfTable({ view, onAction, busy = false, error, hi
       <section data-sk-score-dialog className={`sk-score-dialog sk-ledger-dialog sk-bavarian-ledger-book ${done ? "sk-bavarian-summary" : ""}`} role="dialog" aria-modal="true" aria-labelledby="sk-score-title" onMouseDown={event => event.stopPropagation()}>
         <div className="sk-bavarian-ledger-page">
         <header><div>{done && <span className="sk-summary-kicker">✦ Wirtshauszettel · Runde {view.round} ✦</span>}<h2 id="sk-score-title">{done ? "Spiel-Zusammenfassung" : "Spielstände"}</h2>{done && <small className="sk-summary-subtitle">Der Tisch ist abgerechnet – schau ma, was auf dem Zettel steht.</small>}</div><div className="sk-ledger-header-actions"><Toggle checked={ledgerInk === "pencil"} onChange={checked => setLedgerInk(checked ? "pencil" : "pen")}>{ledgerInk === "pencil" ? "Bleistift" : "Kugelschreiber"}</Toggle>{!done && <button className="sk-close-button" onClick={() => setScoreboardOpen(false)} aria-label="Spielstände schließen"><X size={20} /></button>}</div></header>
+        {done && <GameXpReward amount={onlineSession && view.phase === "finished" ? 100 : 0} />}
         {rulebook.showPoints && <div className="sk-team-scores" aria-label="Punktestand">{teamsKnown ? <><div><span>Spieler · {playingSeats.map(seat => view.names[seat]).join(" & ")}</span><strong>{teamEyes(playingSeats)} Punkte</strong></div><div><span>Gegenspieler · {opposingSeats.map(seat => view.names[seat]).join(" & ")}</span><strong>{teamEyes(opposingSeats)} Punkte</strong></div></> : view.names.map((name, seat) => <div key={seat}><span>{name}</span><strong>{view.points[seat]} Punkte</strong></div>)}</div>}
         {done && latestLedgerEntry?.price && <section className="sk-score-breakdown" aria-label="Berechnung des Spielwerts"><strong>Spielwert · Runde {latestLedgerEntry.round}</strong><span>{latestLedgerEntry.price}</span></section>}
         <div className={`sk-ledger-paged sk-ledger-ink-${ledgerInk}`}><div className="sk-ledger-scroll"><table className="sk-ledger"><thead><tr>{view.names.map((name, seat) => <th scope="col" key={seat}>{name}</th>)}</tr></thead><tbody>

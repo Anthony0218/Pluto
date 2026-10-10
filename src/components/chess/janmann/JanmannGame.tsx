@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { JANMANN, SPHERE_ASSEMBLY_DURATION_MS, EXTRACTION_RATE_M3, type DividendId, type PieceKind } from "@/games/chess/janmann/config";
@@ -143,6 +144,7 @@ export default function JanmannGame() {
         <section className="rounded-2xl border border-amber-100/20 bg-[#181c25] p-4">
           <p className="text-[10px] uppercase tracking-widest text-zinc-400">{ui("Local hotseat")} · {ui("Turn")} {state.ply + 1}</p>
           <h2 role="status" aria-live="polite" className="mt-2 font-serif text-xl text-amber-100">{status}</h2>
+          {state.result && <GameXpReward />}
           <div className="mt-4 grid grid-cols-2 gap-3">
             {(["white", "black"] as const).map((side) => <div key={side} className={`rounded-xl border p-3 ${state.turn === side ? "border-amber-200/40 bg-amber-100/5" : "border-white/10"}`}>
               <p className="text-xs text-zinc-400">{ui(side === "white" ? "White" : "Black")}</p>

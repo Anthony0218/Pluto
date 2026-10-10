@@ -13,11 +13,30 @@ import FriendAvatar from "../social/FriendAvatar";
 import { useTheme } from "../../context/ThemeContext";
 import NavigationDrawer from "./NavigationDrawer";
 import { pageBrand } from "./pageBrand";
-import { useLandingAnimations } from "./landing/motionPreference";
+import { useLandingAnimations, useLandingReducedMotion } from "./landing/motionPreference";
+import "./plutoLogo.css";
+
+/** Pluto with its heart-shaped glacier and Charon, its moon. Hovering the logo spins it, makes the heart beat and sends Charon around. */
+function PlutoMark() {
+  return <svg className="pluto-mark" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
+    <circle cx="15" cy="15" r="11" fill="#d9c3a5" />
+    <path d="M7 11q3-3 6-1 1 3-2 4-3 1-4-3ZM20 20q3-2 4 0-1 3-4 2Z" fill="#a78466" />
+    <path className="pluto-mark-heart" d="M15 12c-1.6-3-6-1.5-4.2 2 1 1.8 3 3.2 4.2 4.2 1.2-1 3.2-2.4 4.2-4.2 1.8-3.5-2.6-5-4.2-2Z" fill="#f6ebdc" />
+    <path d="M15 4a11 11 0 0 1 0 22 8 11 0 0 0 0-22Z" fill="#2b2147" opacity=".28" />
+    <g className="pluto-mark-charon"><circle cx="27" cy="15" r="2.4" fill="#9aa4c9" /></g>
+  </svg>;
+}
 
 export function PlutoHomeLink({ className = "" }: { className?: string }) {
   useUiLanguage();
-  return <Link to="/" className={`shrink-0 text-lg font-bold tracking-tight text-indigo-100 hover:text-white ${className}`}>{ui("Pluto")}</Link>;
+  const { pathname } = useLocation();
+  // The landing page's Animations switch also quiets the logo; elsewhere only the system setting applies.
+  const still = useLandingReducedMotion() && pathname === "/";
+  const name = ui("Pluto");
+  return <Link to="/" aria-label={name} data-still={still || undefined} className={`pluto-logo shrink-0 text-lg font-bold tracking-tight text-indigo-100 hover:text-white ${className}`}>
+    <PlutoMark />
+    <span aria-hidden="true">{Array.from(name).map((letter, index) => <span key={index} className="pluto-logo-letter" style={{ "--i": index } as CSSProperties}>{letter}</span>)}</span>
+  </Link>;
 }
 
 /** Renders page-specific controls in the shared header, just left of the language selector. */

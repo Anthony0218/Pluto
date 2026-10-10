@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import { useMemo, useState, type ReactNode } from "react";
 import { SUIT_NAMES, SUIT_SYMBOLS, isSuit } from "@/games/cards/cards/card";
 import { getAvailableActions } from "@/games/cards/engine/actions";
@@ -116,6 +117,7 @@ export default function GameTable({ def, state, viewerId, onAction, error, revea
 
       {state.result && (
         <div role="status" className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
+          <GameXpReward />
           <p className="font-bold">{state.result.draw && !state.result.winners.length ? "Draw" : `Winner${state.result.winners.length === 1 ? "" : "s"}: ${state.result.winners.map((id) => state.players.find((player) => player.id === id)?.name).join(", ") || "—"}`}</p>
           <p className="mt-1 text-emerald-200/80">{state.result.reason}</p>
         </div>

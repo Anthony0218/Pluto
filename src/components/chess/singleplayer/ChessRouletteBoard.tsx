@@ -430,17 +430,19 @@ const translations: Record<"de" | "bar" | "ko" | "ru", Record<string, string>> &
 
 
 function Panel({
+  gameControls = false,
   title,
   subtitle,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   subtitle?: string;
   children: ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section
+    <section data-chess-controls={gameControls || undefined}
       className="
         rounded-2xl
         border
@@ -1861,7 +1863,7 @@ export default function ChessRouletteBoard({
               space-y-4
             "
           >
-            <Panel title={t("Game Controls")}>
+            <Panel gameControls title={t("Game Controls")}>
               <div
                 className="
                   grid

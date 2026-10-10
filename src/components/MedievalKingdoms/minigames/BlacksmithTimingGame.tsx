@@ -1,3 +1,4 @@
+import GameXpReward from "@/components/games/GameXpReward";
 import {
   useEffect,
   useRef,
@@ -137,6 +138,7 @@ export default function BlacksmithTimingGame({
 
   return (
     <div className="rounded-3xl border-2 border-[#8b6334] bg-[#342215] p-6 shadow-2xl">
+      {(goodHits >= 5) && <GameXpReward />}
       <div className="mx-auto max-w-2xl text-center">
         <div className="text-6xl">
           ⚒️

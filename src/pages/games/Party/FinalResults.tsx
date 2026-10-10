@@ -4,6 +4,7 @@ import { COLORS } from "../../../games/party/config.ts";
 import type { PartyConnection } from "../../../games/party/network/usePartyConnection.ts";
 import type { Lobby, Match } from "../../../games/party/types.ts";
 import Portrait from "./PartyPortrait.tsx";
+import GameXpReward from "@/components/games/GameXpReward";
 
 // Board results retain their configured ranking; festival ties share places and victory.
 export default function FinalResults({
@@ -40,6 +41,7 @@ export default function FinalResults({
         {shared ? `${winnerNames} share first place with ${match.festivalScores?.[winners[0]] ?? 0} points each.` : winner ? festival ? `${winner.name} won the festival with ${match.festivalScores?.[winner.id] ?? 0} points.` : match.roundLimit ? `${winner.name} leads after ${match.roundLimit} rounds.` : `${winner.name} reached ${target} first.` : "The match has ended."} Thanks for making a little
         trouble.
       </p>
+      <GameXpReward />
       <ol className="pp-final-ranking">
         {ranking.map((p, i) => {
           const stats = match.stats?.[p.id],

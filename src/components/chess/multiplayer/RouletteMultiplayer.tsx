@@ -346,17 +346,19 @@ function cardSymbol(card: PortalPromotionCard, color: PortalSide) {
 
 
 function Panel({
+  gameControls = false,
   title,
   subtitle,
   children,
 }: {
+  gameControls?: boolean;
   title: string;
   subtitle?: string;
   children: ReactNode;
 }) {
   useUiLanguage();
   return (
-    <section className="rounded-2xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/15 backdrop-blur">
+    <section data-chess-controls={gameControls || undefined} className="rounded-2xl border border-white/10 bg-zinc-900/75 p-4 shadow-xl shadow-black/15 backdrop-blur">
       <div className="mb-3">
         <h2 className="text-sm font-black text-white">{ui(title)}</h2>
         {subtitle && (
@@ -1539,7 +1541,7 @@ export function RouletteMultiplayerGame() {
               </div>
             </Panel>
 
-            <Panel
+            <Panel gameControls
               title={ui("Game Controls")}
               subtitle={ui("Negotiated multiplayer actions")}
             >
